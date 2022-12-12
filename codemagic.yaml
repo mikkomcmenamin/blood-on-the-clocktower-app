@@ -37,14 +37,14 @@ workflows:
         name: Use system default keychain
         script: |
           keychain add-certificates
-      - &build_xcode_project
-        name: Build the Xcode project
-        script: |
-          /Applications/Unity/Hub/Editor/${UNITY_VERSION}/Unity.app/Contents/MacOS/Unity -batchmode -quit -logFile -projectPath ./BloodOnTheClocktower -executeMethod BuildScript.$BUILD_SCRIPT -nographics -buildTarget iOS
       - &setup_code_signing
         name: Set up code signing settings on Xcode project
         script: |
           xcode-project use-profiles
+      - &build_xcode_project
+        name: Build the Xcode project
+        script: |
+          /Applications/Unity/Hub/Editor/${UNITY_VERSION}/Unity.app/Contents/MacOS/Unity -batchmode -quit -logFile -projectPath ./BloodOnTheClocktower -executeMethod BuildScript.$BUILD_SCRIPT -nographics -buildTarget iOS
       - &build_ipa
         name: Build ipa for distribution
         script: |
