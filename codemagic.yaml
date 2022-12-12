@@ -10,11 +10,12 @@ workflows:
         - appstore_credentials # <-- (Includes APP_STORE_APP_ID, BUNDLE_ID, APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_PRIVATE_KEY )   
       vars:
         BUILD_SCRIPT: BuildIos
-      ios_signing: 
-        distribution_type: app_store
-        bundle_identifier: com.ranchcode.bloodontheclocktower
       cocoapods: default
     scripts:
+      - &set_up_keychain
+        name: Set up keychain
+        script: |
+          keychain initialize
       - &install_unity_ios
         name: Install Unity version
         script: |
@@ -25,6 +26,17 @@ workflows:
         name: Activate Unity License
         script: |
           /Applications/Unity/Hub/Editor/${UNITY_VERSION}/Unity.app/Contents/MacOS/Unity -batchmode -quit -logFile -serial ${UNITY_SERIAL?} -username ${UNITY_EMAIL?} -password ${UNITY_PASSWORD?}
+      - &fetch_signing_files
+        name: Fetch signing files
+        script: |
+          # You can allow creating resources if existing are not found with `--create` flag
+          app-store-connect fetch-signing-files "com.ranchcode.bloodontheclocktower" \
+          --type IOS_APP_STORE \
+          --create
+      - &add_certificates
+        name: Use system default keychain
+        script: |
+          keychain add-certificates
       - &build_xcode_project
         name: Build the Xcode project
         script: |
