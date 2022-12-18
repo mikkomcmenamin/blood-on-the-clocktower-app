@@ -137,6 +137,7 @@ body {
 }
 
 .clockhand {
+  pointer-events: none;
   width: 90%;
   height: 90%;
   position: absolute;
