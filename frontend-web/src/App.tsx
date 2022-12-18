@@ -6,10 +6,12 @@ import "./App.scss";
 import { createPlayer, Player } from "./model";
 import { useClickOutside } from "./hooks";
 
+const initialPlayers = Array.from({ length: 3 }, (_, i) =>
+  createPlayer(fakeNamesList[i])
+);
+
 function App() {
-  const [players, setPlayers] = useState<Player[]>(
-    Array.from({ length: 3 }, (_, i) => createPlayer(fakeNamesList[i]))
-  );
+  const [players, setPlayers] = useState<Player[]>(initialPlayers);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [newPlayerName, setNewPlayerName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
