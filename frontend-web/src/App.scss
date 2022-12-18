@@ -90,11 +90,29 @@ body {
   align-items: center;
   text-align: center;
   // shadow etc to make this look like a raised button
-  box-shadow: 0 0 2rem red;
+  box-shadow: 0 0 1rem #646cffaa;
   cursor: pointer;
 
   & > * {
     cursor: pointer;
+  }
+}
+
+// when the #player-circle has class .nomination,
+// any .player-content who doesn't have class '.in-nomination' should be dehighlighted
+#player-circle.activeNomination  {
+  & > .player > .player-content:not(.in-nomination) {
+    opacity: 0.5;
+    background: #888;
+    box-shadow: 0 0 1rem #888;
+  }
+
+  // .player-content with .nominator should have a very large blue box shadow, while .nominee should have red
+  & > .player > .player-content.nominator {
+    box-shadow: 0 0 4rem #646cffaa;
+  }
+  & > .player > .player-content.nominee {
+    box-shadow: 0 0 4rem #ff6464aa;
   }
 }
 

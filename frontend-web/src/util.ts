@@ -71,3 +71,6 @@ export const fakeNamesList = [
 let id = 0;
 
 export const nextId = () => id++;
+
+export const cat = (array: string[]) =>
+  array.reduce((acc, cur) => (!acc ? cur : `${acc} ${cur}`), "");

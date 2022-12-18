@@ -2,9 +2,15 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import bgVideo from "./assets/bgv.webm";
 import clockHandMinute from "./assets/clockhand.png";
 import clockHandHour from "./assets/clockhand-hour.png";
-import { fakeNamesList } from "./util";
+import { cat, fakeNamesList } from "./util";
 import "./App.scss";
-import { createPlayer, Player, Nomination } from "./model";
+import {
+  createPlayer,
+  Player,
+  Nomination,
+  isNominator,
+  isNominee,
+} from "./model";
 import { useClickOutside } from "./hooks";
 
 const initialPlayers = Array.from({ length: 3 }, (_, i) =>
@@ -160,7 +166,13 @@ function App() {
         </video>
         <div id="background-video-overlay"></div>
       </div>
-      <div id="player-circle" ref={playerCircleRef}>
+      <div
+        id="player-circle"
+        className={cat(
+          nomination.state === "active" ? ["activeNomination"] : []
+        )}
+        ref={playerCircleRef}
+      >
         <section
           style={{ visibility: showMinuteHand ? "visible" : "hidden" }}
           className="clockhand clockhand-minute"
@@ -179,7 +191,13 @@ function App() {
               onClick={() => {
                 handlePlayerClick(player);
               }}
-              className="player-content"
+              className={cat(
+                isNominator(player, nomination)
+                  ? ["player-content", "nominator", "in-nomination"]
+                  : isNominee(player, nomination)
+                  ? ["player-content", "nominee", "in-nomination"]
+                  : ["player-content"]
+              )}
             >
               <div className="name">{player.name}</div>
             </div>
