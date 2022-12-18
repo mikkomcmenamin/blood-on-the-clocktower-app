@@ -228,56 +228,7 @@ button {
   }
 }
 
-.modal {
-  position: fixed; /* Stay in place */
-  z-index: 1000; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
-.modal-content {
-  background-color: rgba(0,0,0,0.9);
-  margin: auto;
-  padding: 2rem;
-  border: 1px solid #888;
-  width: 90%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-
-  & > h2 {
-    font-size: 1.5rem;
-  }
-
-  & > form {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  & > .buttons {
-    display: flex;
-    justify-content: space-evenly;
-    margin-top: 1rem;
-  }
-
-  // make text input and buttons nicer looking (box shadows, border radiuses etc)
-  input, button {
-    border-radius: 0.5rem;
-    border: 1px solid #888;
-    padding: 0.5rem;
-    box-shadow: 0 0 0.5rem #888;
-  }
-}
 
 // on desktop, make the modal content only 50% and the modal takes into account the 2rem taken by the right side drawer
 @media (orientation: landscape) {

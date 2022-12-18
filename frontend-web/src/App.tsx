@@ -12,6 +12,7 @@ import {
   isNominee,
 } from "./model";
 import { useClickOutside } from "./hooks";
+import Modal from "./components/Modal";
 
 const initialPlayers = Array.from({ length: 3 }, (_, i) =>
   createPlayer(fakeNamesList[i])
@@ -63,15 +64,10 @@ function App() {
     }
   }, [nomination]);
 
-  const handleNewPlayerNameChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setNewPlayerName(e.target.value);
-
-  const handleAddPlayer = (e: any) => {
-    e.preventDefault();
-    setPlayers((players) => [...players, createPlayer(newPlayerName)]);
-    setNewPlayerName("");
-    setIsModalOpen(false);
-  };
+  const addPlayer = (name: string) => {
+      setPlayers((players) => [...players, createPlayer(name)]);
+      setIsModalOpen(false);
+  }
 
   // close the modal when clicking outside of it
   const modalRef = useRef<HTMLDivElement>(null);
@@ -84,14 +80,6 @@ function App() {
       setNomination({ state: "inactive" });
     }
   });
-
-  // autofocus the input field inside the modal when the modal becomes visible
-  const modalPlayerInputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (isModalOpen) {
-      modalPlayerInputRef.current?.focus();
-    }
-  }, [isModalOpen]);
 
   // handle keyboard shortcuts
   useEffect(() => {
@@ -230,26 +218,7 @@ function App() {
           <button onClick={() => setIsModalOpen(true)}>Menu option 4</button>
         </div>
       </nav>
-      {isModalOpen && (
-        <div className="modal">
-          <div ref={modalRef} className="modal-content">
-            <h2>Add a new player</h2>
-            <form id="add-player-form" onSubmit={handleAddPlayer}>
-              <input
-                ref={modalPlayerInputRef}
-                type="text"
-                value={newPlayerName}
-                onChange={handleNewPlayerNameChange}
-              />
-              <div className="buttons">
-                <button type="submit" onClick={handleAddPlayer}>
-                  Add
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {isModalOpen && <Modal isOpen={isModalOpen} addPlayer={addPlayer} modalRef={modalRef} />}
     </div>
   );
 }
