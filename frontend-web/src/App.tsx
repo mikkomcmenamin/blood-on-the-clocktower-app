@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import bgVideo from "./assets/bgv.webm";
 import clockHandMinute from "./assets/clockhand.png";
 import clockHandHour from "./assets/clockhand-hour.png";
-import { cat, fakeNamesList } from "./util";
+import { cat, classnames, fakeNamesList } from "./util";
 import "./App.scss";
 import {
   createPlayer,
@@ -150,6 +150,7 @@ function App() {
         ...nomination,
         state: "active",
         nominee: player,
+        voters: [],
       });
     }
   }
@@ -180,13 +181,12 @@ function App() {
                 onClick={() => {
                   handlePlayerClick(player);
                 }}
-                className={cat(
-                  isNominator(player, nomination)
-                    ? ["player-content", "nominator", "in-nomination"]
-                    : isNominee(player, nomination)
-                    ? ["player-content", "nominee", "in-nomination"]
-                    : ["player-content"]
-                )}
+                className={classnames({
+                  "player-content": true,
+                  nominator: isNominator(player, nomination),
+                  nominee: isNominee(player, nomination),
+                  shroud: "alive" in player && !player.alive,
+                })}
               >
                 <div className="name">{player.name}</div>
               </div>

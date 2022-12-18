@@ -74,3 +74,6 @@ export const nextId = () => id++;
 
 export const cat = (array: string[]) =>
   array.reduce((acc, cur) => (!acc ? cur : `${acc} ${cur}`), "");
+
+export const classnames = (classes: Record<string, boolean>) =>
+  cat(Object.entries(classes).map(([key, value]) => (value ? key : "")));

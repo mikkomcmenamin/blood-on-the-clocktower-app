@@ -122,6 +122,7 @@ button {
 
 .player-content {
   background: white;
+  border: 1px solid #646cffaa;
   border-radius: 50%;
   width: 6em; // relative to own font size to prevent layout issues
   height: 6em;
@@ -138,6 +139,27 @@ button {
 
   & > * {
     cursor: pointer;
+  }
+
+  &.shroud {
+    opacity: 0.9;
+    background: darken(white, 20%);
+    box-shadow: none;
+    border: none;
+  }
+
+  &.shroud::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100%;
+    height: 40%;
+    background-image: url('./assets/shroud.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transform: translate(-50%, 0);
   }
 }
 
