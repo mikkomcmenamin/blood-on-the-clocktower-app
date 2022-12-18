@@ -151,13 +151,8 @@ export const transitionFromActiveToFinished = (
 
 export const spendPlayerGhostVote = (
   game: GameInPhase<"day">,
-  player: ActiveStagePlayer
+  player: ActiveStagePlayer & { alive: false; ghostVote: true }
 ): GameInPhase<"day"> => {
-  if (player.alive) {
-    throw new Error(
-      `Invariant violation: cannot spend ghost vote of alive player ${player.name}`
-    );
-  }
   return {
     ...game,
     players: game.players.map((p) =>
@@ -174,14 +169,8 @@ export const spendPlayerGhostVote = (
 
 export const killPlayer = (
   game: Extract<Game, { stage: "active" }>,
-  player: ActiveStagePlayer
+  player: ActiveStagePlayer & { alive: true }
 ): Extract<Game, { stage: "active" }> => {
-  if (!player.alive) {
-    throw new Error(
-      `Invariant violation: cannot kill dead player ${player.name}`
-    );
-  }
-
   if (game.phase.phase === "night") {
     return {
       ...game,
