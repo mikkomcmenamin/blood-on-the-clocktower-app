@@ -40,6 +40,7 @@ button {
     justify-content: center;
     flex-direction: row;
     padding-top: 0;
+    gap: 0;
   }
 }
 
@@ -256,8 +257,11 @@ button {
   }
 }
 
-// on desktop, make the modal content only 50%
+// on desktop, make the modal content only 50% and the modal takes into account the 2rem taken by the right side drawer
 @media (orientation: landscape) {
+  .modal {
+    padding-right: 2rem;
+  }
   .modal-content {
     width: 50%;
   }
@@ -277,10 +281,6 @@ nav {
 
 }
 
-div#hamburger {
-  display: none;
-}
-
 #menu {
   display: flex;
   flex-direction: row;
@@ -298,23 +298,8 @@ div#hamburger {
   }
 }
 
-// On desktop devices, the hamburger should be visible and take up a vertical slice from the right side
-// #menu should only be visible when 'nav' or its children are focused
+// On desktop devices, hovering on the right edge of the screen should show the menu
 @media (orientation: landscape) {
-  div#hamburger {
-    display: block;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 5rem;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    pointer-events: auto;
-  }
-
   #menu {
     display: none;
   }

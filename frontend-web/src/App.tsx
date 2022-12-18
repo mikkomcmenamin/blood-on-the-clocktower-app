@@ -208,7 +208,6 @@ function App() {
       </section>
 
       <nav id="controls">
-        <div role="button" id="hamburger"></div>
         <div aria-roledescription="navigation" id="menu">
           <button
             onClick={() => {
