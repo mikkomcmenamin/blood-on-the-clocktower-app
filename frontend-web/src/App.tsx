@@ -183,6 +183,9 @@ function App() {
                 }}
                 className={classnames({
                   "player-content": true,
+                  "in-nomination":
+                    isNominator(player, nomination) ||
+                    isNominee(player, nomination),
                   nominator: isNominator(player, nomination),
                   nominee: isNominee(player, nomination),
                   shroud: "alive" in player && !player.alive,
