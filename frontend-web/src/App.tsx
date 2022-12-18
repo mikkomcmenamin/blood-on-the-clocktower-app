@@ -71,6 +71,14 @@ function App() {
   const modalRef = useRef<HTMLDivElement>(null);
   useClickOutside(modalRef, () => setIsModalOpen(false));
 
+  // cancel the current nomination when clicking outside of the player-circle
+  const playerCircleRef = useRef<HTMLDivElement>(null);
+  useClickOutside(playerCircleRef, () => {
+    if (nomination.state !== "inactive") {
+      setNomination({ state: "inactive" });
+    }
+  });
+
   // autofocus the input field inside the modal when the modal becomes visible
   const modalPlayerInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -152,7 +160,7 @@ function App() {
         </video>
         <div id="background-video-overlay"></div>
       </div>
-      <div id="player-circle">
+      <div id="player-circle" ref={playerCircleRef}>
         <section
           style={{ visibility: showMinuteHand ? "visible" : "hidden" }}
           className="clockhand clockhand-minute"
