@@ -2,8 +2,18 @@ import { nextId } from "./util";
 
 type Team = "good" | "evil";
 
+type OnTheBlock = {
+  playerId: number;
+  votes: number;
+};
+
 type Phase =
-  | { phase: "day"; nomination: Nomination; dayNumber: number }
+  | {
+      phase: "day";
+      nomination: Nomination;
+      dayNumber: number;
+      onTheBlock?: OnTheBlock;
+    }
   | {
       phase: "night";
       nightDeaths: number[] /* player IDs */;
@@ -30,6 +40,7 @@ export type Nomination =
       state: "active";
       nominator: Player;
       nominee: Player;
+      voters: number[] /* player IDs */;
     }
   | {
       state: "pending";
@@ -186,5 +197,60 @@ export const killPlayer = (
     players: game.players.map((p) =>
       p.id === player.id ? { ...p, alive: false, ghostVote: true } : p
     ),
+  };
+};
+
+export const executePlayerOnTheBlock = (
+  game: GameInPhase<"day">
+): Extract<Game, { stage: "active" }> => {
+  if (!game.phase.onTheBlock) {
+    throw new Error("No player on the block");
+  }
+
+  const executee = game.players[game.phase.onTheBlock.playerId];
+
+  if (!executee.alive) {
+    throw new Error("Player on the block is already dead");
+  }
+
+  return killPlayer(game, executee);
+};
+
+export const resolveNomination = (
+  game: GameInPhase<"day">
+): Extract<Game, { stage: "active" }> => {
+  if (game.phase.nomination.state !== "active") {
+    throw new Error("Nomination is not active");
+  }
+
+  if (game.phase.onTheBlock) {
+    const currentHighestVotes = game.phase.onTheBlock.votes;
+    // Not enough votes to put the player on the block
+    if (currentHighestVotes > game.phase.nomination.voters.length) {
+      return game;
+    }
+    // Tie, no player on the block
+    if (currentHighestVotes === game.phase.nomination.voters.length) {
+      return {
+        ...game,
+        phase: {
+          ...game.phase,
+          onTheBlock: undefined,
+        },
+      };
+    }
+  }
+
+  // New player on the block (no pun intended)
+  return {
+    ...game,
+    phase: {
+      ...game.phase,
+      nomination: { state: "inactive" },
+      onTheBlock: {
+        playerId: game.phase.nomination.nominee.id,
+        votes: game.phase.nomination.voters.length,
+      },
+    },
   };
 };
