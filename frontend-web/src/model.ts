@@ -148,3 +148,43 @@ export const transitionFromActiveToFinished = (
     winningTeam,
   };
 };
+
+export const spendPlayerGhostVote = (
+  game: GameInPhase<"day">,
+  player: Player
+): GameInPhase<"day"> => {
+  return {
+    ...game,
+    players: game.players.map((p) =>
+      p.id === player.id
+        ? {
+            ...p,
+            alive: false,
+            ghostVote: false,
+          }
+        : p
+    ),
+  };
+};
+
+export const killPlayer = (
+  game: Extract<Game, { stage: "active" }>,
+  player: Player
+): Extract<Game, { stage: "active" }> => {
+  if (game.phase.phase === "night") {
+    return {
+      ...game,
+      phase: {
+        ...game.phase,
+        nightDeaths: [...game.phase.nightDeaths, player.id],
+      },
+    };
+  }
+
+  return {
+    ...game,
+    players: game.players.map((p) =>
+      p.id === player.id ? { ...p, alive: false, ghostVote: true } : p
+    ),
+  };
+};
