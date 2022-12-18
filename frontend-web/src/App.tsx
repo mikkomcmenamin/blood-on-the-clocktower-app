@@ -1,9 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import bgVideo from "./assets/bgv.webm";
-import clockHand from "./assets/clockhand.png";
+import clockHandMinute from "./assets/clockhand.png";
+import clockHandHour from "./assets/clockhand-hour.png";
 import { fakeNamesList } from "./util";
 import "./App.scss";
-import { createPlayer, Player } from "./model";
+import { createPlayer, Player, Nomination } from "./model";
 import { useClickOutside } from "./hooks";
 
 const initialPlayers = Array.from({ length: 3 }, (_, i) =>
@@ -12,11 +13,13 @@ const initialPlayers = Array.from({ length: 3 }, (_, i) =>
 
 function App() {
   const [players, setPlayers] = useState<Player[]>(initialPlayers);
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [nomination, setNomination] = useState<Nomination>({
+    state: "inactive",
+  });
   const [newPlayerName, setNewPlayerName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const selectedPlayerId = selectedPlayer?.id ?? -1;
+  console.log({ players, nomination });
 
   useLayoutEffect(() => {
     // set the --num-players css variable defined on .App to be the number of players
@@ -24,19 +27,35 @@ function App() {
     document.body.style.setProperty("--num-players", players.length.toString());
   }, [players.length]);
 
-  useLayoutEffect(() => {
-    if (selectedPlayerId === -1) {
-      // unset the property
-      document.body.style.removeProperty("--selected-player-id");
+  // Handle setting the hour and minute hands of the clock to point at the nominating and nominated players respectively
+  useEffect(() => {
+    if (nomination.state === "inactive") {
+      document.body.style.setProperty("--nominator-id", "0");
+      document.body.style.setProperty("--nominee-id", "0");
       return;
     }
-    // set the --selected-player-id css variable defined on .App to be the id of the selected player
-    // this is used to calculate the rotation angle of the clock hand
-    document.body.style.setProperty(
-      "--selected-player-id",
-      selectedPlayerId.toString()
-    );
-  }, [selectedPlayerId]);
+
+    if (nomination.state === "pending") {
+      document.body.style.setProperty(
+        "--nominator-id",
+        nomination.nominator.id.toString()
+      );
+      document.body.style.setProperty("--nominee-id", "0");
+      return;
+    }
+
+    if (nomination.state === "active") {
+      document.body.style.setProperty(
+        "--nominator-id",
+        nomination.nominator.id.toString()
+      );
+      document.body.style.setProperty(
+        "--nominee-id",
+        nomination.nominee.id.toString()
+      );
+      return;
+    }
+  }, [nomination]);
 
   const handleNewPlayerNameChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setNewPlayerName(e.target.value);
@@ -71,8 +90,13 @@ function App() {
         }
       }
       // close the modal when pressing the "Escape" key
+      // if modal is not open, cancel the current nomination
       if (e.key === "Escape") {
+        e.preventDefault();
         setIsModalOpen(false);
+        if (!isModalOpen) {
+          setNomination({ state: "inactive" });
+        }
       }
     };
 
@@ -94,6 +118,32 @@ function App() {
     return () => document.removeEventListener("dblclick", handleDoubleClick);
   }, [isModalOpen]);
 
+  // when a player is clicked, start the nomination process
+  // 1. if Nomination is state "inactive", set it to "pending" and set the nominating player
+  // 2. if Nomination is state "pending", set it to "active" and set the nominated player
+  function handlePlayerClick(player: Player) {
+    if (
+      nomination.state === "inactive" ||
+      player.id === nomination.nominator.id ||
+      nomination.state === "active"
+    ) {
+      setNomination({
+        state: "pending",
+        nominator: player,
+      });
+    } else if (nomination.state === "pending") {
+      setNomination({
+        ...nomination,
+        state: "active",
+        nominee: player,
+      });
+    }
+  }
+
+  const showMinuteHand = nomination.state === "active";
+  const showHourHand =
+    nomination.state === "pending" || nomination.state === "active";
+
   return (
     <div className="App">
       <div id="background-video">
@@ -103,16 +153,23 @@ function App() {
         <div id="background-video-overlay"></div>
       </div>
       <div id="player-circle">
-        {selectedPlayerId !== -1 && (
-          <section className="clockhand">
-            <img src={clockHand} alt="clock hand" />
-          </section>
-        )}
+        <section
+          style={{ visibility: showMinuteHand ? "visible" : "hidden" }}
+          className="clockhand clockhand-minute"
+        >
+          <img src={clockHandMinute} alt="clock hand minute" />
+        </section>
+        <section
+          style={{ visibility: showHourHand ? "visible" : "hidden" }}
+          className="clockhand clockhand-hour"
+        >
+          <img src={clockHandHour} alt="clock hand hour" />
+        </section>
         {players.map((player) => (
           <div key={player.id} className="player">
             <div
               onClick={() => {
-                setSelectedPlayer(player);
+                handlePlayerClick(player);
               }}
               className="player-content"
             >
