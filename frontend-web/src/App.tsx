@@ -166,44 +166,68 @@ function App() {
         </video>
         <div id="background-video-overlay"></div>
       </div>
-      <div
-        id="player-circle"
-        className={cat(
-          nomination.state === "active" ? ["activeNomination"] : []
-        )}
-        ref={playerCircleRef}
-      >
-        <section
-          style={{ visibility: showMinuteHand ? "visible" : "hidden" }}
-          className="clockhand clockhand-minute"
+      <section id="play-area-container">
+        <div
+          id="player-circle"
+          className={cat(
+            nomination.state === "active" ? ["activeNomination"] : []
+          )}
+          ref={playerCircleRef}
         >
-          <img src={clockHandMinute} alt="clock hand minute" />
-        </section>
-        <section
-          style={{ visibility: showHourHand ? "visible" : "hidden" }}
-          className="clockhand clockhand-hour"
-        >
-          <img src={clockHandHour} alt="clock hand hour" />
-        </section>
-        {players.map((player) => (
-          <div key={player.id} className="player">
-            <div
-              onClick={() => {
-                handlePlayerClick(player);
-              }}
-              className={cat(
-                isNominator(player, nomination)
-                  ? ["player-content", "nominator", "in-nomination"]
-                  : isNominee(player, nomination)
-                  ? ["player-content", "nominee", "in-nomination"]
-                  : ["player-content"]
-              )}
-            >
-              <div className="name">{player.name}</div>
+          {players.map((player) => (
+            <div key={player.id} className="player">
+              <div
+                onClick={() => {
+                  handlePlayerClick(player);
+                }}
+                className={cat(
+                  isNominator(player, nomination)
+                    ? ["player-content", "nominator", "in-nomination"]
+                    : isNominee(player, nomination)
+                    ? ["player-content", "nominee", "in-nomination"]
+                    : ["player-content"]
+                )}
+              >
+                <div className="name">{player.name}</div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+          <section
+            style={{ visibility: showMinuteHand ? "visible" : "hidden" }}
+            className="clockhand clockhand-minute"
+          >
+            <img src={clockHandMinute} alt="clock hand minute" />
+          </section>
+          <section
+            style={{ visibility: showHourHand ? "visible" : "hidden" }}
+            className="clockhand clockhand-hour"
+          >
+            <img src={clockHandHour} alt="clock hand hour" />
+          </section>
+        </div>
+      </section>
+
+      <nav id="controls">
+        <div role="button" id="hamburger"></div>
+        <div aria-roledescription="navigation" id="menu">
+          <button
+            onClick={() => {
+              setIsModalOpen(true);
+            }}
+          >
+            Menu option 1
+          </button>
+          <button onClick={() => setIsModalOpen(true)}>Menu option 2</button>
+          <button
+            onClick={() => {
+              setIsModalOpen(true);
+            }}
+          >
+            Menu option 3
+          </button>
+          <button onClick={() => setIsModalOpen(true)}>Menu option 4</button>
+        </div>
+      </nav>
       {isModalOpen && (
         <div className="modal">
           <div ref={modalRef} className="modal-content">

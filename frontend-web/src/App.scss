@@ -1,11 +1,35 @@
 body {
   --nominator-id: 0;
   --nominee-id: 0;
+  font-size: 1.5vw;
 }
 
+button {
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+// Mobile first: define mobile layout first, then add media queries for larger screens
 .App {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 10vh;
+  align-items: center;
+  padding-top: 10vh;
 }
+
+// Desktop layout
+@media (min-width: 768px) {
+  .App {
+    justify-content: center;
+    flex-direction: row;
+    padding-top: 0;
+  }
+}
+
 
 // #background-video is a container that contains the background video <video> element and a div#background-video-overlay
 #background-video {
@@ -52,16 +76,20 @@ body {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+#play-area-container {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #player-circle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
   width: min(75vw, 75vh);
   height: min(75vw, 75vh);
   
   border-radius: 50%;
-  will-change: opacity;
   background-image: url('./assets/clockface.jpg');
   background-size: cover;
   // Raise it from the foreground as it if it was floating in the air
@@ -81,8 +109,8 @@ body {
 .player-content {
   background: white;
   border-radius: 50%;
-  width: min(11vw, 11vh);
-  height: min(11vw, 11vh);
+  width: 6em; // relative to own font size to prevent layout issues
+  height: 6em;
   color: black;
   display: flex;
   flex-direction: column;
@@ -146,7 +174,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
 
   // add a smooth transition to the rotation
   transition: transform 0.5s ease-in-out;
@@ -167,7 +194,7 @@ body {
 
 .modal {
   position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  z-index: 1000; /* Sit on top */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -210,3 +237,85 @@ body {
   }
 }
 
+nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: flex-end;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  box-shadow: 0 0 1rem black;
+  // should flex shrink as much as possible
+  flex-shrink: 0;
+
+}
+
+div#hamburger {
+  display: none;
+}
+
+#menu {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  pointer-events: none;
+
+  & > button {
+    // make it look like a material button with shadow and padding etc
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #888;
+    box-shadow: 0 0 0.5rem #888;
+  }
+}
+
+// On desktop devices, the hamburger should be visible and take up a vertical slice from the right side
+// #menu should only be visible when 'nav' or its children are focused
+@media (min-width: 768px) {
+  div#hamburger {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto;
+  }
+
+  #menu {
+    display: none;
+  }
+
+  nav {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 2rem;
+    padding: 0;
+    transition: width 0.5s ease-in-out, background 0.5s ease-in-out;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  nav:focus-within, nav:hover {
+    width: 10rem;
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 1rem black;
+
+    #menu {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
