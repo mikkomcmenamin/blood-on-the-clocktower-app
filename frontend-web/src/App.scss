@@ -89,6 +89,7 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
+  transition: scale 1s ease-in-out;
   // shadow etc to make this look like a raised button
   box-shadow: 0 0 1rem #646cffaa;
   cursor: pointer;
@@ -110,9 +111,13 @@ body {
   // .player-content with .nominator should have a very large blue box shadow, while .nominee should have red
   & > .player > .player-content.nominator {
     box-shadow: 0 0 4rem #646cffaa;
+    font-weight: 800;
+    scale: 1.2;
   }
   & > .player > .player-content.nominee {
     box-shadow: 0 0 4rem #ff6464aa;
+    font-weight: 800;
+    scale: 1.2;
   }
 }
 
