@@ -23,7 +23,6 @@ function App() {
   const [nomination, setNomination] = useState<Nomination>({
     state: "inactive",
   });
-  const [newPlayerName, setNewPlayerName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   console.log({ players, nomination });
