@@ -68,3 +68,7 @@ export const fakeNamesList = [
     "Taylor",
   ].sort(randomSort);
 
+  let id = 0;
+
+  export const nextId = () => id++;
+  

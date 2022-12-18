@@ -3,52 +3,22 @@ import bgVideo from "./assets/bgv.webm";
 import clockHand from "./assets/clockhand.png";
 import { fakeNamesList } from "./util";
 import "./App.scss";
-
-let id = 0;
-
-const nextId = () => id++;
-
-type Player = {
-  name: string;
-  id: number;
-};
-
-const createPlayer = (name: string): Player => ({
-  name,
-  id: nextId(),
-});
-
-function useClickOutside(
-  ref: React.RefObject<HTMLElement>,
-  callback: () => void
-) {
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        callback();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [ref, callback]);
-}
+import { createPlayer, Player } from "./model";
+import { useClickOutside } from "./hooks";
 
 function App() {
   const [players, setPlayers] = useState<Player[]>(
-    Array.from({ length: 0 }, (_, i) => createPlayer(fakeNamesList[i]))
+    Array.from({ length: 3 }, (_, i) => createPlayer(fakeNamesList[i]))
   );
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [newPlayerName, setNewPlayerName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log(players);
-
   const selectedPlayerId = selectedPlayer?.id ?? -1;
 
   useLayoutEffect(() => {
     // set the --num-players css variable defined on .App to be the number of players
+    // this is used to calculate the rotation angle per player
     document.body.style.setProperty("--num-players", players.length.toString());
   }, [players.length]);
 
@@ -59,6 +29,7 @@ function App() {
       return;
     }
     // set the --selected-player-id css variable defined on .App to be the id of the selected player
+    // this is used to calculate the rotation angle of the clock hand
     document.body.style.setProperty(
       "--selected-player-id",
       selectedPlayerId.toString()
@@ -75,12 +46,12 @@ function App() {
     setIsModalOpen(false);
   };
 
+  // close the modal when clicking outside of it
   const modalRef = useRef<HTMLDivElement>(null);
-  const modalPlayerInputRef = useRef<HTMLInputElement>(null);
-
   useClickOutside(modalRef, () => setIsModalOpen(false));
 
   // autofocus the input field inside the modal when the modal becomes visible
+  const modalPlayerInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (isModalOpen) {
       modalPlayerInputRef.current?.focus();
@@ -90,12 +61,14 @@ function App() {
   // handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // open the modal when pressing the "+" key
       if (e.key === "+") {
         if (!isModalOpen) {
           e.preventDefault();
           setIsModalOpen(true);
         }
       }
+      // close the modal when pressing the "Escape" key
       if (e.key === "Escape") {
         setIsModalOpen(false);
       }
