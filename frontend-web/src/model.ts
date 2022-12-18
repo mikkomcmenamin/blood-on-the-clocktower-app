@@ -94,7 +94,7 @@ export const transitionFromNightToDay = (
     phase: {
       phase: "day",
       nomination: { state: "inactive" },
-      dayNumber: game.phase.nightNumber + 1,
+      dayNumber: game.phase.nightNumber,
     },
     players: game.players.map((player) => {
       if (!player.alive) {
