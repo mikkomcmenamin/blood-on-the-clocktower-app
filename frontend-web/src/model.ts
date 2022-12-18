@@ -226,6 +226,40 @@ export const executePlayerOnTheBlock = (
   return killPlayer(game, executee);
 };
 
+export const canNominate = (
+  game: GameInPhase<"day">,
+  player: ActiveStagePlayer
+): boolean => {
+  if (game.phase.nomination.state !== "inactive") {
+    return false;
+  }
+
+  if (game.phase.nominationBookkeeping.hasNominated.includes(player.id)) {
+    return false;
+  }
+
+  if (!player.alive) {
+    return false;
+  }
+
+  return true;
+};
+
+export const canBeNominated = (
+  game: GameInPhase<"day">,
+  player: ActiveStagePlayer
+): boolean => {
+  if (game.phase.nomination.state !== "inactive") {
+    return false;
+  }
+
+  if (game.phase.nominationBookkeeping.hasBeenNominated.includes(player.id)) {
+    return false;
+  }
+
+  return true;
+};
+
 export const resolveNomination = (
   game: GameInPhase<"day">
 ): Extract<Game, { stage: "active" }> => {
