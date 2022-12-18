@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import bgVideo from "./assets/bgv.webm";
+
 import clockHandMinute from "./assets/clockhand.png";
 import clockHandHour from "./assets/clockhand-hour.png";
 import { cat, classnames, fakeNamesList } from "./util";
@@ -13,6 +13,7 @@ import {
 } from "./model";
 import { useClickOutside } from "./hooks";
 import Modal from "./components/Modal";
+import Background from "./components/Background";
 
 const initialPlayers = Array.from({ length: 3 }, (_, i) =>
   createPlayer(fakeNamesList[i])
@@ -148,12 +149,7 @@ function App() {
 
   return (
     <div className="App">
-      <div id="background-video">
-        <video autoPlay muted loop>
-          <source src={bgVideo} type="video/mp4" />
-        </video>
-        <div id="background-video-overlay"></div>
-      </div>
+      <Background />
       <section id="play-area-container">
         <div
           id="player-circle"
