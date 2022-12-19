@@ -18,7 +18,7 @@ export type SetupStagePlayer = z.infer<typeof setupStagePlayerSchema>;
 
 const characterStateSchema = z.object({
   character: z.string(),
-  team: z.union([z.literal("good"), z.literal("evil")]),
+  team: teamSchema,
 });
 
 export type CharacterState = z.infer<typeof characterStateSchema>;
