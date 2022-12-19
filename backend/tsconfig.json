@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "lib": ["ES2019", "DOM"],
+    "module": "commonjs",
+    "target": "ES2019",
+    "declaration": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@common/*": ["../common/*"]
+    }
+  },
+  "include": ["./src/*.ts"],
+  "exclude": ["node_modules"]
+}

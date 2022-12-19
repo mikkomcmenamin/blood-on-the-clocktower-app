@@ -1,13 +1,12 @@
 import React, { useRef } from "react";
-import { Nomination, Player } from "../../model";
-import { cat, classnames } from "../../util";
+import { Nomination, Player } from "@common/model";
+import { classnames } from "../../util";
 import PlayerIcon from "../Player/PlayerIcon";
 
 import clockHandMinute from "../../assets/clockhand.png";
 import clockHandHour from "../../assets/clockhand-hour.png";
 import { useClickOutside } from "../../hooks";
 import styles from "./GameBoard.module.scss";
-import { GameAction } from "../../gameLogic";
 
 type GameBoardProps = {
   players: Player[];

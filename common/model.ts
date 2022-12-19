@@ -1,4 +1,4 @@
-import { nextId } from "./util";
+import { nextId } from "../frontend-web/src/util";
 
 export type Team = "good" | "evil";
 

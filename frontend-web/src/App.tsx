@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import { fakeNamesList } from "./util";
 import "./App.scss";
-import { Player, createSetupStagePlayer, Nomination, Game } from "./model";
+import { createSetupStagePlayer, Game } from "@common/model";
 import {
   useClickOutside,
   useHandleNominationUIEffects,
@@ -10,7 +10,7 @@ import {
 import Modal from "./components/Modal";
 import Background from "./components/Background";
 import GameBoard from "./components/GameBoard/GameBoard";
-import { gameStateReducer } from "./gameLogic";
+import { gameStateReducer } from "@common/gameLogic";
 
 const initialPlayers = Array.from({ length: 3 }, (_, i) =>
   createSetupStagePlayer(fakeNamesList[i])

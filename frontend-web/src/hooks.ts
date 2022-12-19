@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect } from "react";
-import { Nomination, Player } from "./model";
+import { Nomination, Player } from "@common/model";
 
 export function useClickOutside(
   ref: React.RefObject<HTMLElement>,
