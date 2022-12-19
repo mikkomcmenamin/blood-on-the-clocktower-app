@@ -1,29 +1,30 @@
-import {useRef, useState, useEffect} from 'react';
-import './Modal.scss'
+import { useRef, useState, useEffect } from "react";
+import "./Modal.scss";
 
 type ModalProps = {
-  isOpen: boolean;
   addPlayer: (name: string) => void;
   modalRef: React.RefObject<HTMLDivElement>;
 };
 
-const Modal: React.FC<ModalProps> = ({isOpen, addPlayer, modalRef}) => {
+const Modal: React.FC<ModalProps> = ({ addPlayer, modalRef }) => {
   const playerInputRef = useRef<HTMLInputElement>(null);
-  const [newPlayerName, setNewPlayerName] = useState('');
+  const [newPlayerName, setNewPlayerName] = useState("");
 
   useEffect(() => {
-    if (isOpen) playerInputRef.current?.focus();
-  }, [isOpen]);
+    playerInputRef.current?.focus();
+  }, []);
 
-  const handleNewPlayerNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNewPlayerNameChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setNewPlayerName(e.target.value);
-  }
+  };
 
   const handleAddPlayer = (e: any) => {
     e.preventDefault();
     addPlayer(newPlayerName);
     setNewPlayerName("");
-  }
+  };
 
   return (
     <div className="modal">

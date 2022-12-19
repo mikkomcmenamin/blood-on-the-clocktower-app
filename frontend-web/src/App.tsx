@@ -65,9 +65,9 @@ function App() {
   }, [nomination]);
 
   const addPlayer = (name: string) => {
-      setPlayers((players) => [...players, createPlayer(name)]);
-      setIsModalOpen(false);
-  }
+    setPlayers((players) => [...players, createPlayer(name)]);
+    setIsModalOpen(false);
+  };
 
   // close the modal when clicking outside of it
   const modalRef = useRef<HTMLDivElement>(null);
@@ -213,7 +213,7 @@ function App() {
           <button onClick={() => setIsModalOpen(true)}>Menu option 4</button>
         </div>
       </nav>
-      {isModalOpen && <Modal isOpen={isModalOpen} addPlayer={addPlayer} modalRef={modalRef} />}
+      {isModalOpen && <Modal addPlayer={addPlayer} modalRef={modalRef} />}
     </div>
   );
 }
