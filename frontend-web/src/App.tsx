@@ -1,8 +1,8 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import clockHandMinute from "./assets/clockhand.png";
 import clockHandHour from "./assets/clockhand-hour.png";
-import { cat, classnames, fakeNamesList } from "./util";
+import { cat, fakeNamesList } from "./util";
 import "./App.scss";
 import { Player, createPlayer, Nomination } from "./model";
 import {
