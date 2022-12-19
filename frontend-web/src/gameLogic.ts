@@ -39,17 +39,11 @@ function gameStateSetupReducer(
 ) {
   switch (action.type) {
     case "addPlayer":
-      if (state.stage !== "setup") {
-        throw new Error("Cannot add player when game is not in setup");
-      }
       return {
         ...state,
         players: [...state.players, action.payload],
       };
     case "removePlayer":
-      if (state.stage !== "setup") {
-        throw new Error("Cannot remove player when game is not in setup");
-      }
       return {
         ...state,
         players: state.players.filter((p) => p.id !== action.payload),
