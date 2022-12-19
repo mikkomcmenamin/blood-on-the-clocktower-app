@@ -4,7 +4,7 @@
 
 // TODO: a lot
 
-import { ActiveStagePlayer, Game, SetupStagePlayer } from "./model";
+import { ActiveStagePlayer, Game, SetupStagePlayer, Team } from "./model";
 
 export type GameAction =
   | {
@@ -28,9 +28,35 @@ export type GameAction =
       payload: ActiveStagePlayer;
     }
   | {
-      type: "setVoters";
+      type: "resolveVote";
       stage: "active";
-      payload: ActiveStagePlayer["id"][];
+    }
+  | {
+      type: "addVote";
+      stage: "active";
+      payload: ActiveStagePlayer;
+    }
+  | {
+      type: "killPlayer";
+      stage: "active";
+      payload: ActiveStagePlayer;
+    }
+  | {
+      type: "phaseTransitionToNight";
+      stage: "active";
+    }
+  | {
+      type: "phaseTransitionToDay";
+      stage: "active";
+    }
+  | {
+      type: "stageTransitionToActive";
+      stage: "setup";
+    }
+  | {
+      type: "stageTransitionToFinished";
+      stage: "active";
+      payload: Team;
     };
 
 function gameStateSetupReducer(
@@ -48,6 +74,24 @@ function gameStateSetupReducer(
         ...state,
         players: state.players.filter((p) => p.id !== action.payload),
       };
+    case "stageTransitionToActive": {
+      const game = state;
+      return {
+        ...game,
+        players: game.players.map((player) => ({
+          ...player,
+          alive: true as const,
+          character: "Clockmaker", // TODO
+          team: "good" as const, // TODO
+        })),
+        stage: "active" as const,
+        phase: {
+          phase: "night" as const,
+          nightDeaths: [],
+          nightNumber: 1,
+        },
+      };
+    }
   }
 }
 
@@ -95,22 +139,195 @@ function gameStateActiveReducer(
         },
       };
     }
-    case "setVoters": {
+    case "addVote": {
       if (state.phase.phase !== "day") {
         throw new Error("Cannot set voters when phase is not day");
       }
       if (state.phase.nomination.state !== "active") {
         throw new Error("Cannot set voters when nomination is not active");
       }
+      const player = action.payload;
+      if (state.phase.nomination.voters.includes(player.id)) {
+        throw new Error("Cannot add vote for player who has already voted");
+      }
+
+      if (!player.alive && !player.ghostVote) {
+        throw new Error(
+          `Dead player ${player.name} has already spent their ghost vote`
+        );
+      }
+
       return {
         ...state,
+        players:
+          !player.alive && player.ghostVote
+            ? state.players.map((p) =>
+                p.id === player.id ? { ...p, ghostVote: false } : p
+              )
+            : state.players,
         phase: {
           ...state.phase,
           nomination: {
             ...state.phase.nomination,
-            voters: action.payload,
+            voters: state.phase.nomination.voters.concat(player.id),
           },
         },
+      };
+    }
+    case "killPlayer": {
+      const player = action.payload;
+      if (!player.alive) {
+        throw new Error(
+          `Cannot kill player ${player.name} who is already dead`
+        );
+      }
+      if (state.phase.phase === "night") {
+        if (state.phase.nightDeaths.includes(player.id)) {
+          throw new Error(
+            `Cannot kill player ${player.name} twice in the same night`
+          );
+        }
+        return {
+          ...state,
+          phase: {
+            ...state.phase,
+            nightDeaths: [...state.phase.nightDeaths, player.id],
+          },
+        };
+      }
+
+      return {
+        ...state,
+        players: state.players.map((p) =>
+          p.id === player.id ? { ...p, alive: false, ghostVote: true } : p
+        ),
+      };
+    }
+    case "resolveVote": {
+      const game = state;
+      if (game.phase.phase !== "day") {
+        throw new Error("Cannot resolve vote when phase is not day");
+      }
+
+      if (game.phase.nomination.state !== "active") {
+        throw new Error("Nomination is not active");
+      }
+
+      const nominationBookkeeping = {
+        hasNominated: [
+          ...game.phase.nominationBookkeeping.hasNominated,
+          game.phase.nomination.nominator.id,
+        ],
+        hasBeenNominated: [
+          ...game.phase.nominationBookkeeping.hasBeenNominated,
+          game.phase.nomination.nominee.id,
+        ],
+      };
+
+      if (game.phase.onTheBlock) {
+        const currentHighestVotes = game.phase.onTheBlock.votes;
+        // Not enough votes to put the player on the block
+        if (currentHighestVotes > game.phase.nomination.voters.length) {
+          return {
+            ...game,
+            phase: {
+              ...game.phase,
+              nomination: { state: "inactive" as const },
+              nominationBookkeeping,
+            },
+          };
+        }
+        // Tie, no player on the block
+        if (currentHighestVotes === game.phase.nomination.voters.length) {
+          return {
+            ...game,
+            phase: {
+              ...game.phase,
+              nomination: { state: "inactive" as const },
+              nominationBookkeeping,
+              onTheBlock: undefined,
+            },
+          };
+        }
+      }
+
+      // New player on the block (no pun intended)
+      return {
+        ...game,
+        phase: {
+          ...game.phase,
+          nomination: { state: "inactive" as const },
+          nominationBookkeeping,
+          onTheBlock: {
+            playerId: game.phase.nomination.nominee.id,
+            votes: game.phase.nomination.voters.length,
+          },
+        },
+      };
+    }
+    case "phaseTransitionToNight": {
+      const game = state;
+      if (game.phase.phase !== "day") {
+        throw new Error("Cannot transition to night when phase is not day");
+      }
+      return {
+        ...game,
+        phase: {
+          phase: "night" as const,
+          nightDeaths: [],
+          nightNumber: game.phase.dayNumber + 1,
+        },
+      };
+    }
+    case "phaseTransitionToDay": {
+      const game = state;
+      if (game.phase.phase !== "night") {
+        throw new Error("Cannot transition to day when phase is not night");
+      }
+      return {
+        ...game,
+        phase: {
+          phase: "day" as const,
+          nomination: { state: "inactive" as const },
+          nominationBookkeeping: {
+            hasNominated: [],
+            hasBeenNominated: [],
+          },
+          dayNumber: game.phase.nightNumber,
+        },
+        players: game.players.map((player) => {
+          if (!player.alive) {
+            return player;
+          }
+
+          if (!("nightDeaths" in game.phase)) {
+            throw new Error(
+              "Bug: no night deaths in game phase even though phase is night"
+            );
+          }
+
+          const aliveAndGhostVote = game.phase.nightDeaths.includes(player.id)
+            ? {
+                alive: false as const,
+                ghostVote: true,
+              }
+            : {
+                alive: true as const,
+              };
+
+          return {
+            ...player,
+            ...aliveAndGhostVote,
+          };
+        }),
+      };
+    }
+    case "stageTransitionToFinished": {
+      const game = state;
+      return {
+        ...game,
+        stage: "finished" as const,
+        winningTeam: action.payload,
       };
     }
   }
