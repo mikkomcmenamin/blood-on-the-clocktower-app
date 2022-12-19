@@ -76,7 +76,7 @@ function App() {
 
     // open the modal when double-clicking
     const handleDoubleClick = () => {
-      if (!isDay) return;
+      if (!isSetup) return;
       if (!isModalOpen) {
         setIsModalOpen(true);
       }
