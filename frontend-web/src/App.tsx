@@ -97,12 +97,12 @@ function App() {
   function handleSelectPlayer(playerId: number) {
     if (game.stage !== "active") return;
     if (game.phase.phase !== "day") return;
+    if (nomination.state === "active") return;
+    if (nomination.state === "pending" && nomination.nominator.id === playerId)
+      return;
+
     const player = game.players.find((p) => p.id === playerId)!;
-    if (
-      nomination.state === "inactive" ||
-      playerId === nomination.nominator.id ||
-      nomination.state === "active"
-    ) {
+    if (nomination.state === "inactive") {
       dispatch({
         type: "setNominator",
         stage: "active",
