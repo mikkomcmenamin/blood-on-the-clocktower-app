@@ -11,7 +11,11 @@ import {
   isNominator,
   isNominee,
 } from "./model";
-import { useClickOutside } from "./hooks";
+import {
+  useClickOutside,
+  useHandleNominationUIEffects,
+  useHandlePlayerCountChangeUIEffects,
+} from "./hooks";
 import Modal from "./components/Modal";
 import Background from "./components/Background";
 
@@ -26,43 +30,8 @@ function App() {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log({ players, nomination });
-
-  useLayoutEffect(() => {
-    // set the --num-players css variable defined on .App to be the number of players
-    // this is used to calculate the rotation angle per player
-    document.body.style.setProperty("--num-players", players.length.toString());
-  }, [players.length]);
-
-  // Handle setting the hour and minute hands of the clock to point at the nominating and nominated players respectively
-  useEffect(() => {
-    if (nomination.state === "inactive") {
-      document.body.style.setProperty("--nominator-id", "0");
-      document.body.style.setProperty("--nominee-id", "0");
-      return;
-    }
-
-    if (nomination.state === "pending") {
-      document.body.style.setProperty(
-        "--nominator-id",
-        nomination.nominator.id.toString()
-      );
-      document.body.style.setProperty("--nominee-id", "0");
-      return;
-    }
-
-    if (nomination.state === "active") {
-      document.body.style.setProperty(
-        "--nominator-id",
-        nomination.nominator.id.toString()
-      );
-      document.body.style.setProperty(
-        "--nominee-id",
-        nomination.nominee.id.toString()
-      );
-      return;
-    }
-  }, [nomination]);
+  useHandlePlayerCountChangeUIEffects(players);
+  useHandleNominationUIEffects(nomination);
 
   const addPlayer = (name: string) => {
     setPlayers((players) => [...players, createPlayer(name)]);
@@ -105,7 +74,7 @@ function App() {
     window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [isModalOpen]);
 
   // handle doubleclick: also open the modal
   useEffect(() => {
