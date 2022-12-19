@@ -2,63 +2,107 @@
 // This should run on the server and the client so it should not contain any UI logic
 // or any logic that is specific to a particular client
 
-// TODO: a lot
+import { z } from "zod";
+import {
+  Game,
+  setupStagePlayerSchema,
+  activeStagePlayerSchema,
+  teamSchema,
+} from "./model";
 
-import { ActiveStagePlayer, Game, SetupStagePlayer, Team } from "./model";
+// Stages mean the game is in a particular state (setup, active, finished)
+const setupActionSchema = z.object({
+  stage: z.literal("setup"),
+});
+const activeActionSchema = z.object({
+  stage: z.literal("active"),
+});
 
-export type GameAction =
-  | {
-      type: "addPlayer";
-      stage: "setup";
-      payload: SetupStagePlayer;
-    }
-  | {
-      type: "removePlayer";
-      stage: "setup";
-      payload: SetupStagePlayer["id"];
-    }
-  | {
-      type: "setNominator";
-      stage: "active";
-      payload: ActiveStagePlayer;
-    }
-  | {
-      type: "setNominee";
-      stage: "active";
-      payload: ActiveStagePlayer;
-    }
-  | { type: "cancelNomination"; stage: "active" }
-  | {
-      type: "resolveVote";
-      stage: "active";
-    }
-  | {
-      type: "addVote";
-      stage: "active";
-      payload: ActiveStagePlayer;
-    }
-  | {
-      type: "killPlayer";
-      stage: "active";
-      payload: ActiveStagePlayer;
-    }
-  | {
-      type: "phaseTransitionToNight";
-      stage: "active";
-    }
-  | {
-      type: "phaseTransitionToDay";
-      stage: "active";
-    }
-  | {
-      type: "stageTransitionToActive";
-      stage: "setup";
-    }
-  | {
-      type: "stageTransitionToFinished";
-      stage: "active";
-      payload: Team;
-    };
+// Actions are the things that can happen within a specific stage
+const addPlayerActionSchema = setupActionSchema.merge(
+  z.object({
+    type: z.literal("addPlayer"),
+    payload: setupStagePlayerSchema,
+  })
+);
+const removePlayerActionSchema = setupActionSchema.merge(
+  z.object({
+    type: z.literal("removePlayer"),
+    payload: z.number(),
+  })
+);
+const setNominatorActionSchema = activeActionSchema.merge(
+  z.object({
+    type: z.literal("setNominator"),
+    payload: activeStagePlayerSchema,
+  })
+);
+const setNomineeActionSchema = activeActionSchema.merge(
+  z.object({
+    type: z.literal("setNominee"),
+    payload: activeStagePlayerSchema,
+  })
+);
+const cancelNominationActionSchema = activeActionSchema.merge(
+  z.object({
+    type: z.literal("cancelNomination"),
+  })
+);
+const resolveVoteActionSchema = activeActionSchema.merge(
+  z.object({
+    type: z.literal("resolveVote"),
+  })
+);
+const addVoteActionSchema = activeActionSchema.merge(
+  z.object({
+    type: z.literal("addVote"),
+    payload: activeStagePlayerSchema,
+  })
+);
+const killPlayerActionSchema = activeActionSchema.merge(
+  z.object({
+    type: z.literal("killPlayer"),
+    payload: activeStagePlayerSchema,
+  })
+);
+const phaseTransitionToNightActionSchema = activeActionSchema.merge(
+  z.object({
+    type: z.literal("phaseTransitionToNight"),
+  })
+);
+const phaseTransitionToDayActionSchema = activeActionSchema.merge(
+  z.object({
+    type: z.literal("phaseTransitionToDay"),
+  })
+);
+const stageTransitionToActiveActionSchema = setupActionSchema.merge(
+  z.object({
+    type: z.literal("stageTransitionToActive"),
+  })
+);
+const stageTransitionToFinishedActionSchema = activeActionSchema.merge(
+  z.object({
+    type: z.literal("stageTransitionToFinished"),
+    payload: teamSchema,
+  })
+);
+
+export const gameActionSchema = z.union([
+  addPlayerActionSchema,
+  removePlayerActionSchema,
+  setNominatorActionSchema,
+  setNomineeActionSchema,
+  cancelNominationActionSchema,
+  resolveVoteActionSchema,
+  addVoteActionSchema,
+  killPlayerActionSchema,
+  phaseTransitionToNightActionSchema,
+  phaseTransitionToDayActionSchema,
+  stageTransitionToActiveActionSchema,
+  stageTransitionToFinishedActionSchema,
+]);
+
+export type GameAction = z.infer<typeof gameActionSchema>;
 
 function gameStateSetupReducer(
   state: Extract<Game, { stage: "setup" }>,

@@ -1,22 +1,22 @@
 import { z } from "zod";
 import { nextId } from "./util";
 
-const teamSchema = z.union([z.literal("good"), z.literal("evil")]);
+export const teamSchema = z.union([z.literal("good"), z.literal("evil")]);
 
 export type Team = z.infer<typeof teamSchema>;
 
-const playerSchema = z.object({
+export const playerSchema = z.object({
   name: z.string(),
   id: z.number(),
 });
 
 export type Player = z.infer<typeof playerSchema>;
 
-const setupStagePlayerSchema = playerSchema;
+export const setupStagePlayerSchema = playerSchema;
 
 export type SetupStagePlayer = z.infer<typeof setupStagePlayerSchema>;
 
-const characterStateSchema = z.object({
+export const characterStateSchema = z.object({
   character: z.string(),
   team: teamSchema,
 });
@@ -25,7 +25,7 @@ export type CharacterState = z.infer<typeof characterStateSchema>;
 
 const _activeStagePlayerSchema = playerSchema.merge(characterStateSchema);
 
-const activeStagePlayerSchema = z.union([
+export const activeStagePlayerSchema = z.union([
   z.object({ alive: z.literal(true) }).merge(_activeStagePlayerSchema),
   z
     .object({ alive: z.literal(false), ghostVote: z.boolean() })
@@ -34,7 +34,7 @@ const activeStagePlayerSchema = z.union([
 
 export type ActiveStagePlayer = z.infer<typeof activeStagePlayerSchema>;
 
-const nominationSchema = z.union([
+export const nominationSchema = z.union([
   z.object({
     state: z.literal("active"),
     nominator: activeStagePlayerSchema,
@@ -52,7 +52,7 @@ const nominationSchema = z.union([
 
 export type Nomination = z.infer<typeof nominationSchema>;
 
-const phaseSchema = z.union([
+export const phaseSchema = z.union([
   z.object({
     phase: z.literal("day"),
     nomination: nominationSchema,
@@ -77,7 +77,7 @@ const phaseSchema = z.union([
 
 export type Phase = z.infer<typeof phaseSchema>;
 
-const gameSchema = z.union([
+export const gameSchema = z.union([
   z.object({
     stage: z.literal("setup"),
     players: z.array(setupStagePlayerSchema),
