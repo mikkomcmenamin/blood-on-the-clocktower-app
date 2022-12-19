@@ -1,4 +1,4 @@
-.player {
+.playerRotator {
   width: min(45vw, 45vh);
   position: absolute;
   transform-origin: 100% 50%;
@@ -8,7 +8,7 @@
   display: flex;
 }
 
-.player-content {
+.playerContent {
   background: white;
   border: 1px solid #646cffaa;
   border-radius: 50%;
@@ -48,5 +48,38 @@
     background-repeat: no-repeat;
     background-position: center;
     transform: translate(-50%, 0);
+  }
+
+  &.notInvolvedInNomination {
+    opacity: 0.5;
+    background: #888;
+    box-shadow: 0 0 1rem #888;
+  }
+
+  // .player-content with .nominator should have a very large blue box shadow, while .nominee should have red
+  &.nominator {
+    box-shadow: 0 0 4rem #646cffaa;
+    font-weight: 800;
+    scale: 1.1;
+  }
+  &.nominee {
+    box-shadow: 0 0 4rem #ff6464aa;
+    font-weight: 800;
+    scale: 1.1;
+  }
+}
+
+.name {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@for $i from 1 through 100 {
+  .playerRotator:nth-of-type(#{$i}) {
+    transform: translate(-100%, -50%) rotate(calc(90deg + 360deg / var(--num-players) * calc(#{$i} - 1)));
+    & > * {
+      transform: rotate(calc(-90deg - 360deg / var(--num-players) * calc(#{$i} - 1)));
+    }
   }
 }

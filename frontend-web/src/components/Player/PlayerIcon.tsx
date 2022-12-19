@@ -1,32 +1,32 @@
 import {Nomination, Player} from "../../model";
 import {classnames} from "../../util";
-import "./PlayerIcon.scss";
+import styles from "./PlayerIcon.module.scss";
 
 type PlayerIconProps = {
+  key: number
   player: Player
   selectPlayer: (player: Player) => void
   nomination: Nomination
 }
 
-const PlayerIcon: React.FC<PlayerIconProps> = ({player, selectPlayer, nomination}) => {
+const PlayerIcon: React.FC<PlayerIconProps> = ({ player, selectPlayer, nomination }) => {
   return (
-    <div key={player.id} className="player">
+    <div className={styles.playerRotator}>
       <div
         onClick={() => {
           selectPlayer(player);
         }}
         className={classnames({
-          "player-content": true,
-          "in-nomination":
-            isNominator(player, nomination) ||
-            isNominee(player, nomination),
-          nominator: isNominator(player, nomination),
-          nominee: isNominee(player, nomination),
-          shroud: "alive" in player && !player.alive,
+          [styles.playerContent]: true,
+          [styles.nominator]: isNominator(player, nomination),
+          [styles.nominee]: isNominee(player, nomination),
+          [styles.notInvolvedInNomination]: notInvolvedInNomination(player, nomination),
+          [styles.shroud]: "alive" in player && !player.alive,
         })}
       >
-        <div className="name">{player.name}</div>
-      </div>
+        <div className={styles.name}>{player.name}</div>
+      </div
+>
     </div>
   )
 }
@@ -36,5 +36,8 @@ const isNominator = (player: Player, nomination: Nomination) =>
 
 const isNominee = (player: Player, nomination: Nomination) =>
   nomination.state === "active" && nomination.nominee.id === player.id;
+
+const notInvolvedInNomination = (player: Player, nomination: Nomination) =>
+  nomination.state === "active" && ![nomination.nominator.id, nomination.nominee.id].includes(player.id);
 
 export default PlayerIcon;

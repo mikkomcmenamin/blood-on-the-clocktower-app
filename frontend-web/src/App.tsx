@@ -13,6 +13,7 @@ import {
 import Modal from "./components/Modal";
 import Background from "./components/Background";
 import PlayerIcon from "./components/Player/PlayerIcon";
+import GameBoard from "./components/GameBoard/GameBoard";
 
 const initialPlayers = Array.from({ length: 3 }, (_, i) =>
   createPlayer(fakeNamesList[i])
@@ -37,13 +38,7 @@ function App() {
   const modalRef = useRef<HTMLDivElement>(null);
   useClickOutside(modalRef, () => setIsModalOpen(false));
 
-  // cancel the current nomination when clicking outside of the player-circle
-  const playerCircleRef = useRef<HTMLDivElement>(null);
-  useClickOutside(playerCircleRef, () => {
-    if (nomination.state !== "inactive") {
-      setNomination({ state: "inactive" });
-    }
-  });
+
 
   // handle keyboard and mouse shortcuts
   useEffect(() => {
@@ -105,42 +100,10 @@ function App() {
     }
   }
 
-  const showMinuteHand = nomination.state === "active";
-  const showHourHand =
-    nomination.state === "pending" || nomination.state === "active";
-
   return (
     <div className="App">
       <Background />
-      <section id="play-area-container">
-        <div
-          id="player-circle"
-          className={cat(
-            nomination.state === "active" ? ["activeNomination"] : []
-          )}
-          ref={playerCircleRef}
-        >
-          {players.map((player) => (
-            <PlayerIcon
-              player={player}
-              nomination={nomination}
-              selectPlayer={handleSelectPlayer}
-            />
-          ))}
-          <section
-            style={{ visibility: showMinuteHand ? "visible" : "hidden" }}
-            className="clockhand clockhand-minute"
-          >
-            <img src={clockHandMinute} alt="clock hand minute" />
-          </section>
-          <section
-            style={{ visibility: showHourHand ? "visible" : "hidden" }}
-            className="clockhand clockhand-hour"
-          >
-            <img src={clockHandHour} alt="clock hand hour" />
-          </section>
-        </div>
-      </section>
+      <GameBoard players={players} nomination={nomination} setNomination={setNomination}/>
 
       <nav id="controls">
         <div aria-roledescription="navigation" id="menu">
