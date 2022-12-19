@@ -84,12 +84,6 @@ export const createPlayer = (name: string): Player => ({
   id: nextId(),
 });
 
-export const isNominator = (player: Player, nomination: Nomination) =>
-  nomination.state !== "inactive" && nomination.nominator.id === player.id;
-
-export const isNominee = (player: Player, nomination: Nomination) =>
-  nomination.state === "active" && nomination.nominee.id === player.id;
-
 export const transitionFromDayToNight = (
   game: GameInPhase<"day">
 ): GameInPhase<"night"> => {

@@ -1,0 +1,52 @@
+.player {
+  width: min(45vw, 45vh);
+  position: absolute;
+  transform-origin: 100% 50%;
+  transition: transform 0.5s ease-in-out;
+  top: 50%;
+  left: 50%;
+  display: flex;
+}
+
+.player-content {
+  background: white;
+  border: 1px solid #646cffaa;
+  border-radius: 50%;
+  width: 6em; // relative to own font size to prevent layout issues
+  height: 6em;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transition: scale 1s ease-in-out;
+  // shadow etc to make this look like a raised button
+  box-shadow: 0 0 1rem #646cffaa;
+  cursor: pointer;
+
+  & > * {
+    cursor: pointer;
+  }
+
+  &.shroud {
+    opacity: 0.9;
+    background: darken(white, 20%);
+    box-shadow: none;
+    border: none;
+  }
+
+  &.shroud::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100%;
+    height: 40%;
+    background-image: url('../../assets/shroud.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transform: translate(-50%, 0);
+  }
+}

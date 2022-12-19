@@ -5,11 +5,9 @@ import clockHandHour from "./assets/clockhand-hour.png";
 import { cat, classnames, fakeNamesList } from "./util";
 import "./App.scss";
 import {
-  createPlayer,
   Player,
+  createPlayer,
   Nomination,
-  isNominator,
-  isNominee,
 } from "./model";
 import {
   useClickOutside,
@@ -18,6 +16,7 @@ import {
 } from "./hooks";
 import Modal from "./components/Modal";
 import Background from "./components/Background";
+import PlayerIcon from "./components/Player/PlayerIcon";
 
 const initialPlayers = Array.from({ length: 3 }, (_, i) =>
   createPlayer(fakeNamesList[i])
@@ -104,7 +103,7 @@ function App() {
   // when a player is clicked, start the nomination process
   // 1. if Nomination is state "inactive", set it to "pending" and set the nominating player
   // 2. if Nomination is state "pending", set it to "active" and set the nominated player
-  function handlePlayerClick(player: Player) {
+  function handleSelectPlayer(player: Player) {
     if (
       nomination.state === "inactive" ||
       player.id === nomination.nominator.id ||
@@ -140,24 +139,11 @@ function App() {
           ref={playerCircleRef}
         >
           {players.map((player) => (
-            <div key={player.id} className="player">
-              <div
-                onClick={() => {
-                  handlePlayerClick(player);
-                }}
-                className={classnames({
-                  "player-content": true,
-                  "in-nomination":
-                    isNominator(player, nomination) ||
-                    isNominee(player, nomination),
-                  nominator: isNominator(player, nomination),
-                  nominee: isNominee(player, nomination),
-                  shroud: "alive" in player && !player.alive,
-                })}
-              >
-                <div className="name">{player.name}</div>
-              </div>
-            </div>
+                  <PlayerIcon
+                    player={player}
+                    nomination={nomination}
+                    selectPlayer={handleSelectPlayer}
+                  />
           ))}
           <section
             style={{ visibility: showMinuteHand ? "visible" : "hidden" }}
