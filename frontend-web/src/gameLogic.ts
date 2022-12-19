@@ -27,6 +27,7 @@ export type GameAction =
       stage: "active";
       payload: ActiveStagePlayer;
     }
+  | { type: "cancelNomination"; stage: "active" }
   | {
       type: "resolveVote";
       stage: "active";
@@ -201,6 +202,24 @@ function gameStateActiveReducer(
         players: state.players.map((p) =>
           p.id === player.id ? { ...p, alive: false, ghostVote: true } : p
         ),
+      };
+    }
+    case "cancelNomination": {
+      if (state.phase.phase !== "day") {
+        throw new Error("Cannot cancel nomination when phase is not day");
+      }
+      if (state.phase.nomination.state === "inactive") {
+        throw new Error("Cannot cancel nomination when nomination is inactive");
+      }
+      return {
+        ...state,
+        phase: {
+          ...state.phase,
+          nomination: {
+            ...state.phase.nomination,
+            state: "inactive" as const,
+          },
+        },
       };
     }
     case "resolveVote": {

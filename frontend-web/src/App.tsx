@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { fakeNamesList } from "./util";
 import "./App.scss";
-import { Player, createPlayer, Nomination } from "./model";
+import { Player, createSetupStagePlayer, Nomination, Game } from "./model";
 import {
   useClickOutside,
   useHandleNominationUIEffects,
@@ -10,23 +10,37 @@ import {
 import Modal from "./components/Modal";
 import Background from "./components/Background";
 import GameBoard from "./components/GameBoard/GameBoard";
+import { gameStateReducer } from "./gameLogic";
 
 const initialPlayers = Array.from({ length: 3 }, (_, i) =>
-  createPlayer(fakeNamesList[i])
+  createSetupStagePlayer(fakeNamesList[i])
 );
 
+const initialGameState: Game = {
+  stage: "setup",
+  players: initialPlayers,
+};
+
 function App() {
-  const [players, setPlayers] = useState<Player[]>(initialPlayers);
-  const [nomination, setNomination] = useState<Nomination>({
-    state: "inactive",
-  });
+  const [game, dispatch] = useReducer(gameStateReducer, initialGameState);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useHandlePlayerCountChangeUIEffects(players);
+  console.log(game);
+
+  const nomination =
+    game.stage === "active" && game.phase.phase === "day"
+      ? game.phase.nomination
+      : { state: "inactive" as const };
+
+  useHandlePlayerCountChangeUIEffects(game.players);
   useHandleNominationUIEffects(nomination);
 
   const addPlayer = (name: string) => {
-    setPlayers((players) => [...players, createPlayer(name)]);
+    dispatch({
+      type: "addPlayer",
+      stage: "setup",
+      payload: createSetupStagePlayer(name),
+    });
     setIsModalOpen(false);
   };
 
@@ -50,7 +64,7 @@ function App() {
         e.preventDefault();
         setIsModalOpen(false);
         if (!isModalOpen) {
-          setNomination({ state: "inactive" });
+          dispatch({ type: "cancelNomination", stage: "active" });
         }
       }
     };
@@ -71,29 +85,85 @@ function App() {
     };
   }, [isModalOpen]);
 
+  // when a player is clicked, start the nomination process
+  // 1. if Nomination is state "inactive", set it to "pending" and set the nominating player
+  // 2. if Nomination is state "pending", set it to "active" and set the nominated player
+  function handleSelectPlayer(playerId: number) {
+    if (game.stage !== "active") return;
+    if (game.phase.phase !== "day") return;
+    const player = game.players.find((p) => p.id === playerId)!;
+    if (
+      nomination.state === "inactive" ||
+      playerId === nomination.nominator.id ||
+      nomination.state === "active"
+    ) {
+      dispatch({
+        type: "setNominator",
+        stage: "active",
+        payload: player,
+      });
+    } else if (nomination.state === "pending") {
+      dispatch({
+        type: "setNominee",
+        stage: "active",
+        payload: player,
+      });
+    }
+  }
+
   return (
     <div className="App">
-      <Background />
-      <GameBoard players={players} nomination={nomination} setNomination={setNomination}/>
+      <Background phase={game.stage === "active" ? game.phase.phase : "day"} />
+      <GameBoard
+        players={game.players}
+        nomination={nomination}
+        onSelectPlayer={handleSelectPlayer}
+        onClickOutside={() => {
+          if (nomination.state !== "inactive") {
+            dispatch({ type: "cancelNomination", stage: "active" });
+          }
+        }}
+      />
 
       <nav id="controls">
         <div aria-roledescription="navigation" id="menu">
-          <button
-            onClick={() => {
-              setIsModalOpen(true);
-            }}
-          >
-            Menu option 1
-          </button>
-          <button onClick={() => setIsModalOpen(true)}>Menu option 2</button>
-          <button
-            onClick={() => {
-              setIsModalOpen(true);
-            }}
-          >
-            Menu option 3
-          </button>
-          <button onClick={() => setIsModalOpen(true)}>Menu option 4</button>
+          {game.stage === "setup" && (
+            <button
+              onClick={() => {
+                dispatch({ type: "stageTransitionToActive", stage: "setup" });
+              }}
+            >
+              Start game
+            </button>
+          )}
+          {game.stage === "active" && (
+            <button
+              onClick={() => {
+                dispatch({
+                  type: "stageTransitionToFinished",
+                  stage: "active",
+                  payload: "good",
+                });
+              }}
+            >
+              Finish game
+            </button>
+          )}
+          {game.stage === "active" && (
+            <button
+              onClick={() => {
+                dispatch(
+                  game.phase.phase === "day"
+                    ? { type: "phaseTransitionToNight", stage: "active" }
+                    : { type: "phaseTransitionToDay", stage: "active" }
+                );
+              }}
+            >
+              {game.phase.phase === "day"
+                ? "Transition to night"
+                : "Transition to day"}
+            </button>
+          )}
         </div>
       </nav>
       {isModalOpen && <Modal addPlayer={addPlayer} modalRef={modalRef} />}

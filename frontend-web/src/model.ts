@@ -79,9 +79,19 @@ export type GameInPhase<P extends Phase["phase"]> = Extract<
   ? G & { phase: Extract<Phase, { phase: P }> }
   : never;
 
-export const createPlayer = (name: string): Player => ({
+export const createSetupStagePlayer = (name: string): Player => ({
   name,
   id: nextId(),
+});
+
+export const createMockActiveStagePlayer = (
+  name: string
+): ActiveStagePlayer => ({
+  name,
+  id: nextId(),
+  character: "character",
+  team: "good",
+  alive: true,
 });
 
 export const canNominate = (
