@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from "react";
-import { fakeNamesList } from "./util";
+import { fakeNamesList } from "@common/util";
 import "./App.scss";
 import { createSetupStagePlayer, Game } from "@common/model";
 import {

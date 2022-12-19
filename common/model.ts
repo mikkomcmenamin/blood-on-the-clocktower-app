@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { nextId } from "../frontend-web/src/util";
+import { nextId } from "./util";
 
 const teamSchema = z.union([z.literal("good"), z.literal("evil")]);
 

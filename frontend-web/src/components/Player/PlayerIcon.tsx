@@ -1,5 +1,5 @@
 import { Nomination, Player } from "@common/model";
-import { classnames } from "../../util";
+import { classnames } from "@common/util";
 import styles from "./PlayerIcon.module.scss";
 
 type PlayerIconProps = {

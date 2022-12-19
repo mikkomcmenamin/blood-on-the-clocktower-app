@@ -20,6 +20,6 @@
       "@common/*": ["../common/*"],
     }
   },
-  "include": ["src", "../common/model.ts"],
+  "include": ["src", "../common/model.ts", "../common/util.ts"],
   "references": [{ "path": "./tsconfig.node.json" }],
 }

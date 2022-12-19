@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { Nomination, Player } from "@common/model";
-import { classnames } from "../../util";
+import { classnames } from "@common/util";
 import PlayerIcon from "../Player/PlayerIcon";
 
 import clockHandMinute from "../../assets/clockhand.png";
