@@ -76,7 +76,7 @@ function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isModalOpen]);
 
-  // handle doubleclick: also open the modal
+  // handle doubleclick and space press: also open the modal
   useEffect(() => {
     const handleDoubleClick = () => {
       if (!isModalOpen) {
@@ -84,9 +84,21 @@ function App() {
       }
     };
 
-    document.addEventListener("dblclick", handleDoubleClick);
+    const handleKeyPress = (event: any) => {
+      if (event.key === ' ') {
+        if (!isModalOpen) {
+          setIsModalOpen(true);
+        }
+      }
+    };
 
-    return () => document.removeEventListener("dblclick", handleDoubleClick);
+    document.addEventListener("dblclick", handleDoubleClick);
+    document.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      document.removeEventListener("dblclick", handleDoubleClick);
+      document.removeEventListener('keydown', handleKeyPress);
+    };
   }, [isModalOpen]);
 
   // when a player is clicked, start the nomination process
