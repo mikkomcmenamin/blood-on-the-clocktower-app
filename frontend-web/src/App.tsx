@@ -1,8 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-
-import clockHandMinute from "./assets/clockhand.png";
-import clockHandHour from "./assets/clockhand-hour.png";
-import { cat, fakeNamesList } from "./util";
+import { fakeNamesList } from "./util";
 import "./App.scss";
 import { Player, createPlayer, Nomination } from "./model";
 import {
@@ -12,7 +9,6 @@ import {
 } from "./hooks";
 import Modal from "./components/Modal";
 import Background from "./components/Background";
-import PlayerIcon from "./components/Player/PlayerIcon";
 import GameBoard from "./components/GameBoard/GameBoard";
 
 const initialPlayers = Array.from({ length: 3 }, (_, i) =>
@@ -37,8 +33,6 @@ function App() {
   // close the modal when clicking outside of it
   const modalRef = useRef<HTMLDivElement>(null);
   useClickOutside(modalRef, () => setIsModalOpen(false));
-
-
 
   // handle keyboard and mouse shortcuts
   useEffect(() => {
@@ -76,29 +70,6 @@ function App() {
       document.addEventListener("dblclick", handleDoubleClick);
     };
   }, [isModalOpen]);
-
-  // when a player is clicked, start the nomination process
-  // 1. if Nomination is state "inactive", set it to "pending" and set the nominating player
-  // 2. if Nomination is state "pending", set it to "active" and set the nominated player
-  function handleSelectPlayer(player: Player) {
-    if (
-      nomination.state === "inactive" ||
-      player.id === nomination.nominator.id ||
-      nomination.state === "active"
-    ) {
-      setNomination({
-        state: "pending",
-        nominator: player,
-      });
-    } else if (nomination.state === "pending") {
-      setNomination({
-        ...nomination,
-        state: "active",
-        nominee: player,
-        voters: [],
-      });
-    }
-  }
 
   return (
     <div className="App">
