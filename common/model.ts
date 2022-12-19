@@ -1,83 +1,100 @@
+import { z } from "zod";
 import { nextId } from "../frontend-web/src/util";
 
-export type Team = "good" | "evil";
+const teamSchema = z.union([z.literal("good"), z.literal("evil")]);
 
-type OnTheBlock = {
-  playerId: number;
-  votes: number;
-};
+export type Team = z.infer<typeof teamSchema>;
 
-type NominationBookkeeping = {
-  hasNominated: number[] /* player IDs */;
-  hasBeenNominated: number[] /* player IDs */;
-};
+const playerSchema = z.object({
+  name: z.string(),
+  id: z.number(),
+});
 
-type Phase =
-  | {
-      phase: "day";
-      nomination: Nomination;
-      dayNumber: number;
-      onTheBlock?: OnTheBlock;
-      nominationBookkeeping: NominationBookkeeping;
-    }
-  | {
-      phase: "night";
-      nightDeaths: number[] /* player IDs */;
-      nightNumber: number;
-    };
+export type Player = z.infer<typeof playerSchema>;
 
-type Character = string; // todo: make an union of all the BOTC characters
+const setupStagePlayerSchema = playerSchema;
 
-export type Player = {
-  name: string;
-  id: number;
-};
+export type SetupStagePlayer = z.infer<typeof setupStagePlayerSchema>;
 
-export type SetupStagePlayer = Player;
+const characterStateSchema = z.object({
+  character: z.string(),
+  team: z.union([z.literal("good"), z.literal("evil")]),
+});
 
-type AliveState = { alive: true } | { alive: false; ghostVote: boolean };
+export type CharacterState = z.infer<typeof characterStateSchema>;
 
-type CharacterState = { character: Character; team: Team };
+const _activeStagePlayerSchema = playerSchema.merge(characterStateSchema);
 
-export type ActiveStagePlayer = Player & CharacterState & AliveState;
+const activeStagePlayerSchema = z.union([
+  z.object({ alive: z.literal(true) }).merge(_activeStagePlayerSchema),
+  z
+    .object({ alive: z.literal(false), ghostVote: z.boolean() })
+    .merge(_activeStagePlayerSchema),
+]);
 
-export type Nomination =
-  | {
-      state: "active";
-      nominator: Player;
-      nominee: Player;
-      voters: number[] /* player IDs */;
-    }
-  | {
-      state: "pending";
-      nominator: Player;
-    }
-  | {
-      state: "inactive";
-    };
+export type ActiveStagePlayer = z.infer<typeof activeStagePlayerSchema>;
 
-export type Game =
-  | {
-      stage: "setup";
-      players: SetupStagePlayer[];
-    }
-  | {
-      stage: "active";
-      players: ActiveStagePlayer[];
-      phase: Phase;
-    }
-  | {
-      stage: "finished";
-      players: ActiveStagePlayer[];
-      winningTeam: Team;
-    };
+const nominationSchema = z.union([
+  z.object({
+    state: z.literal("active"),
+    nominator: activeStagePlayerSchema,
+    nominee: activeStagePlayerSchema,
+    voters: z.array(z.number()),
+  }),
+  z.object({
+    state: z.literal("pending"),
+    nominator: activeStagePlayerSchema,
+  }),
+  z.object({
+    state: z.literal("inactive"),
+  }),
+]);
 
-export type GameInPhase<P extends Phase["phase"]> = Extract<
-  Game,
-  { stage: "active" }
-> extends infer G
-  ? G & { phase: Extract<Phase, { phase: P }> }
-  : never;
+export type Nomination = z.infer<typeof nominationSchema>;
+
+const phaseSchema = z.union([
+  z.object({
+    phase: z.literal("day"),
+    nomination: nominationSchema,
+    dayNumber: z.number(),
+    onTheBlock: z.optional(
+      z.object({
+        playerId: z.number(),
+        votes: z.number(),
+      })
+    ),
+    nominationBookkeeping: z.object({
+      hasNominated: z.array(z.number()),
+      hasBeenNominated: z.array(z.number()),
+    }),
+  }),
+  z.object({
+    phase: z.literal("night"),
+    nightDeaths: z.array(z.number()),
+    nightNumber: z.number(),
+  }),
+]);
+
+export type Phase = z.infer<typeof phaseSchema>;
+
+const gameSchema = z.union([
+  z.object({
+    stage: z.literal("setup"),
+    players: z.array(setupStagePlayerSchema),
+  }),
+  z.object({
+    stage: z.literal("active"),
+    players: z.array(activeStagePlayerSchema),
+    phase: phaseSchema,
+  }),
+  z.object({
+    stage: z.literal("finished"),
+    players: z.array(activeStagePlayerSchema),
+    winningTeam: teamSchema,
+  }),
+]);
+
+export type Game = z.infer<typeof gameSchema>;
 
 export const createSetupStagePlayer = (name: string): Player => ({
   name,
@@ -93,37 +110,3 @@ export const createMockActiveStagePlayer = (
   team: "good",
   alive: true,
 });
-
-export const canNominate = (
-  game: GameInPhase<"day">,
-  player: ActiveStagePlayer
-): boolean => {
-  if (game.phase.nomination.state !== "inactive") {
-    return false;
-  }
-
-  if (game.phase.nominationBookkeeping.hasNominated.includes(player.id)) {
-    return false;
-  }
-
-  if (!player.alive) {
-    return false;
-  }
-
-  return true;
-};
-
-export const canBeNominated = (
-  game: GameInPhase<"day">,
-  player: ActiveStagePlayer
-): boolean => {
-  if (game.phase.nomination.state !== "inactive") {
-    return false;
-  }
-
-  if (game.phase.nominationBookkeeping.hasBeenNominated.includes(player.id)) {
-    return false;
-  }
-
-  return true;
-};
