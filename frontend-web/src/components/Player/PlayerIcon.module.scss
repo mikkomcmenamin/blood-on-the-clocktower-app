@@ -11,11 +11,10 @@
 .playerContent {
   background-size: 144px 140px;
   background: url("../../assets/T_PlayerBgGraySolid.png") -5px;
-  border: 1px solid #646cffaa;
   border-radius: 50%;
   width: 6em; // relative to own font size to prevent layout issues
   height: 6em;
-  color: hsl(0 0% 70%);
+  color: rgb(255, 255, 255);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -23,7 +22,7 @@
   text-align: center;
   transition: scale 1s ease-in-out;
   // shadow etc to make this look like a raised button
-  box-shadow: 0 0 1rem #646cffaa;
+  box-shadow: 0 0 1rem rgb(255, 255, 255);
   cursor: pointer;
 
   & > * {
