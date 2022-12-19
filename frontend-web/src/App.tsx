@@ -89,7 +89,7 @@ function App() {
       window.removeEventListener("keydown", handleKeyDown);
       document.addEventListener("dblclick", handleDoubleClick);
     };
-  }, [isModalOpen, game.stage]);
+  }, [isModalOpen, game]);
 
   // when a player is clicked, start the nomination process
   // 1. if Nomination is state "inactive", set it to "pending" and set the nominating player
