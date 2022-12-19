@@ -4,11 +4,7 @@ import clockHandMinute from "./assets/clockhand.png";
 import clockHandHour from "./assets/clockhand-hour.png";
 import { cat, classnames, fakeNamesList } from "./util";
 import "./App.scss";
-import {
-  Player,
-  createPlayer,
-  Nomination,
-} from "./model";
+import { Player, createPlayer, Nomination } from "./model";
 import {
   useClickOutside,
   useHandleNominationUIEffects,
@@ -49,11 +45,11 @@ function App() {
     }
   });
 
-  // handle keyboard shortcuts
+  // handle keyboard and mouse shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // open the modal when pressing the "+" key
-      if (e.key === "+") {
+      // open the modal when pressing the "+" or Space key
+      if (e.key === "+" || e.key === " ") {
         if (!isModalOpen) {
           e.preventDefault();
           setIsModalOpen(true);
@@ -70,33 +66,19 @@ function App() {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isModalOpen]);
-
-  // handle doubleclick and space press: also open the modal
-  useEffect(() => {
+    // open the modal when double-clicking
     const handleDoubleClick = () => {
       if (!isModalOpen) {
         setIsModalOpen(true);
       }
     };
 
-    const handleKeyPress = (event: any) => {
-      if (event.key === ' ') {
-        if (!isModalOpen) {
-          setIsModalOpen(true);
-        }
-      }
-    };
-
     document.addEventListener("dblclick", handleDoubleClick);
-    document.addEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener("dblclick", handleDoubleClick);
-      document.removeEventListener('keydown', handleKeyPress);
+      window.removeEventListener("keydown", handleKeyDown);
+      document.addEventListener("dblclick", handleDoubleClick);
     };
   }, [isModalOpen]);
 
@@ -139,11 +121,11 @@ function App() {
           ref={playerCircleRef}
         >
           {players.map((player) => (
-                  <PlayerIcon
-                    player={player}
-                    nomination={nomination}
-                    selectPlayer={handleSelectPlayer}
-                  />
+            <PlayerIcon
+              player={player}
+              nomination={nomination}
+              selectPlayer={handleSelectPlayer}
+            />
           ))}
           <section
             style={{ visibility: showMinuteHand ? "visible" : "hidden" }}
