@@ -87,7 +87,7 @@ function App() {
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      document.addEventListener("dblclick", handleDoubleClick);
+      document.removeEventListener("dblclick", handleDoubleClick);
     };
   }, [isModalOpen, game]);
 
