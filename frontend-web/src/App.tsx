@@ -50,10 +50,12 @@ function App() {
 
   // handle keyboard and mouse shortcuts
   useEffect(() => {
+    const isSetup = game.stage === "setup";
+    const isDay = game.stage === "active" && game.phase.phase === "day";
     const handleKeyDown = (e: KeyboardEvent) => {
       // open the modal when pressing the "+" or Space key
       if (e.key === "+" || e.key === " ") {
-        if (!isModalOpen) {
+        if (isSetup && !isModalOpen) {
           e.preventDefault();
           setIsModalOpen(true);
         }
@@ -62,8 +64,11 @@ function App() {
       // if modal is not open, cancel the current nomination
       if (e.key === "Escape") {
         e.preventDefault();
-        setIsModalOpen(false);
-        if (!isModalOpen) {
+        if (isSetup) {
+          setIsModalOpen(false);
+        }
+
+        if (isDay) {
           dispatch({ type: "cancelNomination", stage: "active" });
         }
       }
@@ -71,6 +76,7 @@ function App() {
 
     // open the modal when double-clicking
     const handleDoubleClick = () => {
+      if (!isDay) return;
       if (!isModalOpen) {
         setIsModalOpen(true);
       }
@@ -83,7 +89,7 @@ function App() {
       window.removeEventListener("keydown", handleKeyDown);
       document.addEventListener("dblclick", handleDoubleClick);
     };
-  }, [isModalOpen]);
+  }, [isModalOpen, game.stage]);
 
   // when a player is clicked, start the nomination process
   // 1. if Nomination is state "inactive", set it to "pending" and set the nominating player
@@ -113,6 +119,22 @@ function App() {
 
   return (
     <div className="App">
+      <div className="gameStageIndicator">
+        {(() => {
+          switch (game.stage) {
+            case "setup":
+              return "Game stage: Setup";
+            case "active": {
+              if (game.phase.phase === "day") {
+                return `Game stage: Day ${game.phase.dayNumber}`;
+              }
+              return `Game stage: Night ${game.phase.nightNumber}`;
+            }
+            case "finished":
+              return "Game stage: Finished";
+          }
+        })()}
+      </div>
       <Background phase={game.stage === "active" ? game.phase.phase : "day"} />
       <GameBoard
         players={game.players}
