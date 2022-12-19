@@ -151,7 +151,8 @@ function App() {
         <div aria-roledescription="navigation" id="menu">
           {game.stage === "setup" && (
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 dispatch({ type: "stageTransitionToActive", stage: "setup" });
               }}
             >
@@ -160,7 +161,8 @@ function App() {
           )}
           {game.stage === "active" && (
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 dispatch({
                   type: "stageTransitionToFinished",
                   stage: "active",
@@ -173,7 +175,8 @@ function App() {
           )}
           {game.stage === "active" && (
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 dispatch(
                   game.phase.phase === "day"
                     ? { type: "phaseTransitionToNight", stage: "active" }
