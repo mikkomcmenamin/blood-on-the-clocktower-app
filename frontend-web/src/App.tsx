@@ -71,7 +71,7 @@ function App() {
       : { state: "inactive" as const };
 
   useHandlePlayerCountChangeUIEffects(game.players);
-  useHandleNominationUIEffects(nomination);
+  useHandleNominationUIEffects(nomination, game.players);
 
   const addPlayer = (name: string, existingPlayers: Player[]) => {
     dispatch({

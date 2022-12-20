@@ -39,9 +39,9 @@
   }
 
   &.clockhandMinute {
-    transform: translate(-50%, -50%) rotate(calc(360deg / var(--num-players) * var(--nominee-id)));
+    transform: translate(-50%, -50%) rotate(calc(360deg / var(--num-players) * var(--nominee-index)));
   }
   &.clockhandHour {
-    transform: translate(-50%, -50%) rotate(calc(360deg / var(--num-players) * var(--nominator-id)));
+    transform: translate(-50%, -50%) rotate(calc(360deg / var(--num-players) * var(--nominator-index)));
   }
 }

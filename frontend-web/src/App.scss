@@ -3,8 +3,8 @@
  }
 
 body {
-  --nominator-id: 0;
-  --nominee-id: 0;
+  --nominator-index: 0;
+  --nominee-index: 0;
   font-size: 3vw;
   height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   width: 100%;

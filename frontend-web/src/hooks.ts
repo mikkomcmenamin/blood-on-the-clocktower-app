@@ -19,32 +19,44 @@ export function useClickOutside(
   }, [ref, callback]);
 }
 
-export function useHandleNominationUIEffects(nomination: Nomination) {
+export function useHandleNominationUIEffects(
+  nomination: Nomination,
+  players: Player[]
+) {
   // Handle setting the hour and minute hands of the clock to point at the nominating and nominated players respectively
   useLayoutEffect(() => {
     if (nomination.state === "inactive") {
-      document.body.style.setProperty("--nominator-id", "0");
-      document.body.style.setProperty("--nominee-id", "0");
+      document.body.style.setProperty("--nominator-index", "0");
+      document.body.style.setProperty("--nominee-index", "0");
       return;
     }
 
     if (nomination.state === "pending") {
+      const nominatorIndex = players.findIndex(
+        (player) => player.id === nomination.nominator.id
+      )!;
       document.body.style.setProperty(
-        "--nominator-id",
-        nomination.nominator.id.toString()
+        "--nominator-index",
+        nominatorIndex.toString()
       );
-      document.body.style.setProperty("--nominee-id", "0");
+      document.body.style.setProperty("--nominee-index", "0");
       return;
     }
 
     if (nomination.state === "active") {
+      const nominatorIndex = players.findIndex(
+        (player) => player.id === nomination.nominator.id
+      )!;
+      const nomineeIndex = players.findIndex(
+        (player) => player.id === nomination.nominee.id
+      )!;
       document.body.style.setProperty(
-        "--nominator-id",
-        nomination.nominator.id.toString()
+        "--nominator-index",
+        nominatorIndex.toString()
       );
       document.body.style.setProperty(
-        "--nominee-id",
-        nomination.nominee.id.toString()
+        "--nominee-index",
+        nomineeIndex.toString()
       );
       return;
     }
