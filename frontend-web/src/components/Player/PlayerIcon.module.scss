@@ -9,8 +9,8 @@
 }
 
 .playerContent {
-  background-size: 144px 140px;
-  background: url("../../assets/T_PlayerBgGraySolid.png") -5px;
+  background-size: contain;
+  background-image: url("../../assets/T_PlayerBgGraySolid.png");
   border-radius: 50%;
   width: 6em; // relative to own font size to prevent layout issues
   height: 6em;
@@ -58,15 +58,15 @@
 
   // .player-content with .nominator should have a very large blue box shadow, while .nominee should have red
   &.nominator {
-    background-size: 144px 140px;
-    background: url("../../assets/T_PlayerBgBlueSolid.png") -5px;
+    background-size: contain;
+    background-image: url("../../assets/T_PlayerBgBlueSolid.png");
     box-shadow: 0 0 4rem #646cffaa;
     font-weight: 800;
     scale: 1.1;
   }
   &.nominee {
-    background-size: 144px 140px;
-    background: url("../../assets/T_PlayerBgRedSolid.png") -5px;
+    background-size: contain;
+    background-image: url("../../assets/T_PlayerBgRedSolid.png");
     box-shadow: 0 0 4rem #ff6464aa;
     font-weight: 800;
     scale: 1.1;
