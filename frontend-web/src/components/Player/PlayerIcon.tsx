@@ -6,12 +6,14 @@ type PlayerIconProps = {
   key: number;
   player: Player;
   selectPlayer: (player: Player) => void;
+  onDragPlayer: (e: React.DragEvent<HTMLDivElement>, id: number) => void;
   nomination: Nomination;
 };
 
 const PlayerIcon: React.FC<PlayerIconProps> = ({
   player,
   selectPlayer,
+  onDragPlayer,
   nomination,
 }) => {
   return (
@@ -19,6 +21,10 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
       <div
         onClick={() => {
           selectPlayer(player);
+        }}
+        draggable
+        onDragStart={(e) => {
+          e.dataTransfer.setData("application/botc", player.id.toString());
         }}
         className={classnames({
           [styles.playerContent]: true,

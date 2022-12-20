@@ -82,6 +82,13 @@ function App() {
     setIsModalOpen(false);
   };
 
+  const removePlayer = (id: number) => {
+    if (game.stage !== "setup") {
+      return;
+    }
+    dispatch({ type: "removePlayer", stage: "setup", payload: id });
+  };
+
   // close the modal when clicking outside of it
   const modalRef = useRef<HTMLDivElement>(null);
   useClickOutside(modalRef, () => setIsModalOpen(false));
@@ -178,6 +185,7 @@ function App() {
         players={game.players}
         nomination={nomination}
         onSelectPlayer={handleSelectPlayer}
+        onDropPlayer={removePlayer}
         onClickOutside={() => {
           if (nomination.state !== "inactive") {
             dispatch({ type: "cancelNomination", stage: "active" });

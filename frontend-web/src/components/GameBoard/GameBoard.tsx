@@ -12,6 +12,7 @@ type GameBoardProps = {
   players: Player[];
   nomination: Nomination;
   onSelectPlayer: (playerId: number) => void;
+  onDropPlayer: (id: number) => void;
   onClickOutside: () => void;
 };
 
@@ -19,6 +20,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   players,
   nomination,
   onSelectPlayer,
+  onDropPlayer,
   onClickOutside,
 }) => {
   // cancel the current nomination when clicking outside of the player-circle
@@ -29,8 +31,40 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const showHourHand =
     nomination.state === "pending" || nomination.state === "active";
 
+  // When a Player is dropped onto the background in setup, remove them from the game.
+  const gameBoardContainerRef = useRef<HTMLElement>(null);
+
+  // These two events need to be prevented to allow the drop event to fire.
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  // Handle the drop here; only consider it if the target is the game board, i.e. not its children.
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (
+      !gameBoardContainerRef.current ||
+      e.target !== gameBoardContainerRef.current
+    )
+      return;
+    const playerId = e.dataTransfer.getData("application/botc");
+    if (!playerId) {
+      return;
+    }
+    onDropPlayer(parseInt(playerId));
+  };
+
   return (
-    <section id={styles.gameBoardContainer}>
+    <section
+      ref={gameBoardContainerRef}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      id={styles.gameBoardContainer}
+    >
       <div id={styles.gameBoard} ref={gameBoardRef}>
         {players.map((player) => (
           <PlayerIcon
