@@ -28,8 +28,8 @@
 
   @media (orientation: landscape) {
     --ball-size: calc(4rem + (50rem / var(--num-players)));
-    width: clamp(12rem, var(--ball-size), 18rem);
-    height: clamp(12rem, var(--ball-size), 18rem);
+    width: clamp(8rem, var(--ball-size), 18rem);
+    height: clamp(8rem, var(--ball-size), 18rem);
   }
 
   & > * {
