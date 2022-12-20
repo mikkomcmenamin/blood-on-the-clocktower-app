@@ -10,7 +10,7 @@
     "fe:prod": "cd frontend-web && vite build && vite preview",
     "fe:build": "cd frontend-web && tsc && vite build",
     "fe:preview": "cd frontend-web && vite preview",
-    "be:dev": "cd backend && nodemon src/server.ts",
+    "be:dev": "cd backend && nodemon --watch . --watch ../common src/server.ts",
     "be:prod": "cd backend && ts-node src/server.ts"
   },
   "repository": {
