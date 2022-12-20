@@ -18,6 +18,7 @@ import Modal from "./components/Modal";
 import Background from "./components/Background";
 import GameBoard from "./components/GameBoard/GameBoard";
 import { GameAction, gameStateReducer } from "@common/gameLogic";
+import Menu from "./components/Menu/Menu";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -193,60 +194,7 @@ function App() {
         }}
       />
 
-      <nav id="controls">
-        <div aria-roledescription="navigation" id="menu">
-          {game.stage === "setup" && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                dispatch({ type: "stageTransitionToActive", stage: "setup" });
-              }}
-            >
-              Start game
-            </button>
-          )}
-          {game.stage === "active" && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                dispatch({
-                  type: "stageTransitionToFinished",
-                  stage: "active",
-                  payload: "good",
-                });
-              }}
-            >
-              Finish game
-            </button>
-          )}
-          {game.stage === "active" && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                dispatch(
-                  game.phase.phase === "day"
-                    ? { type: "phaseTransitionToNight", stage: "active" }
-                    : { type: "phaseTransitionToDay", stage: "active" }
-                );
-              }}
-            >
-              {game.phase.phase === "day"
-                ? "Transition to night"
-                : "Transition to day"}
-            </button>
-          )}
-          {game.stage !== "setup" && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                dispatch({ type: "resetToSetup" });
-              }}
-            >
-              Reset game
-            </button>
-          )}
-        </div>
-      </nav>
+      <Menu game={game} dispatch={dispatch} />
       {isModalOpen && (
         <Modal
           addPlayer={(p) => addPlayer(p, game.players)}
