@@ -235,6 +235,16 @@ function App() {
                 : "Transition to day"}
             </button>
           )}
+          {game.stage !== "setup" && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                dispatch({ type: "resetToSetup" });
+              }}
+            >
+              Reset game
+            </button>
+          )}
         </div>
       </nav>
       {isModalOpen && (

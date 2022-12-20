@@ -92,6 +92,10 @@ const replaceStateSchema = z.object({
   payload: gameSchema,
 });
 
+const resetToSetupSchema = z.object({
+  type: z.literal("resetToSetup"),
+});
+
 export const gameActionSchema = z.union([
   addPlayerActionSchema,
   removePlayerActionSchema,
@@ -106,6 +110,7 @@ export const gameActionSchema = z.union([
   stageTransitionToActiveActionSchema,
   stageTransitionToFinishedActionSchema,
   replaceStateSchema,
+  resetToSetupSchema,
 ]);
 
 export type GameAction = z.infer<typeof gameActionSchema>;
@@ -405,6 +410,15 @@ function gameStateActiveReducer(
 export function gameStateReducer(state: Game, action: GameAction): Game {
   if (action.type === "replaceState") {
     return action.payload;
+  } else if (action.type === "resetToSetup") {
+    return {
+      ...state,
+      stage: "setup",
+      players: state.players.map(({ id, name }) => ({
+        id,
+        name,
+      })),
+    };
   }
   switch (action.stage) {
     case "setup":
