@@ -16,7 +16,7 @@ import { GameAction, gameStateReducer } from "@common/gameLogic";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
-  url: `ws://localhost:2022`,
+  url: `ws://${window.location.hostname}:2022`,
 });
 // configure TRPCClient to use WebSockets transport
 const client = createTRPCProxyClient<AppRouter>({
