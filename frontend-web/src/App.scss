@@ -56,15 +56,6 @@ button {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-// on desktop, make the modal content only 50% and the modal takes into account the 2rem taken by the right side drawer
-@media (orientation: landscape) {
-  .modal {
-    padding-right: 2rem;
-  }
-  .modal-content {
-    width: 50%;
-  }
-}
 
 nav {
   display: flex;

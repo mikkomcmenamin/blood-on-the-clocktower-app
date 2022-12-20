@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import "./Modal.scss";
+import styles from "./Modal.module.scss";
 
 type ModalProps = {
   addPlayer: (name: string) => void;
@@ -27,8 +27,8 @@ const Modal: React.FC<ModalProps> = ({ addPlayer, modalRef }) => {
   };
 
   return (
-    <div className="modal">
-      <div ref={modalRef} className="modal-content">
+    <div className={styles.modal}>
+      <div ref={modalRef} className={styles.modalContent}>
         <h2>Add a new player</h2>
         <form id="add-player-form" onSubmit={handleAddPlayer}>
           <input
@@ -37,7 +37,7 @@ const Modal: React.FC<ModalProps> = ({ addPlayer, modalRef }) => {
             value={newPlayerName}
             onChange={handleNewPlayerNameChange}
           />
-          <div className="buttons">
+          <div className={styles.buttons}>
             <button type="submit" onClick={handleAddPlayer}>
               Add
             </button>

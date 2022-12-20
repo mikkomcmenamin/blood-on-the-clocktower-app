@@ -12,7 +12,7 @@
   align-items: center;
 }
 
-.modal-content {
+.modalContent {
   background-color: rgba(0, 0, 0, 0.9);
   margin: auto;
   padding: 2rem;
@@ -46,5 +46,15 @@
     border: 1px solid #888;
     padding: 0.5rem;
     box-shadow: 0 0 0.5rem #888;
+  }
+}
+
+// on desktop, make the modal content only 50% and the modal takes into account the 2rem taken by the right side drawer
+@media (orientation: landscape) {
+  .modal {
+    padding-right: 2rem;
+  }
+  .modalContent{
+    width: 50%;
   }
 }
