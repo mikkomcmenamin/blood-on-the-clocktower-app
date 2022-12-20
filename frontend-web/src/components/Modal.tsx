@@ -39,7 +39,6 @@ const Modal: React.FC<ModalProps> = ({ addPlayer, modalRef }) => {
           />
           <div className={styles.buttons}>
             <button type="submit" onClick={handleAddPlayer}>
-              Add
             </button>
           </div>
         </form>

@@ -12,8 +12,9 @@
   background-size: contain;
   background-image: url("../../assets/T_PlayerBgGraySolid.png");
   border-radius: 50%;
-  width: 6em; // relative to own font size to prevent layout issues
-  height: 6em;
+  --ball-size: calc(2rem + (30rem / var(--num-players)));
+  width: var(--ball-size);
+  height: var(--ball-size);
   color: rgb(255, 255, 255);
   display: flex;
   flex-direction: column;
@@ -24,6 +25,10 @@
   // shadow etc to make this look like a raised button
   box-shadow: 0 0 1rem rgb(255, 255, 255);
   cursor: pointer;
+
+  @media (orientation: landscape) {
+    --ball-size: calc(4rem + (50rem / var(--num-players)));
+  }
 
   & > * {
     cursor: pointer;
