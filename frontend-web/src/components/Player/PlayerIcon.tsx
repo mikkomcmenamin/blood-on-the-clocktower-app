@@ -6,14 +6,12 @@ type PlayerIconProps = {
   key: number;
   player: Player;
   selectPlayer: (player: Player) => void;
-  onDragPlayer: (e: React.DragEvent<HTMLDivElement>, id: number) => void;
   nomination: Nomination;
 };
 
 const PlayerIcon: React.FC<PlayerIconProps> = ({
   player,
   selectPlayer,
-  onDragPlayer,
   nomination,
 }) => {
   return (
