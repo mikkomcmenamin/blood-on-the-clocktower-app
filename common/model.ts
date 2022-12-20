@@ -96,19 +96,12 @@ export const gameSchema = z.union([
 
 export type Game = z.infer<typeof gameSchema>;
 
-export const createSetupStagePlayer = (name: string): Player => ({
+export const createSetupStagePlayer = (
+  name: string,
+  existingPlayers: Player[]
+): Player => ({
   name,
-  id: nextId(),
-});
-
-export const createMockActiveStagePlayer = (
-  name: string
-): ActiveStagePlayer => ({
-  name,
-  id: nextId(),
-  character: "character",
-  team: "good",
-  alive: true,
+  id: nextId(existingPlayers),
 });
 
 export const initialGameState: Game = {

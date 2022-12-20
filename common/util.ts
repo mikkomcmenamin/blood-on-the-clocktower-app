@@ -1,3 +1,5 @@
+import { Player } from "./model";
+
 const randomSort = () => Math.random() - 0.5;
 
 export const fakeNamesList = [
@@ -68,9 +70,10 @@ export const fakeNamesList = [
   "Taylor",
 ].sort(randomSort);
 
-let id = 0;
-
-export const nextId = () => id++;
+export const nextId = (players: Player[]) => {
+  const ids = players.map((player) => player.id);
+  return Math.max(...ids, -1) + 1;
+};
 
 export const cat = (array: string[]) =>
   array.reduce((acc, cur) => (!cur ? acc : !acc ? cur : `${acc} ${cur}`), "");

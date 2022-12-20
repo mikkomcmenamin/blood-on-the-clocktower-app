@@ -3,7 +3,12 @@ import { createTRPCProxyClient, createWSClient, wsLink } from "@trpc/client";
 import type { AppRouter } from "@common/router";
 import { fakeNamesList } from "@common/util";
 import "./App.scss";
-import { createSetupStagePlayer, Game, initialGameState } from "@common/model";
+import {
+  createSetupStagePlayer,
+  Game,
+  initialGameState,
+  Player,
+} from "@common/model";
 import {
   useClickOutside,
   useHandleNominationUIEffects,
@@ -68,11 +73,11 @@ function App() {
   useHandlePlayerCountChangeUIEffects(game.players);
   useHandleNominationUIEffects(nomination);
 
-  const addPlayer = (name: string) => {
+  const addPlayer = (name: string, existingPlayers: Player[]) => {
     dispatch({
       type: "addPlayer",
       stage: "setup",
-      payload: createSetupStagePlayer(name),
+      payload: createSetupStagePlayer(name, existingPlayers),
     });
     setIsModalOpen(false);
   };
@@ -224,7 +229,12 @@ function App() {
           )}
         </div>
       </nav>
-      {isModalOpen && <Modal addPlayer={addPlayer} modalRef={modalRef} />}
+      {isModalOpen && (
+        <Modal
+          addPlayer={(p) => addPlayer(p, game.players)}
+          modalRef={modalRef}
+        />
+      )}
     </div>
   );
 }
