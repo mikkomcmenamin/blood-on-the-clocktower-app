@@ -13,8 +13,8 @@
   background-image: url("../../assets/T_PlayerBgGraySolid.png");
   border-radius: 50%;
   --ball-size: calc(2rem + (30rem / var(--num-players)));
-  width: clamp(3rem, var(--ball-size), 18rem);
-  height: clamp(3rem, var(--ball-size), 18rem);
+  width: clamp(3rem, var(--ball-size), 7rem);
+  height: clamp(3rem, var(--ball-size), 7rem);
   color: rgb(255, 255, 255);
   display: flex;
   flex-direction: column;
@@ -28,6 +28,8 @@
 
   @media (orientation: landscape) {
     --ball-size: calc(4rem + (50rem / var(--num-players)));
+    width: clamp(12rem, var(--ball-size), 18rem);
+    height: clamp(12rem, var(--ball-size), 18rem);
   }
 
   & > * {
