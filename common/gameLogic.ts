@@ -8,6 +8,7 @@ import {
   setupStagePlayerSchema,
   activeStagePlayerSchema,
   teamSchema,
+  gameSchema,
 } from "./model";
 
 // Stages mean the game is in a particular state (setup, active, finished)
@@ -86,6 +87,10 @@ const stageTransitionToFinishedActionSchema = activeActionSchema.merge(
     payload: teamSchema,
   })
 );
+const replaceStateSchema = z.object({
+  type: z.literal("replaceState"),
+  payload: gameSchema,
+});
 
 export const gameActionSchema = z.union([
   addPlayerActionSchema,
@@ -100,6 +105,7 @@ export const gameActionSchema = z.union([
   phaseTransitionToDayActionSchema,
   stageTransitionToActiveActionSchema,
   stageTransitionToFinishedActionSchema,
+  replaceStateSchema,
 ]);
 
 export type GameAction = z.infer<typeof gameActionSchema>;
@@ -397,6 +403,9 @@ function gameStateActiveReducer(
 }
 
 export function gameStateReducer(state: Game, action: GameAction): Game {
+  if (action.type === "replaceState") {
+    return action.payload;
+  }
   switch (action.stage) {
     case "setup":
       if (state.stage !== "setup") {

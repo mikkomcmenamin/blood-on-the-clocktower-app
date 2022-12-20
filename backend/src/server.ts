@@ -1,20 +1,25 @@
-import { createHTTPServer } from "@trpc/server/adapters/standalone";
+import { createHTTPHandler } from "@trpc/server/adapters/standalone";
 import { applyWSSHandler } from "@trpc/server/adapters/ws";
+import http from "http";
 import ws from "ws";
-import { appRouter, createContext, AppRouter } from "@common/router";
+import { createAppRouter, createContext, AppRouter } from "@common/router";
 
+const router = createAppRouter();
 // http server
-const { server, listen } = createHTTPServer({
-  router: appRouter,
+const handler = createHTTPHandler({
+  router,
   createContext,
 });
+
+const server = http.createServer(handler);
 
 // ws server
 const wss = new ws.Server({ server });
 applyWSSHandler<AppRouter>({
   wss,
-  router: appRouter,
+  router,
   createContext,
 });
 
-listen(2022);
+// listen on 0.0.0.0 to allow e.g. mobile phone on same network to connect
+server.listen(2022, "0.0.0.0");

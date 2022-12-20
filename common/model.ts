@@ -110,3 +110,8 @@ export const createMockActiveStagePlayer = (
   team: "good",
   alive: true,
 });
+
+export const initialGameState: Game = {
+  stage: "setup",
+  players: [],
+};

@@ -3,7 +3,7 @@ import { createTRPCProxyClient, createWSClient, wsLink } from "@trpc/client";
 import type { AppRouter } from "@common/router";
 import { fakeNamesList } from "@common/util";
 import "./App.scss";
-import { createSetupStagePlayer, Game } from "@common/model";
+import { createSetupStagePlayer, Game, initialGameState } from "@common/model";
 import {
   useClickOutside,
   useHandleNominationUIEffects,
@@ -12,16 +12,7 @@ import {
 import Modal from "./components/Modal";
 import Background from "./components/Background";
 import GameBoard from "./components/GameBoard/GameBoard";
-import { gameStateReducer } from "@common/gameLogic";
-
-const initialPlayers = Array.from({ length: 3 }, (_, i) =>
-  createSetupStagePlayer(fakeNamesList[i])
-);
-
-const initialGameState: Game = {
-  stage: "setup",
-  players: initialPlayers,
-};
+import { GameAction, gameStateReducer } from "@common/gameLogic";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -46,10 +37,28 @@ client.onHeartbeat.subscribe(undefined, {
 });
 
 function App() {
-  const [game, dispatch] = useReducer(gameStateReducer, initialGameState);
+  const [game, _dispatch] = useReducer(gameStateReducer, initialGameState);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log(game);
+  const dispatch = (action: GameAction) => {
+    _dispatch(action);
+    client.gameAction.mutate(action);
+  };
+
+  useEffect(() => {
+    const unsub = client.onGameAction.subscribe(undefined, {
+      onData: (data) => {
+        console.log("Got server state", data);
+        _dispatch({ type: "replaceState", payload: data });
+      },
+      onError: (err) => {
+        console.error(err);
+      },
+    });
+    return () => {
+      unsub.unsubscribe();
+    };
+  }, []);
 
   const nomination =
     game.stage === "active" && game.phase.phase === "day"
