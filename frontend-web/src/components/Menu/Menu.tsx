@@ -1,17 +1,14 @@
 import React from "react";
-import {Game} from "@common/model";
-import {GameAction} from "@common/gameLogic";
+import { Game } from "@common/model";
+import { GameAction } from "@common/gameLogic";
 import "./Menu.scss";
 
 type Props = {
-  game: Game
+  game: Game;
   dispatch: (action: GameAction) => void;
-}
+};
 
-const Menu: React.FC<Props> = ({
-  game,
-  dispatch,
-}) => {
+const Menu: React.FC<Props> = ({ game, dispatch }) => {
   return (
     <>
       <nav id="controls">
@@ -20,7 +17,7 @@ const Menu: React.FC<Props> = ({
             <button
               onClick={(e) => {
                 e.preventDefault();
-                dispatch({type: "stageTransitionToActive", stage: "setup"});
+                dispatch({ type: "stageTransitionToActive", stage: "setup" });
               }}
             >
               Start game
@@ -46,8 +43,8 @@ const Menu: React.FC<Props> = ({
                 e.preventDefault();
                 dispatch(
                   game.phase.phase === "day"
-                    ? {type: "phaseTransitionToNight", stage: "active"}
-                    : {type: "phaseTransitionToDay", stage: "active"}
+                    ? { type: "phaseTransitionToNight", stage: "active" }
+                    : { type: "phaseTransitionToDay", stage: "active" }
                 );
               }}
             >
@@ -60,7 +57,7 @@ const Menu: React.FC<Props> = ({
             <button
               onClick={(e) => {
                 e.preventDefault();
-                dispatch({type: "resetToSetup"});
+                dispatch({ type: "resetToSetup" });
               }}
             >
               Reset game

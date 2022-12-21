@@ -185,8 +185,12 @@ function App() {
 
   return (
     <div className="App">
-      <InfoPanel text={getGameStateText()} position={"top-left"} showOnMobile={true}/>
-      <Background phase={game.stage === "active" ? game.phase.phase : "day"}/>
+      <InfoPanel
+        text={getGameStateText()}
+        position={"top-left"}
+        showOnMobile={true}
+      />
+      <Background phase={game.stage === "active" ? game.phase.phase : "day"} />
       <GameBoard
         players={game.players}
         nomination={nomination}
@@ -205,12 +209,12 @@ function App() {
         onDeletePlayer={removePlayer}
         onClickOutside={() => {
           if (nomination.state !== "inactive") {
-            dispatch({type: "cancelNomination", stage: "active"});
+            dispatch({ type: "cancelNomination", stage: "active" });
           }
         }}
       />
 
-      <Menu game={game} dispatch={dispatch}/>
+      <Menu game={game} dispatch={dispatch} />
       {isModalOpen && (
         <Modal
           addPlayer={(p) => addPlayer(p, game.players)}
@@ -218,12 +222,14 @@ function App() {
         />
       )}
       {nomination.state === "active" && (
-        <InfoPanel text={`Votes required: ${calculateVotesRequired(game)}`} position={"top-right"}
-          showOnMobile={false}/>
+        <InfoPanel
+          text={`Votes required: ${calculateVotesRequired(game)}`}
+          position={"top-right"}
+          showOnMobile={false}
+        />
       )}
     </div>
   );
 }
 
 export default App;
-

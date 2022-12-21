@@ -38,8 +38,7 @@ const Modal: React.FC<ModalProps> = ({ addPlayer, modalRef }) => {
             onChange={handleNewPlayerNameChange}
           />
           <div className={styles.buttons}>
-            <button type="submit" onClick={handleAddPlayer}>
-            </button>
+            <button type="submit" onClick={handleAddPlayer}></button>
           </div>
         </form>
       </div>

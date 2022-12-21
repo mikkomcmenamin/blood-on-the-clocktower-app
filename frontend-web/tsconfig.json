@@ -17,9 +17,9 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@common/*": ["../common/*"],
+      "@common/*": ["../common/*"]
     }
   },
   "include": ["src", "../common/model.ts", "../common/util.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

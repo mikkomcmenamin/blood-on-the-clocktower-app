@@ -11,7 +11,8 @@
     "fe:build": "cd frontend-web && tsc && vite build",
     "fe:preview": "cd frontend-web && vite preview",
     "be:dev": "cd backend && nodemon --watch . --watch ../common src/server.ts",
-    "be:prod": "cd backend && ts-node src/server.ts"
+    "be:prod": "cd backend && ts-node src/server.ts",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\""
   },
   "repository": {
     "type": "git",
@@ -41,6 +42,7 @@
     "@vitejs/plugin-react": "^3.0.0",
     "concurrently": "^7.6.0",
     "nodemon": "^2.0.20",
+    "prettier": "^2.8.1",
     "sass": "^1.57.0",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.1",

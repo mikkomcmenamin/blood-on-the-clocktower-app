@@ -6,13 +6,13 @@
   justify-content: center;
 }
 
-#gameBoard{
+#gameBoard {
   position: relative;
   width: min(75vw, 75vh);
   height: min(75vw, 75vh);
 
   border-radius: 50%;
-  background-image: url('../../assets/clockface.jpg');
+  background-image: url("../../assets/clockface.jpg");
   background-size: cover;
   // Raise it from the foreground as it if it was floating in the air
   box-shadow: 0 0 2rem #646cffaa;
@@ -39,9 +39,11 @@
   }
 
   &.clockhandMinute {
-    transform: translate(-50%, -50%) rotate(calc(360deg / var(--num-players) * var(--nominee-index)));
+    transform: translate(-50%, -50%)
+      rotate(calc(360deg / var(--num-players) * var(--nominee-index)));
   }
   &.clockhandHour {
-    transform: translate(-50%, -50%) rotate(calc(360deg / var(--num-players) * var(--nominator-index)));
+    transform: translate(-50%, -50%)
+      rotate(calc(360deg / var(--num-players) * var(--nominator-index)));
   }
 }
