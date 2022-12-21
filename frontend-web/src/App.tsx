@@ -17,7 +17,11 @@ import {
 import Modal from "./components/Modal";
 import Background from "./components/Background";
 import GameBoard from "./components/GameBoard/GameBoard";
-import {calculateVotesRequired, GameAction, gameStateReducer } from "@common/gameLogic";
+import {
+  calculateVotesRequired,
+  GameAction,
+  gameStateReducer,
+} from "@common/gameLogic";
 import Menu from "./components/Menu/Menu";
 import InfoPanel from "./components/InfoPanel";
 
@@ -36,7 +40,7 @@ const client = createTRPCProxyClient<AppRouter>({
 
 client.onHeartbeat.subscribe(undefined, {
   onData: (data) => {
-    console.log("heartbeat", data);
+    // console.log("heartbeat", data);
   },
   onError: (err) => {
     console.error(err);
@@ -187,7 +191,18 @@ function App() {
         players={game.players}
         nomination={nomination}
         onSelectPlayer={handleSelectPlayer}
-        onDropPlayer={removePlayer}
+        onReorderPlayers={(playerIds) => {
+          console.log("reorder players", playerIds);
+          const players = playerIds.map(
+            (id) => game.players.find((p) => p.id === id)!
+          );
+          dispatch({
+            type: "reorderPlayers",
+            stage: "setup",
+            payload: players,
+          });
+        }}
+        onDeletePlayer={removePlayer}
         onClickOutside={() => {
           if (nomination.state !== "inactive") {
             dispatch({ type: "cancelNomination", stage: "active" });
@@ -202,10 +217,11 @@ function App() {
           modalRef={modalRef}
         />
       )}
-      {nomination.state === "active" && (<InfoPanel text={`Votes required: ${calculateVotesRequired(game)}`}/>)}
+      {nomination.state === "active" && (
+        <InfoPanel text={`Votes required: ${calculateVotesRequired(game)}`} />
+      )}
     </div>
   );
 }
 
 export default App;
-

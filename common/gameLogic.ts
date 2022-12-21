@@ -96,6 +96,13 @@ const resetToSetupSchema = z.object({
   type: z.literal("resetToSetup"),
 });
 
+const reorderPlayersSchema = setupActionSchema.merge(
+  z.object({
+    type: z.literal("reorderPlayers"),
+    payload: z.array(setupStagePlayerSchema),
+  })
+);
+
 export const gameActionSchema = z.union([
   addPlayerActionSchema,
   removePlayerActionSchema,
@@ -111,6 +118,7 @@ export const gameActionSchema = z.union([
   stageTransitionToFinishedActionSchema,
   replaceStateSchema,
   resetToSetupSchema,
+  reorderPlayersSchema,
 ]);
 
 export type GameAction = z.infer<typeof gameActionSchema>;
@@ -146,6 +154,12 @@ function gameStateSetupReducer(
           nightDeaths: [],
           nightNumber: 1,
         },
+      };
+    }
+    case "reorderPlayers": {
+      return {
+        ...state,
+        players: action.payload,
       };
     }
   }
@@ -439,11 +453,11 @@ export function gameStateReducer(state: Game, action: GameAction): Game {
 }
 
 export function calculateVotesRequired(game: Game): number {
-    if(game.stage == "active") {
-        const alivePlayers = game.players.filter(player => player.alive);
-        return Math.ceil(alivePlayers.length/2);
-        //Also take into account previous highest vote.
-    }
+  if (game.stage == "active") {
+    const alivePlayers = game.players.filter((player) => player.alive);
+    return Math.ceil(alivePlayers.length / 2);
+    //Also take into account previous highest vote.
+  }
 
   return 0;
 }

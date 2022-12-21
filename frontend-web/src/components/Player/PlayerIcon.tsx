@@ -17,6 +17,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
   return (
     <div className={styles.playerRotator}>
       <div
+        data-playerid={player.id}
         onClick={() => {
           selectPlayer(player);
         }}

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Nomination, Player } from "@common/model";
 
 export function useClickOutside(
@@ -78,7 +78,42 @@ export function useWindowInnerWidth(): number {
     const handleResize = () => setWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-    }, []);
+  }, []);
 
   return width;
+}
+
+export function useDropzone({
+  ref,
+  onDrop,
+  deps = [],
+  exact = false,
+}: {
+  ref: React.RefObject<HTMLElement>;
+  onDrop: (e: DragEvent) => void;
+  exact?: boolean;
+  deps?: any[];
+}) {
+  useEffect(() => {
+    if (!ref.current) return;
+    const handleDrop = (e: DragEvent) => {
+      if (exact) {
+        if (ref.current === (e.target as Node)) {
+          onDrop(e);
+        }
+        return;
+      }
+      if (ref.current?.contains(e.target as Node)) {
+        onDrop(e);
+      }
+    };
+
+    ref.current.addEventListener("drop", handleDrop);
+    ref.current.addEventListener("dragover", (e) => e.preventDefault());
+
+    return () => {
+      ref.current?.removeEventListener("drop", handleDrop);
+      ref.current?.removeEventListener("dragover", (e) => e.preventDefault());
+    };
+  }, [ref.current, onDrop, ...deps]);
 }

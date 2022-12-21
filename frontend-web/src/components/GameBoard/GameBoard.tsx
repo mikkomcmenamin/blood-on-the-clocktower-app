@@ -5,14 +5,15 @@ import PlayerIcon from "../Player/PlayerIcon";
 
 import clockHandMinute from "../../assets/clockhand.png";
 import clockHandHour from "../../assets/clockhand-hour.png";
-import { useClickOutside } from "../../hooks";
+import { useClickOutside, useDropzone } from "../../hooks";
 import styles from "./GameBoard.module.scss";
 
 type GameBoardProps = {
   players: Player[];
   nomination: Nomination;
   onSelectPlayer: (playerId: number) => void;
-  onDropPlayer: (id: number) => void;
+  onDeletePlayer: (id: number) => void;
+  onReorderPlayers: (playerIds: number[]) => void;
   onClickOutside: () => void;
 };
 
@@ -20,7 +21,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
   players,
   nomination,
   onSelectPlayer,
-  onDropPlayer,
+  onDeletePlayer,
+  onReorderPlayers,
   onClickOutside,
 }) => {
   // cancel the current nomination when clicking outside of the player-circle
@@ -33,38 +35,122 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   // When a Player is dropped onto the background in setup, remove them from the game.
   const gameBoardContainerRef = useRef<HTMLElement>(null);
+  useDropzone({
+    ref: gameBoardContainerRef,
+    onDrop: (e) => {
+      const id = e.dataTransfer?.getData("application/botc");
+      if (!id) return;
+      const playerId = parseInt(id);
+      onDeletePlayer(playerId);
+    },
+    exact: true,
+  });
 
-  // These two events need to be prevented to allow the drop event to fire.
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
+  // When a Player is dropped onto the .gameBoard, calculate what are the two nearest players.
+  // The players can be retrieved by querying for the data-playerid attribute.
+  function getDistance(x1: number, y1: number, x2: number, y2: number) {
+    return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+  }
 
-  // Handle the drop here; only consider it if the target is the game board, i.e. not its children.
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    if (
-      !gameBoardContainerRef.current ||
-      e.target !== gameBoardContainerRef.current
-    )
-      return;
-    const playerId = e.dataTransfer.getData("application/botc");
-    if (!playerId) {
-      return;
-    }
-    onDropPlayer(parseInt(playerId));
-  };
+  useDropzone({
+    ref: gameBoardRef,
+    onDrop: (e) => {
+      const id = e.dataTransfer?.getData("application/botc");
+      if (!id) return;
+      const playerElements =
+        gameBoardRef.current?.querySelectorAll(`[data-playerid]`);
+      if (!playerElements) return;
+      const playerElementsArray = Array.from(playerElements).filter(
+        (el): el is HTMLElement => el instanceof HTMLElement
+      );
+      const playerElementsWithId = playerElementsArray.map((element) => {
+        const id = element.getAttribute("data-playerid");
+        if (!id) {
+          throw Error("Player element has no data-playerid attribute");
+        }
+        return {
+          id: parseInt(id),
+          element,
+        };
+      });
+
+      let closestPlayerId = null;
+      let closestDistance = Infinity;
+      let secondClosestPlayerId = null;
+      let secondClosestDistance = Infinity;
+      const playerCenterX = e.clientX;
+      const playerCenterY = e.clientY;
+      for (const playerElement of playerElementsWithId) {
+        const { left, top, width, height } =
+          playerElement.element.getBoundingClientRect();
+        const centerX = left + width / 2;
+        const centerY = top + height / 2;
+        const distance = getDistance(
+          playerCenterX,
+          playerCenterY,
+          centerX,
+          centerY
+        );
+        if (distance < closestDistance) {
+          secondClosestPlayerId = closestPlayerId;
+          secondClosestDistance = closestDistance;
+          closestPlayerId = playerElement.id;
+          closestDistance = distance;
+        } else if (distance < secondClosestDistance) {
+          secondClosestPlayerId = playerElement.id;
+          secondClosestDistance = distance;
+        }
+      }
+
+      if (closestPlayerId === null || secondClosestPlayerId === null) {
+        throw Error("Could not find closest players");
+      }
+
+      console.log("closestPlayerId", closestPlayerId);
+      console.log("secondClosestPlayerId", secondClosestPlayerId);
+
+      // Reorder players so that the dropped player is between the two closest players.
+      // If the dropped player is one of the two closest players, do nothing.
+      // If the closest players are next to each other, reorder them so that the dropped player is between them.
+      // If the closest player are the first and last in the list, move the dropped player to the end of the list.
+      const playerIds = players.map((player) => player.id);
+      const droppedPlayerId = parseInt(id);
+      const droppedPlayerIndex = playerIds.indexOf(droppedPlayerId);
+      const closestPlayerIndex = playerIds.indexOf(closestPlayerId);
+      const secondClosestPlayerIndex = playerIds.indexOf(secondClosestPlayerId);
+      if (
+        droppedPlayerIndex === closestPlayerIndex ||
+        droppedPlayerIndex === secondClosestPlayerIndex
+      ) {
+        return;
+      }
+
+      const reorderedPlayerIds = [...playerIds];
+      const TEMPORARY_DUMMY = Infinity;
+      reorderedPlayerIds.splice(droppedPlayerIndex, 1, TEMPORARY_DUMMY);
+      if (
+        closestPlayerIndex === 0 &&
+        secondClosestPlayerIndex === reorderedPlayerIds.length - 1
+      ) {
+        reorderedPlayerIds.push(droppedPlayerId);
+      } else if (
+        closestPlayerIndex === reorderedPlayerIds.length - 1 &&
+        secondClosestPlayerIndex === 0
+      ) {
+        reorderedPlayerIds.splice(0, 0, droppedPlayerId);
+      } else if (closestPlayerIndex < secondClosestPlayerIndex) {
+        reorderedPlayerIds.splice(secondClosestPlayerIndex, 0, droppedPlayerId);
+      } else {
+        reorderedPlayerIds.splice(closestPlayerIndex, 0, droppedPlayerId);
+      }
+      reorderedPlayerIds.splice(reorderedPlayerIds.indexOf(TEMPORARY_DUMMY), 1);
+      onReorderPlayers(reorderedPlayerIds);
+    },
+    deps: [players],
+  });
 
   return (
-    <section
-      ref={gameBoardContainerRef}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onDragEnter={handleDragEnter}
-      id={styles.gameBoardContainer}
-    >
+    <section ref={gameBoardContainerRef} id={styles.gameBoardContainer}>
       <div id={styles.gameBoard} ref={gameBoardRef}>
         {players.map((player) => (
           <PlayerIcon
