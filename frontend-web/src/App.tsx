@@ -196,6 +196,7 @@ function App() {
         nomination={nomination}
         onSelectPlayer={handleSelectPlayer}
         onReorderPlayers={(playerIds) => {
+          if (game.stage !== "setup") return;
           console.log("reorder players", playerIds);
           const players = playerIds.map(
             (id) => game.players.find((p) => p.id === id)!
