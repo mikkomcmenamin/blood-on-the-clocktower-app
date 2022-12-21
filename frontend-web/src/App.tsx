@@ -168,25 +168,25 @@ function App() {
     }
   }
 
+  function getGameStateText(): string {
+    switch (game.stage) {
+      case "setup":
+        return "Setup Players";
+      case "active": {
+        if (game.phase.phase === "day") {
+          return `Day ${game.phase.dayNumber}`;
+        }
+        return `Night ${game.phase.nightNumber}`;
+      }
+      case "finished":
+        return "Game Finished";
+    }
+  }
+
   return (
     <div className="App">
-      <div className="gameStageIndicator">
-        {(() => {
-          switch (game.stage) {
-            case "setup":
-              return "Game stage: Setup";
-            case "active": {
-              if (game.phase.phase === "day") {
-                return `Game stage: Day ${game.phase.dayNumber}`;
-              }
-              return `Game stage: Night ${game.phase.nightNumber}`;
-            }
-            case "finished":
-              return "Game stage: Finished";
-          }
-        })()}
-      </div>
-      <Background phase={game.stage === "active" ? game.phase.phase : "day"} />
+      <InfoPanel text={getGameStateText()} position={"top-left"} showOnMobile={true}/>
+      <Background phase={game.stage === "active" ? game.phase.phase : "day"}/>
       <GameBoard
         players={game.players}
         nomination={nomination}
@@ -205,12 +205,12 @@ function App() {
         onDeletePlayer={removePlayer}
         onClickOutside={() => {
           if (nomination.state !== "inactive") {
-            dispatch({ type: "cancelNomination", stage: "active" });
+            dispatch({type: "cancelNomination", stage: "active"});
           }
         }}
       />
 
-      <Menu game={game} dispatch={dispatch} />
+      <Menu game={game} dispatch={dispatch}/>
       {isModalOpen && (
         <Modal
           addPlayer={(p) => addPlayer(p, game.players)}
@@ -218,10 +218,12 @@ function App() {
         />
       )}
       {nomination.state === "active" && (
-        <InfoPanel text={`Votes required: ${calculateVotesRequired(game)}`} />
+        <InfoPanel text={`Votes required: ${calculateVotesRequired(game)}`} position={"top-right"}
+          showOnMobile={false}/>
       )}
     </div>
   );
 }
 
 export default App;
+
