@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Nomination, Player } from "@common/model";
 
 export function useClickOutside(
@@ -69,4 +69,16 @@ export function useHandlePlayerCountChangeUIEffects(players: Player[]) {
   useLayoutEffect(() => {
     document.body.style.setProperty("--num-players", players.length.toString());
   }, [players.length]);
+}
+
+export function useWindowInnerWidth(): number {
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+  return width;
 }

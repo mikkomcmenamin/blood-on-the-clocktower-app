@@ -1,4 +1,5 @@
 import React from 'react';
+import { useWindowInnerWidth } from '../hooks';
 import styled from "styled-components";
 
 const Panel = styled.div`
@@ -15,9 +16,9 @@ type Props = {
 
 const InfoPanel: React.FC<Props> = ({ text }) => {
 
-  const isDesktop = window.innerWidth > 768; //probably no need to react to screen size changes
+  const width = useWindowInnerWidth();
 
-  return isDesktop ? (<Panel>{text}</Panel>): null;
+  return width > 768 ? (<Panel>{text}</Panel>): null;
 };
 
 export default InfoPanel;
