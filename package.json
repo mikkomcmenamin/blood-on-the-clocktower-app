@@ -12,7 +12,8 @@
     "fe:preview": "cd frontend-web && vite preview",
     "be:dev": "cd backend && nodemon --watch . --watch ../common src/server.ts",
     "be:prod": "cd backend && ts-node src/server.ts",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\""
   },
   "repository": {
     "type": "git",
