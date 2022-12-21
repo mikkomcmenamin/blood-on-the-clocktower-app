@@ -3,7 +3,13 @@ import {useWindowInnerWidth} from '../hooks';
 import styled from "styled-components";
 import InfoPanelImage from "../assets/T_InfoPanel.png";
 
-const Panel = styled.div<{ position: string }>`
+type InfoPanelPosition =
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-right";
+
+const Panel = styled.div<{ position: InfoPanelPosition }>`
   background-image: url(${InfoPanelImage});
   background-size: 100% 100%;
   background-repeat: no-repeat;
@@ -24,8 +30,6 @@ ${props => {
           return `bottom: 0; left: 0;`;
           case 'bottom-right':
             return `bottom: 0; right: 0;`;
-            default:
-              return `top: 0; right: 0;`;
   }
 }
 
@@ -33,7 +37,7 @@ ${props => {
 
 type Props = {
   text: string;
-  position: string
+  position: InfoPanelPosition
   showOnMobile: boolean
 }
 
