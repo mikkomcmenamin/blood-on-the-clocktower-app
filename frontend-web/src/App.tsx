@@ -17,7 +17,7 @@ import {
 import Modal from "./components/Modal";
 import Background from "./components/Background";
 import GameBoard from "./components/GameBoard/GameBoard";
-import { GameAction, gameStateReducer } from "@common/gameLogic";
+import {calculateVotesRequired, GameAction, gameStateReducer } from "@common/gameLogic";
 import Menu from "./components/Menu/Menu";
 import InfoPanel from "./components/InfoPanel";
 
@@ -164,8 +164,6 @@ function App() {
     }
   }
 
-  const votesRequired = Math.ceil(game.players.length/2); //TODO: calculate alive players. Also take into account previous highest vote.
-
   return (
     <div className="App">
       <div className="gameStageIndicator">
@@ -204,9 +202,10 @@ function App() {
           modalRef={modalRef}
         />
       )}
-      {nomination.state === "active" && (<InfoPanel text={`Votes required: ${votesRequired}`}/>)}
+      {nomination.state === "active" && (<InfoPanel text={`Votes required: ${calculateVotesRequired(game)}`}/>)}
     </div>
   );
 }
 
 export default App;
+

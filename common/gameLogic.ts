@@ -437,3 +437,13 @@ export function gameStateReducer(state: Game, action: GameAction): Game {
       return gameStateActiveReducer(state, action);
   }
 }
+
+export function calculateVotesRequired(game: Game): number {
+    if(game.stage == "active") {
+        const alivePlayers = game.players.filter(player => player.alive);
+        return Math.ceil(alivePlayers.length/2);
+        //Also take into account previous highest vote.
+    }
+
+  return 0;
+}
