@@ -13,6 +13,7 @@ import {
   useClickOutside,
   useHandleNominationUIEffects,
   useHandlePlayerCountChangeUIEffects,
+  useWindowInnerWidth,
 } from "./hooks";
 import Modal from "./components/Modal";
 import Background from "./components/Background";
@@ -185,9 +186,12 @@ function App() {
     }
   }
 
+  const windowInnerWidth = useWindowInnerWidth();
+  const MOBILE_THRESHOLD = 768;
+
   return (
     <div className="App">
-      <InfoPanel position={"top-left"} showOnMobile={true}>
+      <InfoPanel position={"top-left"}>
         <p>{getGameStateText()}</p>
       </InfoPanel>
       <Background phase={game.stage === "active" ? game.phase.phase : "day"} />
@@ -222,8 +226,8 @@ function App() {
           modalRef={modalRef}
         />
       )}
-      {nomination.state === "active" && (
-        <InfoPanel position={"top-right"} showOnMobile={false}>
+      {nomination.state === "active" && windowInnerWidth > MOBILE_THRESHOLD && (
+        <InfoPanel position={"top-right"}>
           <p>Votes required: {calculateVotesRequired(game)}</p>
         </InfoPanel>
       )}

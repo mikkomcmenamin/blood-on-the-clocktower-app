@@ -37,15 +37,10 @@ const Panel = styled.div<{ position: InfoPanelPosition }>`
 type Props = {
   children: React.ReactNode;
   position: InfoPanelPosition;
-  showOnMobile: boolean;
 };
 
-const InfoPanel: React.FC<Props> = ({ children, position, showOnMobile }) => {
-  const width = useWindowInnerWidth();
-
-  return showOnMobile || width > 768 ? (
-    <Panel position={position}>{children}</Panel>
-  ) : null;
+const InfoPanel: React.FC<Props> = ({ children, position }) => {
+  return <Panel position={position}>{children}</Panel>;
 };
 
 export default InfoPanel;
