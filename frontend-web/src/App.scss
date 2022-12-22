@@ -30,23 +30,14 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 0;
   align-items: center;
   padding-top: 5vh;
 
   @media (min-width: 768px) {
     padding-top: 10vh;
-    gap: 10vh;
-  }
-}
-
-// Desktop layout
-@media (min-width: 768px) {
-  .App {
     justify-content: center;
     flex-direction: row;
     padding-top: 0;
-    gap: 0;
   }
 }
 
