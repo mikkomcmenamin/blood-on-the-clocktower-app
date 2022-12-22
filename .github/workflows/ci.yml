@@ -13,5 +13,4 @@ jobs:
           node-version: "16.x"
       - run: npm install
       - run: npm run format:check
-        env:
-          CI: true
+      - run: npm run typecheck
