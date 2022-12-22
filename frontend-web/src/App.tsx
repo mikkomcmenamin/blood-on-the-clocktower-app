@@ -1,7 +1,6 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import { createTRPCProxyClient, createWSClient, wsLink } from "@trpc/client";
 import type { AppRouter } from "@common/router";
-import { fakeNamesList } from "@common/util";
 import "./App.scss";
 import {
   createSetupStagePlayer,
