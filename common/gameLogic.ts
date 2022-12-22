@@ -210,11 +210,8 @@ function gameStateActiveReducer(
       };
     }
     case "toggleVote": {
-      if (state.phase.phase !== "day") {
-        throw new Error("Cannot set voters when phase is not day");
-      }
-      if (state.phase.nomination.state !== "active") {
-        throw new Error("Cannot set voters when nomination is not active");
+      if (!isActiveNomination(state)) {
+        throw new Error("Cannot toggle vote when nomination is not active");
       }
       const player = action.payload;
 
@@ -329,12 +326,8 @@ function gameStateActiveReducer(
     }
     case "resolveVote": {
       const game = state;
-      if (game.phase.phase !== "day") {
-        throw new Error("Cannot resolve vote when phase is not day");
-      }
-
-      if (game.phase.nomination.state !== "active") {
-        throw new Error("Nomination is not active");
+      if (!isActiveNomination(game)) {
+        throw new Error("Cannot resolve vote when nomination is not active");
       }
 
       const nominationBookkeeping = {
@@ -495,4 +488,36 @@ export function calculateVotesRequired(game: Game): number {
   const currentVoteCount = game.phase.onTheBlock?.votes ?? 0;
   const alivePlayers = game.players.filter((player) => player.alive);
   return Math.max(currentVoteCount + 1, Math.ceil(alivePlayers.length / 2));
+}
+
+type DayPhase = Extract<
+  Extract<Game, { stage: "active" }>["phase"],
+  { phase: "day" }
+>;
+
+export function isSetup(g: Game): g is Game & { stage: "setup" } {
+  return g.stage === "setup";
+}
+
+export function isDay(
+  g: Game
+): g is Game & { stage: "active"; phase: DayPhase } {
+  return g.stage === "active" && g.phase.phase === "day";
+}
+
+export function isNight(
+  g: Game
+): g is Game & { stage: "active"; phase: { phase: "night" } } {
+  return g.stage === "active" && g.phase.phase === "night";
+}
+
+export function isActiveNomination(g: Game): g is Game & {
+  stage: "active";
+  phase: DayPhase & { nomination: { state: "active" } };
+} {
+  return isDay(g) && g.phase.nomination.state === "active";
+}
+
+export function isFinished(g: Game): g is Game & { stage: "finished" } {
+  return g.stage === "finished";
 }

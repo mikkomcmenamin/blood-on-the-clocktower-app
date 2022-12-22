@@ -21,6 +21,9 @@ import {
   calculateVotesRequired,
   GameAction,
   gameStateReducer,
+  isDay,
+  isNight,
+  isSetup,
 } from "@common/gameLogic";
 import Menu from "./components/Menu/Menu";
 import InfoPanel from "./components/InfoPanel";
@@ -73,10 +76,9 @@ function App() {
     };
   }, []);
 
-  const nomination =
-    game.stage === "active" && game.phase.phase === "day"
-      ? game.phase.nomination
-      : { state: "inactive" as const };
+  const nomination = isDay(game)
+    ? game.phase.nomination
+    : { state: "inactive" as const };
 
   useHandlePlayerCountChangeUIEffects(game.players);
   useHandleNominationUIEffects(nomination, game.players);
@@ -103,12 +105,10 @@ function App() {
 
   // handle keyboard and mouse shortcuts
   useEffect(() => {
-    const isSetup = game.stage === "setup";
-    const isDay = game.stage === "active" && game.phase.phase === "day";
     const handleKeyDown = (e: KeyboardEvent) => {
       // open the modal when pressing the "+" or Space key
       if (e.key === "+" || e.key === " ") {
-        if (isSetup && !isModalOpen) {
+        if (isSetup(game) && !isModalOpen) {
           e.preventDefault();
           setIsModalOpen(true);
         }
@@ -117,11 +117,11 @@ function App() {
       // if modal is not open, cancel the current nomination
       if (e.key === "Escape") {
         e.preventDefault();
-        if (isSetup) {
+        if (isSetup(game)) {
           setIsModalOpen(false);
         }
 
-        if (isDay) {
+        if (isDay(game)) {
           dispatch({ type: "cancelNomination", stage: "active" });
         }
       }
@@ -129,7 +129,7 @@ function App() {
 
     // open the modal when double-clicking
     const handleDoubleClick = () => {
-      if (!isSetup) return;
+      if (!isSetup(game)) return;
       if (!isModalOpen) {
         setIsModalOpen(true);
       }
@@ -148,8 +148,7 @@ function App() {
   // 1. if Nomination is state "inactive", set it to "pending" and set the nominating player
   // 2. if Nomination is state "pending", set it to "active" and set the nominated player
   function handleSelectPlayer(playerId: number) {
-    if (game.stage !== "active") return;
-    if (game.phase.phase !== "day") return;
+    if (!isDay(game)) return;
     if (nomination.state === "pending" && nomination.nominator.id === playerId)
       return;
 
@@ -183,10 +182,11 @@ function App() {
       case "setup":
         return "Setup Players";
       case "active": {
-        if (game.phase.phase === "day") {
+        if (isDay(game)) {
           return `Day ${game.phase.dayNumber}`;
+        } else if (isNight(game)) {
+          return `Night ${game.phase.nightNumber}`;
         }
-        return `Night ${game.phase.nightNumber}`;
       }
       case "finished":
         return "Game Finished";
@@ -196,10 +196,7 @@ function App() {
   const windowInnerWidth = useWindowInnerWidth();
   const MOBILE_THRESHOLD = 768;
 
-  const onTheBlock =
-    game.stage === "active" &&
-    game.phase.phase === "day" &&
-    game.phase.onTheBlock;
+  const onTheBlock = isDay(game) && game.phase.onTheBlock;
 
   console.log(onTheBlock);
 
@@ -208,7 +205,7 @@ function App() {
       <InfoPanel position={"top-left"}>
         <p>{getGameStateText()}</p>
       </InfoPanel>
-      <Background phase={game.stage === "active" ? game.phase.phase : "day"} />
+      <Background phase={isNight(game) ? "night" : "day"} />
       <GameBoard
         players={game.players}
         nomination={nomination}
@@ -255,9 +252,7 @@ function App() {
             )}
           </InfoPanel>
         )}
-      {game.stage === "active" && game.phase.phase === "night" && (
-        <SoundPlayer src={NightLoop} loop={true} />
-      )}
+      {isNight(game) && <SoundPlayer src={NightLoop} loop={true} />}
     </div>
   );
 }
