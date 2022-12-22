@@ -187,11 +187,9 @@ function App() {
 
   return (
     <div className="App">
-      <InfoPanel
-        text={getGameStateText()}
-        position={"top-left"}
-        showOnMobile={true}
-      />
+      <InfoPanel position={"top-left"} showOnMobile={true}>
+        <p>{getGameStateText()}</p>
+      </InfoPanel>
       <Background phase={game.stage === "active" ? game.phase.phase : "day"} />
       <GameBoard
         players={game.players}
@@ -225,11 +223,9 @@ function App() {
         />
       )}
       {nomination.state === "active" && (
-        <InfoPanel
-          text={`Votes required: ${calculateVotesRequired(game)}`}
-          position={"top-right"}
-          showOnMobile={false}
-        />
+        <InfoPanel position={"top-right"} showOnMobile={false}>
+          <p>Votes required: {calculateVotesRequired(game)}</p>
+        </InfoPanel>
       )}
       {game.stage === "active" && game.phase.phase === "night" && (
         <SoundPlayer src={NightLoop} loop={true} />
