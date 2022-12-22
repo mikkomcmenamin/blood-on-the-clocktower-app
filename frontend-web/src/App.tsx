@@ -25,7 +25,7 @@ import {
 import Menu from "./components/Menu/Menu";
 import InfoPanel from "./components/InfoPanel";
 import SoundPlayer from "./components/SoundPlayer";
-import NightLoop from './assets/S_NightLoop.mp3';
+import NightLoop from "./assets/S_NightLoop.mp3";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -231,7 +231,9 @@ function App() {
           showOnMobile={false}
         />
       )}
-      {game.stage === "active" && game.phase.phase === "night" && (<SoundPlayer src={NightLoop} loop={true}/>) }
+      {game.stage === "active" && game.phase.phase === "night" && (
+        <SoundPlayer src={NightLoop} loop={true} />
+      )}
     </div>
   );
 }
