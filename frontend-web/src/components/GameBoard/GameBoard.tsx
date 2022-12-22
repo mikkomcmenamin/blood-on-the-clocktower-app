@@ -7,7 +7,7 @@ import clockHandMinute from "../../assets/clockhand.png";
 import clockHandHour from "../../assets/clockhand-hour.png";
 import { useClickOutside, useDropzone } from "../../hooks";
 import styles from "./GameBoard.module.scss";
-import { getTwoClosestPlayers } from "src/domHelpers";
+import { getTwoClosestPlayers } from "../../domHelpers";
 
 type GameBoardProps = {
   players: Player[];
