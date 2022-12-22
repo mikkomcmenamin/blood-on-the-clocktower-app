@@ -28,7 +28,7 @@ nav {
 }
 
 // On desktop devices, hovering on the right edge of the screen should show the menu
-@media (orientation: landscape) {
+@media (min-width: 768px) {
   #menu {
     display: none;
   }

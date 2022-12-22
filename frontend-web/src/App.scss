@@ -12,7 +12,7 @@ body {
 }
 
 // on desktop, decrease font-size
-@media (orientation: landscape) {
+@media (min-width: 768px) {
   body {
     font-size: 1.5vw;
   }
@@ -41,7 +41,7 @@ button {
 }
 
 // Desktop layout
-@media (orientation: landscape) {
+@media (min-width: 768px) {
   .App {
     justify-content: center;
     flex-direction: row;

@@ -62,7 +62,7 @@
 }
 
 // on desktop, make the modal content only 50% and the modal takes into account the 2rem taken by the right side drawer
-@media (orientation: landscape) {
+@media (min-width: 768px) {
   .modal {
     padding-right: 2rem;
   }

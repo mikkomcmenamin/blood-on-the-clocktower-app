@@ -26,7 +26,7 @@
   box-shadow: 0 0 1rem rgb(255, 255, 255);
   cursor: pointer;
 
-  @media (orientation: landscape) {
+  @media (min-width: 768px) {
     --ball-size: calc(4rem + (50rem / var(--num-players)));
     width: clamp(8rem, var(--ball-size), 18rem);
     height: clamp(8rem, var(--ball-size), 18rem);
