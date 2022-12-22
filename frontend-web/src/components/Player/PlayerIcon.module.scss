@@ -2,7 +2,7 @@
   width: min(45vw, 45vh);
   position: absolute;
   transform-origin: 100% 50%;
-  transition: transform 0.5s ease-in-out;
+  transition: transform 0.2s ease-in-out;
   top: 50%;
   left: 50%;
   display: flex;
@@ -21,7 +21,7 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  transition: scale 1s ease-in-out;
+  transition: scale 0.5s ease-in-out;
   // shadow etc to make this look like a raised button
   box-shadow: 0 0 1rem rgb(255, 255, 255);
   cursor: pointer;
@@ -58,7 +58,7 @@
   }
 
   &.notInvolvedInNomination {
-    opacity: 0.8;
+    scale: 0.9;
     box-shadow: 0 0 1rem #888;
   }
 
@@ -75,6 +75,31 @@
     background-image: url("../../assets/T_PlayerBgRedSolid.png");
     box-shadow: 0 0 4rem #ff6464aa;
     font-weight: 800;
+    scale: 1.1;
+  }
+
+  &.votingDisabled {
+    opacity: 0.5;
+    background: grey;
+    cursor: not-allowed;
+  }
+
+  &.hasVoted {
+    // cool animation that appears when they first vote
+    animation: hasVoted 0.5s ease-out;
+    @keyframes hasVoted {
+      0% {
+        scale: 1;
+      }
+      50% {
+        scale: 1.5;
+      }
+      100% {
+        scale: 1.1;
+        // red border
+      }
+    }
+    border: 0.5rem solid #ff6464aa;
     scale: 1.1;
   }
 }

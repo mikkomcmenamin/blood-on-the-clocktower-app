@@ -54,9 +54,9 @@ const resolveVoteActionSchema = activeActionSchema.merge(
     type: z.literal("resolveVote"),
   })
 );
-const addVoteActionSchema = activeActionSchema.merge(
+const toggleVoteActionSchema = activeActionSchema.merge(
   z.object({
-    type: z.literal("addVote"),
+    type: z.literal("toggleVote"),
     payload: activeStagePlayerSchema,
   })
 );
@@ -110,7 +110,7 @@ export const gameActionSchema = z.union([
   setNomineeActionSchema,
   cancelNominationActionSchema,
   resolveVoteActionSchema,
-  addVoteActionSchema,
+  toggleVoteActionSchema,
   killPlayerActionSchema,
   phaseTransitionToNightActionSchema,
   phaseTransitionToDayActionSchema,
@@ -209,7 +209,7 @@ function gameStateActiveReducer(
         },
       };
     }
-    case "addVote": {
+    case "toggleVote": {
       if (state.phase.phase !== "day") {
         throw new Error("Cannot set voters when phase is not day");
       }
@@ -217,14 +217,50 @@ function gameStateActiveReducer(
         throw new Error("Cannot set voters when nomination is not active");
       }
       const player = action.payload;
-      if (state.phase.nomination.voters.includes(player.id)) {
-        throw new Error("Cannot add vote for player who has already voted");
-      }
 
       if (!player.alive && !player.ghostVote) {
+        // toggle back
+        if (state.phase.nomination.voters.includes(player.id)) {
+          return {
+            ...state,
+            phase: {
+              ...state.phase,
+              nomination: {
+                ...state.phase.nomination,
+                voters: state.phase.nomination.voters.filter(
+                  (voter) => voter !== player.id
+                ),
+              },
+            },
+          };
+        }
         throw new Error(
-          `Dead player ${player.name} has already spent their ghost vote`
+          `Dead player ${player.name} has already spent their ghost vote on another nomination`
         );
+      }
+
+      if (state.phase.nomination.voters.includes(player.id)) {
+        // toggle back
+        return {
+          ...state,
+          players:
+            !player.alive && !player.ghostVote
+              ? state.players.map((p) =>
+                  p.id === player.id ? { ...p, ghostVote: true } : p
+                )
+              : state.players.map((p) =>
+                  p.id === player.id ? { ...p, ghostVote: false } : p
+                ),
+          phase: {
+            ...state.phase,
+            nomination: {
+              ...state.phase.nomination,
+              voters: state.phase.nomination.voters.filter(
+                (voter) => voter !== player.id
+              ),
+            },
+          },
+        };
       }
 
       return {
@@ -312,31 +348,30 @@ function gameStateActiveReducer(
         ],
       };
 
-      if (game.phase.onTheBlock) {
-        const currentHighestVotes = game.phase.onTheBlock.votes;
-        // Not enough votes to put the player on the block
-        if (currentHighestVotes > game.phase.nomination.voters.length) {
-          return {
-            ...game,
-            phase: {
-              ...game.phase,
-              nomination: { state: "inactive" as const },
-              nominationBookkeeping,
-            },
-          };
-        }
-        // Tie, no player on the block
-        if (currentHighestVotes === game.phase.nomination.voters.length) {
-          return {
-            ...game,
-            phase: {
-              ...game.phase,
-              nomination: { state: "inactive" as const },
-              nominationBookkeeping,
-              onTheBlock: undefined,
-            },
-          };
-        }
+      const currentMaxVotes = calculateVotesRequired(game) - 1;
+
+      // No player on the block
+      if (game.phase.nomination.voters.length < currentMaxVotes) {
+        return {
+          ...game,
+          phase: {
+            ...game.phase,
+            nomination: { state: "inactive" as const },
+            nominationBookkeeping,
+          },
+        };
+      }
+      // Tie, no player on the block
+      if (currentMaxVotes === game.phase.nomination.voters.length) {
+        return {
+          ...game,
+          phase: {
+            ...game.phase,
+            nomination: { state: "inactive" as const },
+            nominationBookkeeping,
+            onTheBlock: undefined,
+          },
+        };
       }
 
       // New player on the block (no pun intended)
@@ -453,11 +488,11 @@ export function gameStateReducer(state: Game, action: GameAction): Game {
 }
 
 export function calculateVotesRequired(game: Game): number {
-  if (game.stage == "active") {
-    const alivePlayers = game.players.filter((player) => player.alive);
-    return Math.ceil(alivePlayers.length / 2);
-    //Also take into account previous highest vote.
+  if (game.stage !== "active" || game.phase.phase === "night") {
+    return 0;
   }
 
-  return 0;
+  const currentVoteCount = game.phase.onTheBlock?.votes ?? 0;
+  const alivePlayers = game.players.filter((player) => player.alive);
+  return Math.max(currentVoteCount + 1, Math.ceil(alivePlayers.length / 2));
 }

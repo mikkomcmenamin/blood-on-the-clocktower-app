@@ -150,7 +150,6 @@ function App() {
   function handleSelectPlayer(playerId: number) {
     if (game.stage !== "active") return;
     if (game.phase.phase !== "day") return;
-    if (nomination.state === "active") return;
     if (nomination.state === "pending" && nomination.nominator.id === playerId)
       return;
 
@@ -164,6 +163,15 @@ function App() {
     } else if (nomination.state === "pending") {
       dispatch({
         type: "setNominee",
+        stage: "active",
+        payload: player,
+      });
+    } else {
+      // Count the player's vote if they can vote
+      const canVote = player.alive || player.ghostVote;
+      if (!canVote) return;
+      dispatch({
+        type: "toggleVote",
         stage: "active",
         payload: player,
       });
@@ -188,6 +196,13 @@ function App() {
   const windowInnerWidth = useWindowInnerWidth();
   const MOBILE_THRESHOLD = 768;
 
+  const onTheBlock =
+    game.stage === "active" &&
+    game.phase.phase === "day" &&
+    game.phase.onTheBlock;
+
+  console.log(onTheBlock);
+
   return (
     <div className="App">
       <InfoPanel position={"top-left"}>
@@ -211,7 +226,7 @@ function App() {
           });
         }}
         onDeletePlayer={removePlayer}
-        onClickOutside={() => {
+        onCancelNomination={() => {
           if (nomination.state !== "inactive") {
             dispatch({ type: "cancelNomination", stage: "active" });
           }
@@ -225,11 +240,21 @@ function App() {
           modalRef={modalRef}
         />
       )}
-      {nomination.state === "active" && windowInnerWidth > MOBILE_THRESHOLD && (
-        <InfoPanel position={"top-right"}>
-          <p>Votes required: {calculateVotesRequired(game)}</p>
-        </InfoPanel>
-      )}
+      {(nomination.state === "active" || onTheBlock) &&
+        windowInnerWidth > MOBILE_THRESHOLD && (
+          <InfoPanel position={"top-right"}>
+            <p>Votes required: {calculateVotesRequired(game)}</p>
+            {onTheBlock && (
+              <p>
+                {game.players.find((p) => p.id === onTheBlock.playerId)!.name}{" "}
+                about to die
+              </p>
+            )}
+            {nomination.state === "active" && nomination.voters.length > 0 && (
+              <p>{nomination.voters.length} votes</p>
+            )}
+          </InfoPanel>
+        )}
       {game.stage === "active" && game.phase.phase === "night" && (
         <SoundPlayer src={NightLoop} loop={true} />
       )}

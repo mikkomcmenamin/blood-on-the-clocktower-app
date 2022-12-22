@@ -53,6 +53,18 @@ const Menu: React.FC<Props> = ({ game, dispatch }) => {
                 : "Transition to day"}
             </button>
           )}
+          {game.stage === "active" &&
+            game.phase.phase === "day" &&
+            game.phase.nomination.state === "active" && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  dispatch({ type: "resolveVote", stage: "active" });
+                }}
+              >
+                Resolve vote
+              </button>
+            )}
           {game.stage !== "setup" && (
             <button
               onClick={(e) => {

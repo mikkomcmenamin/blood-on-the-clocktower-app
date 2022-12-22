@@ -15,7 +15,7 @@ type GameBoardProps = {
   onSelectPlayer: (playerId: number) => void;
   onDeletePlayer: (id: number) => void;
   onReorderPlayers: (playerIds: number[]) => void;
-  onClickOutside: () => void;
+  onCancelNomination: () => void;
 };
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -24,11 +24,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
   onSelectPlayer,
   onDeletePlayer,
   onReorderPlayers,
-  onClickOutside,
+  onCancelNomination,
 }) => {
-  // cancel the current nomination when clicking outside of the player-circle
   const gameBoardRef = useRef<HTMLDivElement>(null);
-  useClickOutside(gameBoardRef, onClickOutside);
 
   const showMinuteHand = nomination.state === "active";
   const showHourHand =
@@ -105,8 +103,22 @@ const GameBoard: React.FC<GameBoardProps> = ({
     deps: [players],
   });
 
+  function onClickGameBoardContainer(e: React.PointerEvent<HTMLElement>) {
+    if (e.target !== gameBoardContainerRef.current) {
+      return;
+    }
+
+    if (nomination.state !== "inactive") {
+      onCancelNomination();
+    }
+  }
+
   return (
-    <section ref={gameBoardContainerRef} id={styles.gameBoardContainer}>
+    <section
+      onClick={onClickGameBoardContainer}
+      ref={gameBoardContainerRef}
+      id={styles.gameBoardContainer}
+    >
       <div id={styles.gameBoard} ref={gameBoardRef}>
         {players.map((player) => (
           <PlayerIcon
