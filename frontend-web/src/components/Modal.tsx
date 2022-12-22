@@ -22,6 +22,9 @@ const Modal: React.FC<ModalProps> = ({ addPlayer, modalRef }) => {
 
   const handleAddPlayer = (e: any) => {
     e.preventDefault();
+    if (newPlayerName.length === 0) {
+      return;
+    }
     addPlayer(newPlayerName);
     setNewPlayerName("");
   };
@@ -38,7 +41,11 @@ const Modal: React.FC<ModalProps> = ({ addPlayer, modalRef }) => {
             onChange={handleNewPlayerNameChange}
           />
           <div className={styles.buttons}>
-            <button type="submit" onClick={handleAddPlayer}></button>
+            <button
+              disabled={newPlayerName.length === 0}
+              type="submit"
+              onClick={handleAddPlayer}
+            ></button>
           </div>
         </form>
       </div>
