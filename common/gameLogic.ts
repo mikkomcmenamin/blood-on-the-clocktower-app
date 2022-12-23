@@ -71,6 +71,7 @@ const togglePlayerAliveStatusActionSchema = activeActionSchema.merge(
 const phaseTransitionToNightActionSchema = activeActionSchema.merge(
   z.object({
     type: z.literal("phaseTransitionToNight"),
+    arbitraryExecutions: z.array(z.number()).optional(),
   })
 );
 const phaseTransitionToDayActionSchema = activeActionSchema.merge(
@@ -412,6 +413,27 @@ function gameStateActiveReducer(
         throw new Error(
           "Cannot transition to night when nomination is not inactive"
         );
+      }
+
+      // e.g. player nominates the virgin and is townsfolk -> is executed immediately
+      if (action.arbitraryExecutions) {
+        return {
+          ...game,
+          phase: {
+            phase: "night" as const,
+            nightDeaths: [],
+            nightNumber: game.phase.dayNumber + 1,
+          },
+          players: game.players.map((player) =>
+            action.arbitraryExecutions?.includes(player.id)
+              ? {
+                  ...player,
+                  alive: false,
+                  ghostVote: player.alive ? true : player.ghostVote,
+                }
+              : player
+          ),
+        };
       }
 
       const onTheBlock = game.phase.onTheBlock;
