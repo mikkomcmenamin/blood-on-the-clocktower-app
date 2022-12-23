@@ -207,8 +207,7 @@ function App() {
       </InfoPanel>
       <Background phase={isNight(game) ? "night" : "day"} />
       <GameBoard
-        players={game.players}
-        nomination={nomination}
+        game={game}
         onSelectPlayer={handleSelectPlayer}
         onReorderPlayers={(playerIds) => {
           if (game.stage !== "setup") return;

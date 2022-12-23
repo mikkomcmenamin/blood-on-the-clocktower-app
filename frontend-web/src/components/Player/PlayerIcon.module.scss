@@ -99,6 +99,30 @@
     border: 0.5rem solid #ff6464aa;
     scale: 1.1;
   }
+
+  &.onTheBlock {
+    background: transparent;
+  }
+
+  &.onTheBlock::before {
+    // overlay the skull svg on top of the player icon
+    content: "";
+    // add a red overlay on top of the skull
+    background-image: linear-gradient(black, #aa0000ff),
+      url("../../assets/skull.svg");
+    background-blend-mode: overlay;
+    opacity: 1;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    z-index: -1;
+  }
 }
 
 .name {

@@ -86,7 +86,6 @@ export function useWindowInnerWidth(): number {
 export function useDropzone({
   ref,
   onDrop,
-  deps = [],
   exact = false,
 }: {
   ref: React.RefObject<HTMLElement>;
@@ -115,5 +114,5 @@ export function useDropzone({
       ref.current?.removeEventListener("drop", handleDrop);
       ref.current?.removeEventListener("dragover", (e) => e.preventDefault());
     };
-  }, [ref.current, onDrop, ...deps]);
+  }, [ref.current, onDrop, exact]);
 }

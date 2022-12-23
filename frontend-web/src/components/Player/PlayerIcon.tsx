@@ -1,4 +1,10 @@
-import { ActiveStagePlayer, Nomination, Player } from "@common/model";
+import {
+  isActiveNomination,
+  isDay,
+  isInactiveNomination,
+  isPendingNomination,
+} from "@common/gameLogic";
+import { ActiveStagePlayer, Game, Nomination, Player } from "@common/model";
 import { classnames } from "@common/util";
 import styles from "./PlayerIcon.module.scss";
 
@@ -6,21 +12,26 @@ type PlayerIconProps = {
   key: number;
   player: Player | ActiveStagePlayer;
   selectPlayer: (player: Player) => void;
-  nomination: Nomination;
+  game: Game;
 };
 
 const PlayerIcon: React.FC<PlayerIconProps> = ({
   player,
   selectPlayer,
-  nomination,
+  game,
 }) => {
   const votingDisabled =
-    nomination.state === "active" &&
+    isActiveNomination(game) &&
     "alive" in player &&
     !player.alive &&
     !player.ghostVote;
   const hasVoted =
-    nomination.state === "active" && nomination.voters.includes(player.id);
+    isActiveNomination(game) &&
+    game.phase.nomination.voters.includes(player.id);
+
+  const isOnTheBlock =
+    isDay(game) && game.phase.onTheBlock?.playerId === player.id;
+
   return (
     <div className={styles.playerRotator}>
       <div
@@ -34,15 +45,16 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
         }}
         className={classnames({
           [styles.playerContent]: true,
-          [styles.nominator]: isNominator(player, nomination),
-          [styles.nominee]: isNominee(player, nomination),
+          [styles.nominator]: isNominator(player, game),
+          [styles.nominee]: isNominee(player, game),
           [styles.notInvolvedInNomination]: notInvolvedInNomination(
             player,
-            nomination
+            game
           ),
           [styles.shroud]: "alive" in player && !player.alive,
           [styles.votingDisabled]: votingDisabled,
           [styles.hasVoted]: hasVoted,
+          [styles.onTheBlock]: isOnTheBlock,
         })}
       >
         <div className={styles.name}>{player.name}</div>
@@ -51,14 +63,18 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
   );
 };
 
-const isNominator = (player: Player, nomination: Nomination) =>
-  nomination.state !== "inactive" && nomination.nominator.id === player.id;
+const isNominator = (player: Player, game: Game) =>
+  (isPendingNomination(game) || isActiveNomination(game)) &&
+  game.phase.nomination.nominator.id === player.id;
 
-const isNominee = (player: Player, nomination: Nomination) =>
-  nomination.state === "active" && nomination.nominee.id === player.id;
+const isNominee = (player: Player, game: Game) =>
+  isActiveNomination(game) && game.phase.nomination.nominee.id === player.id;
 
-const notInvolvedInNomination = (player: Player, nomination: Nomination) =>
-  nomination.state === "active" &&
-  ![nomination.nominator.id, nomination.nominee.id].includes(player.id);
+const notInvolvedInNomination = (player: Player, game: Game) =>
+  isActiveNomination(game) &&
+  ![
+    game.phase.nomination.nominator.id,
+    game.phase.nomination.nominee.id,
+  ].includes(player.id);
 
 export default PlayerIcon;

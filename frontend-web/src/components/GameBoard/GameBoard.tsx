@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Nomination, Player } from "@common/model";
+import { Game, Nomination, Player } from "@common/model";
 import { classnames } from "@common/util";
 import PlayerIcon from "../Player/PlayerIcon";
 
@@ -8,10 +8,10 @@ import clockHandHour from "../../assets/clockhand-hour.png";
 import { useClickOutside, useDropzone } from "../../hooks";
 import styles from "./GameBoard.module.scss";
 import { getTwoClosestPlayers } from "../../domHelpers";
+import { isActiveNomination, isPendingNomination } from "@common/gameLogic";
 
 type GameBoardProps = {
-  players: Player[];
-  nomination: Nomination;
+  game: Game;
   onSelectPlayer: (playerId: number) => void;
   onDeletePlayer: (id: number) => void;
   onReorderPlayers: (playerIds: number[]) => void;
@@ -19,8 +19,7 @@ type GameBoardProps = {
 };
 
 const GameBoard: React.FC<GameBoardProps> = ({
-  players,
-  nomination,
+  game,
   onSelectPlayer,
   onDeletePlayer,
   onReorderPlayers,
@@ -28,9 +27,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
 }) => {
   const gameBoardRef = useRef<HTMLDivElement>(null);
 
-  const showMinuteHand = nomination.state === "active";
-  const showHourHand =
-    nomination.state === "pending" || nomination.state === "active";
+  const showMinuteHand = isActiveNomination(game);
+  const showHourHand = isActiveNomination(game) || isPendingNomination(game);
 
   // When a Player is dropped onto the background in setup, remove them from the game.
   const gameBoardContainerRef = useRef<HTMLElement>(null);
@@ -67,7 +65,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
       // If the dropped player is one of the two closest players, do nothing.
       // If the closest players are next to each other, reorder them so that the dropped player is between them.
       // If the closest player are the first and last in the list, move the dropped player to the end of the list.
-      const playerIds = players.map((player) => player.id);
+      const playerIds = game.players.map((player) => player.id);
       const droppedPlayerId = parseInt(id);
       const droppedPlayerIndex = playerIds.indexOf(droppedPlayerId);
       const closestPlayerIndex = playerIds.indexOf(closestPlayerId);
@@ -100,7 +98,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
       reorderedPlayerIds.splice(reorderedPlayerIds.indexOf(TEMPORARY_DUMMY), 1);
       onReorderPlayers(reorderedPlayerIds);
     },
-    deps: [players],
   });
 
   function onClickGameBoardContainer(e: React.PointerEvent<HTMLElement>) {
@@ -108,7 +105,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
       return;
     }
 
-    if (nomination.state !== "inactive") {
+    if (isActiveNomination(game) || isPendingNomination(game)) {
       onCancelNomination();
     }
   }
@@ -120,11 +117,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
       id={styles.gameBoardContainer}
     >
       <div id={styles.gameBoard} ref={gameBoardRef}>
-        {players.map((player) => (
+        {game.players.map((player) => (
           <PlayerIcon
             key={player.id}
             player={player}
-            nomination={nomination}
+            game={game}
             selectPlayer={() => onSelectPlayer(player.id)}
           />
         ))}

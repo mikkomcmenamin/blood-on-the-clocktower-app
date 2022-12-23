@@ -518,6 +518,20 @@ export function isActiveNomination(g: Game): g is Game & {
   return isDay(g) && g.phase.nomination.state === "active";
 }
 
+export function isPendingNomination(g: Game): g is Game & {
+  stage: "active";
+  phase: DayPhase & { nomination: { state: "pending" } };
+} {
+  return isDay(g) && g.phase.nomination.state === "pending";
+}
+
+export function isInactiveNomination(g: Game): g is Game & {
+  stage: "active";
+  phase: DayPhase & { nomination: { state: "inactive" } };
+} {
+  return isDay(g) && g.phase.nomination.state === "inactive";
+}
+
 export function isFinished(g: Game): g is Game & { stage: "finished" } {
   return g.stage === "finished";
 }
