@@ -152,8 +152,6 @@ function App() {
   // 2. if Nomination is state "pending", set it to "active" and set the nominated player
   function handleSelectPlayer(playerId: number) {
     if (!isDay(game)) return;
-    if (nomination.state === "pending" && nomination.nominator.id === playerId)
-      return;
 
     const player = game.players.find((p) => p.id === playerId)!;
     if (nomination.state === "inactive") {
