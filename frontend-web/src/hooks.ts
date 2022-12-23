@@ -116,3 +116,44 @@ export function useDropzone({
     };
   }, [ref.current, onDrop, exact]);
 }
+
+type PressHandlers = {
+  onShortPress?: (e: PointerEvent) => void;
+  onLongPress?: (e: PointerEvent) => void;
+};
+
+// Should fire the callback when a long press is detected (e.g. at least 1 second)
+// And another when a short press is detected (e.g. less than 1 second)
+export function usePressDurationDependentHandlers(
+  ref: React.RefObject<HTMLElement>,
+  handlers: PressHandlers,
+  timeout = 1000
+) {
+  useEffect(() => {
+    if (!ref.current) return;
+
+    let timer: NodeJS.Timeout;
+    let longPressFired = false;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      timer = setTimeout(() => {
+        handlers.onLongPress?.(e);
+        longPressFired = true;
+      }, timeout);
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      !longPressFired && handlers.onShortPress?.(e);
+      longPressFired = false;
+      clearTimeout(timer);
+    };
+
+    ref.current.addEventListener("pointerdown", handlePointerDown);
+    ref.current.addEventListener("pointerup", handlePointerUp);
+
+    return () => {
+      ref.current?.removeEventListener("pointerdown", handlePointerDown);
+      ref.current?.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [ref.current, handlers, timeout]);
+}

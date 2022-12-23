@@ -9,6 +9,8 @@ import {
 } from "@common/gameLogic";
 import { ActiveStagePlayer, Game, Nomination, Player } from "@common/model";
 import { classnames } from "@common/util";
+import { useRef } from "react";
+import { usePressDurationDependentHandlers } from "../../hooks";
 import styles from "./PlayerIcon.module.scss";
 
 type PlayerIconProps = {
@@ -41,13 +43,30 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
   const isNightDeath =
     isNight(game) && game.phase.nightDeaths.includes(player.id);
 
+  const playerIconRef = useRef<HTMLDivElement>(null);
+
+  function handleSelectPlayer(e: PointerEvent) {
+    e.preventDefault();
+    selectPlayer(player);
+  }
+
+  function onLongPress(e: PointerEvent) {
+    e.preventDefault();
+    // todo should open a context menu in certain situations
+    alert("long press");
+  }
+
+  usePressDurationDependentHandlers(
+    playerIconRef,
+    { onShortPress: handleSelectPlayer, onLongPress },
+    1000
+  );
+
   return (
     <div className={styles.playerRotator}>
       <div
+        ref={playerIconRef}
         data-playerid={player.id}
-        onClick={() => {
-          selectPlayer(player);
-        }}
         draggable
         onDragStart={(e) => {
           e.dataTransfer.setData("application/botc", player.id.toString());
