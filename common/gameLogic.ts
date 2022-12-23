@@ -9,6 +9,8 @@ import {
   activeStagePlayerSchema,
   teamSchema,
   gameSchema,
+  Player,
+  ActiveStagePlayer,
 } from "./model";
 
 // Stages mean the game is in a particular state (setup, active, finished)
@@ -383,9 +385,47 @@ function gameStateActiveReducer(
     }
     case "phaseTransitionToNight": {
       const game = state;
-      if (game.phase.phase !== "day") {
+      if (!isDay(game)) {
         throw new Error("Cannot transition to night when phase is not day");
       }
+
+      if (!isInactiveNomination(game)) {
+        throw new Error(
+          "Cannot transition to night when nomination is not inactive"
+        );
+      }
+
+      const onTheBlock = game.phase.onTheBlock;
+
+      if (onTheBlock) {
+        const player = game.players.find(
+          (player) => player.id === onTheBlock.playerId
+        );
+        if (!player) {
+          throw new Error(
+            `Cannot execute ${onTheBlock.playerId} because they do not exist`
+          );
+        }
+
+        return {
+          ...game,
+          phase: {
+            phase: "night" as const,
+            nightDeaths: [],
+            nightNumber: game.phase.dayNumber + 1,
+          },
+          players: game.players.map((player) =>
+            player.id === onTheBlock.playerId
+              ? {
+                  ...player,
+                  alive: false,
+                  ghostVote: player.alive ? true : player.ghostVote,
+                }
+              : player
+          ),
+        };
+      }
+
       return {
         ...game,
         phase: {
@@ -534,4 +574,45 @@ export function isInactiveNomination(g: Game): g is Game & {
 
 export function isFinished(g: Game): g is Game & { stage: "finished" } {
   return g.stage === "finished";
+}
+
+export function playerCanNominate(
+  player: Player,
+  game: Game
+): player is ActiveStagePlayer & { alive: true } {
+  return (
+    "alive" in player &&
+    !!player.alive &&
+    isInactiveNomination(game) &&
+    !game.phase.nominationBookkeeping.hasNominated.includes(player.id)
+  );
+}
+
+export function playerCanBeNominated(
+  player: Player,
+  game: Game
+): player is ActiveStagePlayer {
+  return (
+    "alive" in player &&
+    isPendingNomination(game) &&
+    !game.phase.nominationBookkeeping.hasBeenNominated.includes(player.id)
+  );
+}
+
+export function playerCanVote(
+  player: Player,
+  game: Game
+): player is ActiveStagePlayer {
+  return (
+    "alive" in player &&
+    isActiveNomination(game) &&
+    (!!player.alive || ("ghostVote" in player && !!player.ghostVote))
+  );
+}
+
+export function canTransitionToNight(game: Game): game is Game & {
+  stage: "active";
+  phase: DayPhase & { nomination: { state: "inactive" } };
+} {
+  return isDay(game) && game.phase.nomination.state === "inactive";
 }

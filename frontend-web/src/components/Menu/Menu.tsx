@@ -1,6 +1,12 @@
 import React from "react";
 import { Game } from "@common/model";
-import { GameAction, isActiveNomination, isDay } from "@common/gameLogic";
+import {
+  canTransitionToNight,
+  GameAction,
+  isActiveNomination,
+  isDay,
+  isNight,
+} from "@common/gameLogic";
 import "./Menu.scss";
 
 type Props = {
@@ -37,18 +43,24 @@ const Menu: React.FC<Props> = ({ game, dispatch }) => {
               Finish game
             </button>
           )}
-          {game.stage === "active" && (
+          {canTransitionToNight(game) && (
             <button
               onClick={(e) => {
                 e.preventDefault();
-                dispatch(
-                  isDay(game)
-                    ? { type: "phaseTransitionToNight", stage: "active" }
-                    : { type: "phaseTransitionToDay", stage: "active" }
-                );
+                dispatch({ type: "phaseTransitionToNight", stage: "active" });
               }}
             >
-              {isDay(game) ? "Transition to night" : "Transition to day"}
+              Transition to night
+            </button>
+          )}
+          {isNight(game) && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                dispatch({ type: "phaseTransitionToDay", stage: "active" });
+              }}
+            >
+              Transition to day
             </button>
           )}
           {isActiveNomination(game) && (

@@ -24,6 +24,9 @@ import {
   isDay,
   isNight,
   isSetup,
+  playerCanBeNominated,
+  playerCanNominate,
+  playerCanVote,
 } from "@common/gameLogic";
 import Menu from "./components/Menu/Menu";
 import InfoPanel from "./components/InfoPanel";
@@ -154,12 +157,18 @@ function App() {
 
     const player = game.players.find((p) => p.id === playerId)!;
     if (nomination.state === "inactive") {
+      if (!playerCanNominate(player, game)) {
+        return;
+      }
       dispatch({
         type: "setNominator",
         stage: "active",
         payload: player,
       });
     } else if (nomination.state === "pending") {
+      if (!playerCanBeNominated(player, game)) {
+        return;
+      }
       dispatch({
         type: "setNominee",
         stage: "active",
@@ -167,8 +176,9 @@ function App() {
       });
     } else {
       // Count the player's vote if they can vote
-      const canVote = player.alive || player.ghostVote;
-      if (!canVote) return;
+      if (!playerCanVote(player, game)) {
+        return;
+      }
       dispatch({
         type: "toggleVote",
         stage: "active",

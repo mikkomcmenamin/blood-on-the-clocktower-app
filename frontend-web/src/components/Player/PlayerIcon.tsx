@@ -3,6 +3,8 @@ import {
   isDay,
   isInactiveNomination,
   isPendingNomination,
+  playerCanBeNominated,
+  playerCanNominate,
 } from "@common/gameLogic";
 import { ActiveStagePlayer, Game, Nomination, Player } from "@common/model";
 import { classnames } from "@common/util";
@@ -32,6 +34,9 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
   const isOnTheBlock =
     isDay(game) && game.phase.onTheBlock?.playerId === player.id;
 
+  const canNominate = playerCanNominate(player, game);
+  const canBeNominated = playerCanBeNominated(player, game);
+
   return (
     <div className={styles.playerRotator}>
       <div
@@ -55,6 +60,8 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
           [styles.votingDisabled]: votingDisabled,
           [styles.hasVoted]: hasVoted,
           [styles.onTheBlock]: isOnTheBlock,
+          [styles.canNominate]: canNominate,
+          [styles.canBeNominated]: canBeNominated,
         })}
       >
         <div className={styles.name}>{player.name}</div>
