@@ -62,9 +62,9 @@ const toggleVoteActionSchema = activeActionSchema.merge(
     payload: activeStagePlayerSchema,
   })
 );
-const killPlayerActionSchema = activeActionSchema.merge(
+const togglePlayerAliveStatusActionSchema = activeActionSchema.merge(
   z.object({
-    type: z.literal("killPlayer"),
+    type: z.literal("togglePlayerAliveStatus"),
     payload: activeStagePlayerSchema,
   })
 );
@@ -113,7 +113,7 @@ export const gameActionSchema = z.union([
   cancelNominationActionSchema,
   resolveVoteActionSchema,
   toggleVoteActionSchema,
-  killPlayerActionSchema,
+  togglePlayerAliveStatusActionSchema,
   phaseTransitionToNightActionSchema,
   phaseTransitionToDayActionSchema,
   stageTransitionToActiveActionSchema,
@@ -279,19 +279,38 @@ function gameStateActiveReducer(
         },
       };
     }
-    case "killPlayer": {
+    case "togglePlayerAliveStatus": {
       const player = action.payload;
       if (!player.alive) {
-        throw new Error(
-          `Cannot kill player ${player.name} who is already dead`
-        );
+        return {
+          ...state,
+          players: state.players.map((p) =>
+            p.id === player.id
+              ? {
+                  id: p.id,
+                  name: p.name,
+                  alive: true as const,
+                  character: p.character,
+                  team: p.team,
+                }
+              : p
+          ),
+        };
       }
+
       if (state.phase.phase === "night") {
         if (state.phase.nightDeaths.includes(player.id)) {
-          throw new Error(
-            `Cannot kill player ${player.name} twice in the same night`
-          );
+          return {
+            ...state,
+            phase: {
+              ...state.phase,
+              nightDeaths: state.phase.nightDeaths.filter(
+                (death) => death !== player.id
+              ),
+            },
+          };
         }
+
         return {
           ...state,
           phase: {

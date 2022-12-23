@@ -2,6 +2,7 @@ import {
   isActiveNomination,
   isDay,
   isInactiveNomination,
+  isNight,
   isPendingNomination,
   playerCanBeNominated,
   playerCanNominate,
@@ -37,6 +38,9 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
   const canNominate = playerCanNominate(player, game);
   const canBeNominated = playerCanBeNominated(player, game);
 
+  const isNightDeath =
+    isNight(game) && game.phase.nightDeaths.includes(player.id);
+
   return (
     <div className={styles.playerRotator}>
       <div
@@ -62,6 +66,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
           [styles.onTheBlock]: isOnTheBlock,
           [styles.canNominate]: canNominate,
           [styles.canBeNominated]: canBeNominated,
+          [styles.nightDeath]: isNightDeath,
         })}
       >
         <div className={styles.name}>{player.name}</div>

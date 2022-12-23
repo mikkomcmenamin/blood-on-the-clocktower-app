@@ -147,12 +147,8 @@ function App() {
     };
   }, [isModalOpen, game]);
 
-  // when a player is clicked, start the nomination process
-  // 1. if Nomination is state "inactive", set it to "pending" and set the nominating player
-  // 2. if Nomination is state "pending", set it to "active" and set the nominated player
-  function handleSelectPlayer(playerId: number) {
+  function handleNomination(playerId: number) {
     if (!isDay(game)) return;
-
     const player = game.players.find((p) => p.id === playerId)!;
     if (nomination.state === "inactive") {
       if (!playerCanNominate(player, game)) {
@@ -179,6 +175,19 @@ function App() {
       }
       dispatch({
         type: "toggleVote",
+        stage: "active",
+        payload: player,
+      });
+    }
+  }
+  function handleSelectPlayer(playerId: number) {
+    if (isDay(game)) {
+      handleNomination(playerId);
+      return;
+    } else if (isNight(game)) {
+      const player = game.players.find((p) => p.id === playerId)!;
+      dispatch({
+        type: "togglePlayerAliveStatus",
         stage: "active",
         payload: player,
       });
