@@ -58,7 +58,10 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
 
   usePressDurationDependentHandlers(
     playerIconRef,
-    { onShortPress: handleSelectPlayer, onLongPress },
+    {
+      onShortPress: handleSelectPlayer,
+      onLongPress: isDay(game) ? onLongPress : undefined,
+    },
     1000
   );
 
@@ -67,8 +70,12 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
       <div
         ref={playerIconRef}
         data-playerid={player.id}
-        draggable
         onDragStart={(e) => {
+          // no dragging unless it's setup phase
+          if (game.stage !== "setup") {
+            e.preventDefault();
+            return;
+          }
           e.dataTransfer.setData("application/botc", player.id.toString());
         }}
         className={classnames({
