@@ -2,8 +2,15 @@
   flex: 1;
   height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-block: 4rem;
+
+  @media (min-width: 768px) {
+    justify-content: center;
+    padding: 0;
+  }
 }
 
 #gameBoard {

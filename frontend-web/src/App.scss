@@ -1,14 +1,22 @@
 body,
 html {
   overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  width: 100%;
 }
 
 body {
   --nominator-index: 0;
   --nominee-index: 0;
   font-size: 3vw;
-  height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 // on desktop, decrease font-size
@@ -31,7 +39,7 @@ button {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  padding-top: 15vh;
+  padding-top: calc(2vh + env(safe-area-inset-top));
 
   @media (min-width: 768px) {
     padding-top: 10vh;
