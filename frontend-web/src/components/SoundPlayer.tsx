@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
+import { AppContext } from "../context";
 
 type SoundPlayerProps = {
   src: string;
@@ -11,11 +12,12 @@ const SoundPlayer: React.FC<SoundPlayerProps> = ({
   volume = 1,
   loop = true,
 }) => {
+  const globals = useContext(AppContext);
   const audioElement = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     const audio = audioElement.current;
-    if (audio) {
+    if (audio && globals.value.sound) {
       audio.volume = volume;
       audio.loop = loop;
       audio.src = src;
