@@ -6,7 +6,8 @@ type InfoPanelPosition =
   | "top-left"
   | "top-right"
   | "bottom-left"
-  | "bottom-right";
+  | "bottom-right"
+  | "top-right-2";
 
 const Panel = styled.div<{ position: InfoPanelPosition }>`
   background-image: url(${InfoPanelImage});
@@ -30,6 +31,8 @@ const Panel = styled.div<{ position: InfoPanelPosition }>`
           return `bottom: 0; left: 0;`;
         case "bottom-right":
           return `bottom: 0; right: 0;`;
+          case "top-right-2":
+            return `top: 100px; right: 0;`;
       }
     }}
   }

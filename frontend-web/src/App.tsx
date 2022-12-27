@@ -284,21 +284,24 @@ function App() {
       )}
       {(nomination.state === "active" || onTheBlock) &&
         windowInnerWidth > MOBILE_THRESHOLD && (
-          <InfoPanel position={"top-right"}>
-            <p>Votes required: {calculateVotesRequired(game)}</p>
-            {onTheBlock && (
-              <p>
-                {game.players.find((p) => p.id === onTheBlock.playerId)!.name}{" "}
-                about to die
-              </p>
-            )}
-            {nomination.state === "active" && nomination.voters.length > 0 && (
-              <p>{nomination.voters.length} votes</p>
-            )}
-          </InfoPanel>
-        )}
-      {isNight(game) && <SoundPlayer src={NightLoop} loop={true} />}
-      {isNight(game) && <VideoAnimation src={ReaperVideo} />}
+          <div>
+            <InfoPanel position={"top-right"}>
+              <p>Votes required: {calculateVotesRequired(game)}</p>
+            </InfoPanel>
+            <InfoPanel position={"top-right-2"}>
+              {onTheBlock && (
+                <p>
+                  {game.players.find((p) => p.id === onTheBlock.playerId)!.name}{" "}
+                  about to die
+                </p>
+              )}
+              {nomination.state === "active" && nomination.voters.length > 0 && (
+                <p>{nomination.voters.length} votes given</p>
+              )}
+            </InfoPanel>
+          </div>)}
+      {isNight(game) && <SoundPlayer src={NightLoop} loop={true}/>}
+      {isNight(game) && <VideoAnimation src={ReaperVideo}/>}
     </div>
   );
 }
