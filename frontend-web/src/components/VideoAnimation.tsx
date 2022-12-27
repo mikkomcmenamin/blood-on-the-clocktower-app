@@ -59,8 +59,10 @@ const VideoAnimation: React.FC<VideoAnimationProps> = ({ src }) => {
     }
   }, [isEnded]);
 
+  // playsInline is required for the video to play on iOS
+
   return hide ? null : (
-    <Video fadeIn={!isEnded} ref={videoRef} onEnded={handleEnded}>
+    <Video fadeIn={!isEnded} ref={videoRef} playsInline onEnded={handleEnded}>
       <source src={src} type="video/mp4"></source>
     </Video>
   );
