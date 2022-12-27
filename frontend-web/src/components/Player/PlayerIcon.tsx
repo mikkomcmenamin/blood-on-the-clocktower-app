@@ -1,15 +1,15 @@
 import {
   isActiveNomination,
   isDay,
-  isNight,
   isPendingNomination,
   isSetup,
   playerCanBeNominated,
   playerCanNominate,
 } from "@common/gameLogic";
-import { ActiveStagePlayer, Game, Nomination, Player } from "@common/model";
+import { ActiveStagePlayer, Game, Player } from "@common/model";
 import { classnames } from "@common/util";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
+import { AppContext } from "../../context";
 import { usePressDurationDependentHandlers } from "../../hooks";
 import styles from "./PlayerIcon.module.scss";
 
@@ -27,6 +27,8 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
   game,
   onToggleContextMenu,
 }) => {
+  const globals = useContext(AppContext);
+
   const votingDisabled =
     isActiveNomination(game) &&
     "alive" in player &&
@@ -42,8 +44,12 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
   const canNominate = playerCanNominate(player, game);
   const canBeNominated = playerCanBeNominated(player, game);
 
-  const isNightDeath =
-    isNight(game) && game.phase.nightDeaths.includes(player.id);
+  const isDead = "alive" in player && !player.alive;
+
+  const showDeathReminder =
+    !isDead &&
+    globals.value.storytellerMode &&
+    globals.value.deathReminders.includes(player.id);
 
   const playerIconRef = useRef<HTMLDivElement>(null);
 
@@ -88,13 +94,13 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
             player,
             game
           ),
-          [styles.shroud]: "alive" in player && !player.alive,
+          [styles.shroud]: isDead,
           [styles.votingDisabled]: votingDisabled,
           [styles.hasVoted]: hasVoted,
           [styles.onTheBlock]: isOnTheBlock,
           [styles.canNominate]: canNominate,
           [styles.canBeNominated]: canBeNominated,
-          [styles.nightDeath]: isNightDeath,
+          [styles.nightDeath]: showDeathReminder,
         })}
       >
         <div className={styles.name}>{player.name}</div>

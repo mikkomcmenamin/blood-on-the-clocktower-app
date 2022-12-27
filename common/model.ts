@@ -70,7 +70,6 @@ export const phaseSchema = z.union([
   }),
   z.object({
     phase: z.literal("night"),
-    nightDeaths: z.array(z.number()),
     nightNumber: z.number(),
   }),
 ]);

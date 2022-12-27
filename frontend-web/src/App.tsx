@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useContext, useEffect, useReducer, useRef, useState } from "react";
 import { createTRPCProxyClient, createWSClient, wsLink } from "@trpc/client";
 import type { AppRouter } from "@common/router";
 import "./App.scss";
@@ -35,6 +35,7 @@ import NightLoop from "./assets/S_NightLoop.mp3";
 import VideoAnimation from "./components/VideoAnimation";
 import ReaperVideo from "./assets/V_Reaper.mp4";
 import AddPlayerModal from "./components/Player/AddPlayerModal";
+import { AppContext } from "./context";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -61,6 +62,7 @@ client.onHeartbeat.subscribe(undefined, {
 function App() {
   const [game, _dispatch] = useReducer(gameStateReducer, initialGameState);
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
+  const globals = useContext(AppContext);
 
   const dispatch = (action: GameAction) => {
     _dispatch(action);
@@ -183,17 +185,31 @@ function App() {
       });
     }
   }
+
+  function toggleDeathReminder(playerId: number, onState?: boolean) {
+    if (!globals.value.storytellerMode) {
+      return;
+    }
+
+    const deathReminders = globals.value.deathReminders;
+
+    const updatedDeathReminders =
+      onState ?? !deathReminders.includes(playerId)
+        ? [...deathReminders, playerId]
+        : deathReminders.filter((id) => id !== playerId);
+
+    globals.setValue({
+      ...globals.value,
+      deathReminders: updatedDeathReminders,
+    });
+  }
+
   function handleSelectPlayer(playerId: number) {
     if (isDay(game)) {
       handleNomination(playerId);
       return;
     } else if (isNight(game)) {
-      const player = game.players.find((p) => p.id === playerId)!;
-      dispatch({
-        type: "togglePlayerAliveStatus",
-        stage: "active",
-        payload: player,
-      });
+      toggleDeathReminder(playerId);
     }
   }
 
@@ -255,6 +271,7 @@ function App() {
             stage: "active",
             payload: player,
           });
+          toggleDeathReminder(playerId, false);
         }}
       />
 

@@ -153,7 +153,6 @@ function gameStateSetupReducer(
         stage: "active" as const,
         phase: {
           phase: "night" as const,
-          nightDeaths: [],
           nightNumber: 1,
         },
       };
@@ -298,28 +297,6 @@ function gameStateActiveReducer(
         };
       }
 
-      if (state.phase.phase === "night") {
-        if (state.phase.nightDeaths.includes(player.id)) {
-          return {
-            ...state,
-            phase: {
-              ...state.phase,
-              nightDeaths: state.phase.nightDeaths.filter(
-                (death) => death !== player.id
-              ),
-            },
-          };
-        }
-
-        return {
-          ...state,
-          phase: {
-            ...state.phase,
-            nightDeaths: [...state.phase.nightDeaths, player.id],
-          },
-        };
-      }
-
       return {
         ...state,
         players: state.players.map((p) =>
@@ -418,7 +395,6 @@ function gameStateActiveReducer(
         ...game,
         phase: {
           phase: "night" as const,
-          nightDeaths: [],
           nightNumber: game.phase.dayNumber + 1,
         },
       };
