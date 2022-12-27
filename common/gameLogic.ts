@@ -71,7 +71,6 @@ const togglePlayerAliveStatusActionSchema = activeActionSchema.merge(
 const phaseTransitionToNightActionSchema = activeActionSchema.merge(
   z.object({
     type: z.literal("phaseTransitionToNight"),
-    arbitraryExecutions: z.array(z.number()).optional(),
   })
 );
 const phaseTransitionToDayActionSchema = activeActionSchema.merge(
@@ -415,58 +414,6 @@ function gameStateActiveReducer(
         );
       }
 
-      // e.g. player nominates the virgin and is townsfolk -> is executed immediately
-      if (action.arbitraryExecutions) {
-        return {
-          ...game,
-          phase: {
-            phase: "night" as const,
-            nightDeaths: [],
-            nightNumber: game.phase.dayNumber + 1,
-          },
-          players: game.players.map((player) =>
-            action.arbitraryExecutions?.includes(player.id)
-              ? {
-                  ...player,
-                  alive: false,
-                  ghostVote: player.alive ? true : player.ghostVote,
-                }
-              : player
-          ),
-        };
-      }
-
-      const onTheBlock = game.phase.onTheBlock;
-
-      if (onTheBlock) {
-        const player = game.players.find(
-          (player) => player.id === onTheBlock.playerId
-        );
-        if (!player) {
-          throw new Error(
-            `Cannot execute ${onTheBlock.playerId} because they do not exist`
-          );
-        }
-
-        return {
-          ...game,
-          phase: {
-            phase: "night" as const,
-            nightDeaths: [],
-            nightNumber: game.phase.dayNumber + 1,
-          },
-          players: game.players.map((player) =>
-            player.id === onTheBlock.playerId
-              ? {
-                  ...player,
-                  alive: false,
-                  ghostVote: player.alive ? true : player.ghostVote,
-                }
-              : player
-          ),
-        };
-      }
-
       return {
         ...game,
         phase: {
@@ -492,31 +439,6 @@ function gameStateActiveReducer(
           },
           dayNumber: game.phase.nightNumber,
         },
-        players: game.players.map((player) => {
-          if (!player.alive) {
-            return player;
-          }
-
-          if (!("nightDeaths" in game.phase)) {
-            throw new Error(
-              "Bug: no night deaths in game phase even though phase is night"
-            );
-          }
-
-          const aliveAndGhostVote = game.phase.nightDeaths.includes(player.id)
-            ? {
-                alive: false as const,
-                ghostVote: true,
-              }
-            : {
-                alive: true as const,
-              };
-
-          return {
-            ...player,
-            ...aliveAndGhostVote,
-          };
-        }),
       };
     }
     case "stageTransitionToFinished": {
