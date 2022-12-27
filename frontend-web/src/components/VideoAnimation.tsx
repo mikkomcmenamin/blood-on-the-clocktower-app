@@ -32,10 +32,9 @@ const Video = styled.video<{ fadeIn: boolean }>`
 
 type VideoAnimationProps = {
   src: string;
-  play: boolean;
 };
 
-const VideoAnimation: React.FC<VideoAnimationProps> = ({src, play}) => {
+const VideoAnimation: React.FC<VideoAnimationProps> = ({src}) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isEnded, setIsEnded] = useState(false);
   const [hide, setHide] = useState(false);
