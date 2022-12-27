@@ -52,7 +52,8 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
     globals.value.storytellerMode &&
     globals.value.deathReminders.includes(player.id);
 
-  const hasGhostVote = isActiveNomination(game) &&
+  const hasGhostVote =
+    isActiveNomination(game) &&
     "alive" in player &&
     !player.alive &&
     player.ghostVote;
@@ -110,7 +111,9 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
         })}
       >
         <div className={styles.name}>{player.name}</div>
-        {hasGhostVote && <img className={styles.ghostVote} src={ghostVoteIcon} />}
+        {hasGhostVote && (
+          <img className={styles.ghostVote} src={ghostVoteIcon} />
+        )}
       </div>
     </div>
   );
