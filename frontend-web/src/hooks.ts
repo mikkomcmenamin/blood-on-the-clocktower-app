@@ -129,22 +129,22 @@ export function usePressDurationDependentHandlers(
   handlers: PressHandlers,
   timeout = 1000
 ) {
+  const [longPressFired, setLongPressFired] = useState(false);
   useEffect(() => {
     if (!ref.current) return;
 
     let timer: NodeJS.Timeout;
-    let longPressFired = false;
 
     const handlePointerDown = (e: PointerEvent) => {
       timer = setTimeout(() => {
         handlers.onLongPress?.(e);
-        longPressFired = true;
+        setLongPressFired(true);
       }, timeout);
     };
 
     const handlePointerUp = (e: PointerEvent) => {
       !longPressFired && handlers.onShortPress?.(e);
-      longPressFired = false;
+      setLongPressFired(false);
       clearTimeout(timer);
     };
 
