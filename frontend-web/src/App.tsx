@@ -32,6 +32,8 @@ import Menu from "./components/Menu/Menu";
 import InfoPanel from "./components/InfoPanel";
 import SoundPlayer from "./components/SoundPlayer";
 import NightLoop from "./assets/S_NightLoop.mp3";
+import VideoAnimation from "./components/VideoAnimation";
+import ReaperVideo from "./assets/V_Reaper.mp4";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -269,6 +271,7 @@ function App() {
           </InfoPanel>
         )}
       {isNight(game) && <SoundPlayer src={NightLoop} loop={true} />}
+      {isNight(game) && <VideoAnimation src={ReaperVideo} play={isNight(game)} />}
     </div>
   );
 }
