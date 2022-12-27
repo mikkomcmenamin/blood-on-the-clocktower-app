@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { AppContext } from "src/context";
 import styled from "styled-components";
 import { keyframes } from "styled-components";
 
@@ -39,13 +40,20 @@ const VideoAnimation: React.FC<VideoAnimationProps> = ({ src }) => {
   const [isEnded, setIsEnded] = useState(false);
   const [hide, setHide] = useState(false);
 
+  const globals = useContext(AppContext);
+
   useEffect(() => {
+    if (!globals.value.video) {
+      setHide(true);
+      return;
+    }
+
     if (videoRef.current) {
       setTimeout(() => {
         videoRef.current?.play();
       }, 2000);
     }
-  }, [videoRef.current]);
+  }, [videoRef.current, globals.value.video]);
 
   const handleEnded = () => {
     setIsEnded(true);
