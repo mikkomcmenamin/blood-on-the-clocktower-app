@@ -71,6 +71,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
       <div
         ref={playerIconRef}
         data-playerid={player.id}
+        draggable
         onDragStart={(e) => {
           // no dragging unless it's setup phase
           if (game.stage !== "setup") {
