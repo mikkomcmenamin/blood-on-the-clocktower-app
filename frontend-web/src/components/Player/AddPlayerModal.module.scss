@@ -1,0 +1,34 @@
+h2 {
+  font-size: 1.5rem;
+}
+
+form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+input {
+  border-radius: 0.5rem;
+  border: 1px solid #888;
+  padding: 0.5rem;
+  box-shadow: 0 0 0.5rem #888;
+  font-family: "Vinque", sans-serif;
+}
+
+button {
+  background-image: url("../../assets/T_AddButton.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  box-shadow: 0 0 0.3rem #888;
+}

@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import {keyframes} from "styled-components";
+import { keyframes } from "styled-components";
 
 const Video = styled.video<{ fadeIn: boolean }>`
   position: fixed;
@@ -10,8 +10,8 @@ const Video = styled.video<{ fadeIn: boolean }>`
   object-fit: cover;
   background: ${(props) => (props.fadeIn ? "black" : "transparent")};
   animation: ${(props) =>
-  props.fadeIn
-    ? keyframes`
+    props.fadeIn
+      ? keyframes`
     from {
       opacity: 0;
     }
@@ -19,7 +19,7 @@ const Video = styled.video<{ fadeIn: boolean }>`
       opacity: 1;
     }
   `
-    : keyframes`
+      : keyframes`
     from {
       opacity: 1;
     }
@@ -34,7 +34,7 @@ type VideoAnimationProps = {
   src: string;
 };
 
-const VideoAnimation: React.FC<VideoAnimationProps> = ({src}) => {
+const VideoAnimation: React.FC<VideoAnimationProps> = ({ src }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isEnded, setIsEnded] = useState(false);
   const [hide, setHide] = useState(false);

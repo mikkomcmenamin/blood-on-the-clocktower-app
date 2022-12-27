@@ -34,6 +34,7 @@ import SoundPlayer from "./components/SoundPlayer";
 import NightLoop from "./assets/S_NightLoop.mp3";
 import VideoAnimation from "./components/VideoAnimation";
 import ReaperVideo from "./assets/V_Reaper.mp4";
+import AddPlayerModal from "./components/Player/AddPlayerModal";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -59,7 +60,7 @@ client.onHeartbeat.subscribe(undefined, {
 
 function App() {
   const [game, _dispatch] = useReducer(gameStateReducer, initialGameState);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
 
   const dispatch = (action: GameAction) => {
     _dispatch(action);
@@ -94,7 +95,7 @@ function App() {
       stage: "setup",
       payload: createSetupStagePlayer(name, existingPlayers),
     });
-    setIsModalOpen(false);
+    setIsAddPlayerModalOpen(false);
   };
 
   const removePlayer = (id: number) => {
@@ -105,17 +106,17 @@ function App() {
   };
 
   // close the modal when clicking outside of it
-  const modalRef = useRef<HTMLDivElement>(null);
-  useClickOutside(modalRef, () => setIsModalOpen(false));
+  const addPlayerModalRef = useRef<HTMLDivElement>(null);
+  useClickOutside(addPlayerModalRef, () => setIsAddPlayerModalOpen(false));
 
   // handle keyboard and mouse shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // open the modal when pressing the "+" or Space key
       if (e.key === "+" || e.key === " ") {
-        if (isSetup(game) && !isModalOpen) {
+        if (isSetup(game) && !isAddPlayerModalOpen) {
           e.preventDefault();
-          setIsModalOpen(true);
+          setIsAddPlayerModalOpen(true);
         }
       }
       // close the modal when pressing the "Escape" key
@@ -123,7 +124,7 @@ function App() {
       if (e.key === "Escape") {
         e.preventDefault();
         if (isSetup(game)) {
-          setIsModalOpen(false);
+          setIsAddPlayerModalOpen(false);
         }
 
         if (isDay(game)) {
@@ -135,8 +136,8 @@ function App() {
     // open the modal when double-clicking
     const handleDoubleClick = () => {
       if (!isSetup(game)) return;
-      if (!isModalOpen) {
-        setIsModalOpen(true);
+      if (!isAddPlayerModalOpen) {
+        setIsAddPlayerModalOpen(true);
       }
     };
 
@@ -147,7 +148,7 @@ function App() {
       window.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("dblclick", handleDoubleClick);
     };
-  }, [isModalOpen, game]);
+  }, [isAddPlayerModalOpen, game]);
 
   function handleNomination(playerId: number) {
     if (!isDay(game)) return;
@@ -249,10 +250,10 @@ function App() {
       />
 
       <Menu game={game} dispatch={dispatch} />
-      {isModalOpen && (
-        <Modal
+      {isAddPlayerModalOpen && (
+        <AddPlayerModal
           addPlayer={(p) => addPlayer(p, game.players)}
-          modalRef={modalRef}
+          modalRef={addPlayerModalRef}
         />
       )}
       {(nomination.state === "active" || onTheBlock) &&
@@ -271,9 +272,7 @@ function App() {
           </InfoPanel>
         )}
       {isNight(game) && <SoundPlayer src={NightLoop} loop={true} />}
-      {isNight(game) && (
-        <VideoAnimation src={ReaperVideo} />
-      )}
+      {isNight(game) && <VideoAnimation src={ReaperVideo} />}
     </div>
   );
 }
