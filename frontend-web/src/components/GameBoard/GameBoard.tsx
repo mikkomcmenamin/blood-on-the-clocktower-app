@@ -117,6 +117,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
       return;
     }
 
+    if (playerContextMenuOpen.open === "true") {
+      return;
+    }
+
     if (isActiveNomination(game) || isPendingNomination(game)) {
       onCancelNomination();
     }
