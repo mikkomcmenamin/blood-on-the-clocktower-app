@@ -156,6 +156,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  // Prevent selecting the name since it messes up the desired long press behavior
+  -webkit-user-select: none; /* Safari */
+  user-select: none;
 }
 
 @for $i from 1 through 100 {
