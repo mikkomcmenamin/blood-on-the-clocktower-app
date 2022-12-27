@@ -63,7 +63,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
       onShortPress: handleSelectPlayer,
       onLongPress: !isSetup(game) ? openContextMenu : undefined,
     },
-    1000
+    500
   );
 
   return (
