@@ -272,7 +272,7 @@ function App() {
         )}
       {isNight(game) && <SoundPlayer src={NightLoop} loop={true} />}
       {isNight(game) && (
-        <VideoAnimation src={ReaperVideo} play={isNight(game)} />
+        <VideoAnimation src={ReaperVideo} />
       )}
     </div>
   );
