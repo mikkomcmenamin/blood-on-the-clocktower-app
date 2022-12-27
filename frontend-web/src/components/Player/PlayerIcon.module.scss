@@ -161,6 +161,11 @@
   user-select: none;
 }
 
+.ghostVote {
+  position: fixed;
+  bottom: 0;
+}
+
 @for $i from 1 through 100 {
   .playerRotator:nth-of-type(#{$i}) {
     transform: translate(-100%, -50%)

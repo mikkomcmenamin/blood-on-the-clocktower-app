@@ -12,6 +12,7 @@ import { useContext, useRef } from "react";
 import { AppContext } from "../../context";
 import { usePressDurationDependentHandlers } from "../../hooks";
 import styles from "./PlayerIcon.module.scss";
+import ghostVoteIcon from "../../assets/T_GhostVote.png";
 
 type PlayerIconProps = {
   key: number;
@@ -50,6 +51,11 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
     !isDead &&
     globals.value.storytellerMode &&
     globals.value.deathReminders.includes(player.id);
+
+  const hasGhostVote = isActiveNomination(game) &&
+    "alive" in player &&
+    !player.alive &&
+    player.ghostVote;
 
   const playerIconRef = useRef<HTMLDivElement>(null);
 
@@ -104,6 +110,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
         })}
       >
         <div className={styles.name}>{player.name}</div>
+        {hasGhostVote && <img className={styles.ghostVote} src={ghostVoteIcon} />}
       </div>
     </div>
   );
