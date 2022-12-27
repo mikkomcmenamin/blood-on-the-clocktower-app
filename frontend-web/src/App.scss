@@ -68,3 +68,10 @@ button {
   padding: 1rem;
   background: rgba(0, 0, 0, 0.6);
 }
+
+button {
+  // long pressing on things on ios safari will often unintentionally select text from various elements, which is annoying
+  user-select: none;
+  // safari
+  -webkit-user-select: none;
+}
