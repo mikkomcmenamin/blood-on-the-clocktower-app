@@ -41,6 +41,7 @@ const AddPlayerModal: React.FC<Props> = ({ addPlayer, modalRef }) => {
         />
         <div className={styles.buttons}>
           <button
+            className={styles.addPlayerButton}
             disabled={newPlayerName.length === 0}
             type="submit"
             onClick={handleAddPlayer}
