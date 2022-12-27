@@ -1,9 +1,9 @@
 import {
   isActiveNomination,
   isDay,
-  isInactiveNomination,
   isNight,
   isPendingNomination,
+  isSetup,
   playerCanBeNominated,
   playerCanNominate,
 } from "@common/gameLogic";
@@ -18,12 +18,14 @@ type PlayerIconProps = {
   player: Player | ActiveStagePlayer;
   selectPlayer: (player: Player) => void;
   game: Game;
+  onToggleContextMenu: (openState: boolean) => void;
 };
 
 const PlayerIcon: React.FC<PlayerIconProps> = ({
   player,
   selectPlayer,
   game,
+  onToggleContextMenu,
 }) => {
   const votingDisabled =
     isActiveNomination(game) &&
@@ -50,17 +52,16 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
     selectPlayer(player);
   }
 
-  function onLongPress(e: PointerEvent) {
+  function openContextMenu(e: PointerEvent) {
     e.preventDefault();
-    // todo should open a context menu in certain situations
-    alert("long press");
+    onToggleContextMenu(true);
   }
 
   usePressDurationDependentHandlers(
     playerIconRef,
     {
       onShortPress: handleSelectPlayer,
-      onLongPress: isDay(game) ? onLongPress : undefined,
+      onLongPress: !isSetup(game) ? openContextMenu : undefined,
     },
     1000
   );

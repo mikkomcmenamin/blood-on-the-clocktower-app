@@ -247,6 +247,15 @@ function App() {
             dispatch({ type: "cancelNomination", stage: "active" });
           }
         }}
+        onKillOrResurrect={(playerId: number) => {
+          if (!isNight(game) && !isDay(game)) return;
+          const player = game.players.find((p) => p.id === playerId)!;
+          dispatch({
+            type: "togglePlayerAliveStatus",
+            stage: "active",
+            payload: player,
+          });
+        }}
       />
 
       <Menu game={game} dispatch={dispatch} />

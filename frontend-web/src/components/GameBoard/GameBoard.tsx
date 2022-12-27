@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Game, Nomination, Player } from "@common/model";
 import { classnames } from "@common/util";
 import PlayerIcon from "../Player/PlayerIcon";
@@ -9,6 +9,7 @@ import { useClickOutside, useDropzone } from "../../hooks";
 import styles from "./GameBoard.module.scss";
 import { getTwoClosestPlayers } from "../../domHelpers";
 import { isActiveNomination, isPendingNomination } from "@common/gameLogic";
+import PlayerContextMenuModal from "../Player/PlayerContextMenuModal";
 
 type GameBoardProps = {
   game: Game;
@@ -16,7 +17,17 @@ type GameBoardProps = {
   onDeletePlayer: (id: number) => void;
   onReorderPlayers: (playerIds: number[]) => void;
   onCancelNomination: () => void;
+  onKillOrResurrect: (playerId: number) => void;
 };
+
+type ContextMenuState =
+  | {
+      open: "false";
+    }
+  | {
+      open: "true";
+      playerId: number;
+    };
 
 const GameBoard: React.FC<GameBoardProps> = ({
   game,
@@ -24,6 +35,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   onDeletePlayer,
   onReorderPlayers,
   onCancelNomination,
+  onKillOrResurrect,
 }) => {
   const gameBoardRef = useRef<HTMLDivElement>(null);
 
@@ -110,12 +122,30 @@ const GameBoard: React.FC<GameBoardProps> = ({
     }
   }
 
+  const [playerContextMenuOpen, setPlayerContextMenuOpen] =
+    useState<ContextMenuState>({ open: "false" });
+
+  const contextMenuRef = useRef<HTMLDivElement>(null);
+
+  useClickOutside(contextMenuRef, () =>
+    setPlayerContextMenuOpen({ open: "false" })
+  );
+
   return (
     <section
       onClick={onClickGameBoardContainer}
       ref={gameBoardContainerRef}
       id={styles.gameBoardContainer}
     >
+      {playerContextMenuOpen.open === "true" && (
+        <PlayerContextMenuModal
+          onKillOrResurrect={onKillOrResurrect}
+          onClose={() => setPlayerContextMenuOpen({ open: "false" })}
+          playerId={playerContextMenuOpen.playerId}
+          game={game}
+          modalRef={contextMenuRef}
+        />
+      )}
       <div id={styles.gameBoard} ref={gameBoardRef}>
         {game.players.map((player) => (
           <PlayerIcon
@@ -123,6 +153,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
             player={player}
             game={game}
             selectPlayer={() => onSelectPlayer(player.id)}
+            onToggleContextMenu={(open) => {
+              setPlayerContextMenuOpen(
+                open ? { open: "true", playerId: player.id } : { open: "false" }
+              );
+            }}
           />
         ))}
         <section
