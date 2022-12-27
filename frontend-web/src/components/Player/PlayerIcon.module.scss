@@ -102,8 +102,11 @@
 
   &.votingDisabled {
     opacity: 0.5;
-    background: grey;
     cursor: not-allowed;
+
+    & > * {
+      cursor: not-allowed;
+    }
   }
 
   &.hasVoted {
