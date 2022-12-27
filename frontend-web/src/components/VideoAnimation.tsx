@@ -1,16 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import styled from "styled-components";
-import { keyframes } from "styled-components";
+import {keyframes} from "styled-components";
 
-const VideoContainer = styled.div<{ fadeIn: boolean }>`
+const Video = styled.video<{ fadeIn: boolean }>`
   position: fixed;
   pointer-events: none;
   width: 100%;
   height: 100%;
+  object-fit: cover;
   background: ${(props) => (props.fadeIn ? "black" : "transparent")};
   animation: ${(props) =>
-    props.fadeIn
-      ? keyframes`
+  props.fadeIn
+    ? keyframes`
     from {
       opacity: 0;
     }
@@ -18,7 +19,7 @@ const VideoContainer = styled.div<{ fadeIn: boolean }>`
       opacity: 1;
     }
   `
-      : keyframes`
+    : keyframes`
     from {
       opacity: 1;
     }
@@ -29,23 +30,15 @@ const VideoContainer = styled.div<{ fadeIn: boolean }>`
   animation-duration: 3s;
 `;
 
-const Video = styled.video`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-
 type VideoAnimationProps = {
   src: string;
   play: boolean;
 };
 
-const VideoAnimation: React.FC<VideoAnimationProps> = ({ src, play }) => {
+const VideoAnimation: React.FC<VideoAnimationProps> = ({src, play}) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isEnded, setIsEnded] = useState(false);
   const [hide, setHide] = useState(false);
-
-  console.log({ play, isEnded });
 
   useEffect(() => {
     if (videoRef.current) {
@@ -57,7 +50,6 @@ const VideoAnimation: React.FC<VideoAnimationProps> = ({ src, play }) => {
 
   const handleEnded = () => {
     setIsEnded(true);
-    console.log("video ended");
   };
 
   useEffect(() => {
@@ -69,11 +61,9 @@ const VideoAnimation: React.FC<VideoAnimationProps> = ({ src, play }) => {
   }, [isEnded]);
 
   return hide ? null : (
-    <VideoContainer fadeIn={!isEnded}>
-      <Video ref={videoRef} onEnded={handleEnded}>
-        <source src={src} type="video/mp4"></source>
-      </Video>
-    </VideoContainer>
+    <Video fadeIn={!isEnded} ref={videoRef} onEnded={handleEnded}>
+      <source src={src} type="video/mp4"></source>
+    </Video>
   );
 };
 
