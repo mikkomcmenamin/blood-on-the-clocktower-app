@@ -271,7 +271,9 @@ function App() {
           </InfoPanel>
         )}
       {isNight(game) && <SoundPlayer src={NightLoop} loop={true} />}
-      {isNight(game) && <VideoAnimation src={ReaperVideo} play={isNight(game)} />}
+      {isNight(game) && (
+        <VideoAnimation src={ReaperVideo} play={isNight(game)} />
+      )}
     </div>
   );
 }

@@ -1,98 +1,80 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import {keyframes} from 'styled-components'
+import { keyframes } from "styled-components";
 
-const VideoContainer = styled.div`
+const VideoContainer = styled.div<{ fadeIn: boolean }>`
   position: fixed;
+  pointer-events: none;
   width: 100%;
   height: 100%;
-`
+  background: ${(props) => (props.fadeIn ? "black" : "transparent")};
+  animation: ${(props) =>
+    props.fadeIn
+      ? keyframes`
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  `
+      : keyframes`
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  `};
+  animation-duration: 3s;
+`;
 
 const Video = styled.video`
   width: 100%;
   height: 100%;
   object-fit: cover;
-`
-
-const FadeOutKeyframes = keyframes`
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-`
-
-const FadeInKeyframes = keyframes`
-   from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-`
-
-const Fade = styled.div<{ fadeIn: boolean }>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  opacity: 0;
-  background-color: #000;
-  transition: opacity 1s linear;
-  animation-name: ${props => (props.fadeIn ? FadeInKeyframes : FadeOutKeyframes)};
-  animation-duration: 1s;
-  animation-fill-mode: ${props => (props.fadeIn ? "forward" : "backwards")};
 `;
 
 type VideoAnimationProps = {
   src: string;
   play: boolean;
-}
+};
 
-const VideoAnimation: React.FC<VideoAnimationProps> = ({src, play}) => {
+const VideoAnimation: React.FC<VideoAnimationProps> = ({ src, play }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isFadeIn, setIsFadeIn] = useState(true);
+  const [isEnded, setIsEnded] = useState(false);
+  const [hide, setHide] = useState(false);
+
+  console.log({ play, isEnded });
 
   useEffect(() => {
-    if (play && videoRef.current) {
-      handlePlay();
-    } else if (videoRef.current) {
-      //handleStop();
-    }
-  }, [play])
-
-  const handlePlay = () => {
     if (videoRef.current) {
-      videoRef.current.play();
-      setIsPlaying(true);
+      setTimeout(() => {
+        videoRef.current?.play();
+      }, 2000);
     }
-  }
-
-  //is handleStop really needed?
-//  const handleStop = () => {
-//    if(videoRef.current){
-//      videoRef.current.pause();
-//      setIsPlaying(false);
-//    }
-//  }
+  }, [videoRef.current]);
 
   const handleEnded = () => {
-    setIsFadeIn(false);
-    //setIsPlaying(false);
+    setIsEnded(true);
     console.log("video ended");
-  }
+  };
 
-  return (
-    <VideoContainer>
+  useEffect(() => {
+    if (isEnded) {
+      setTimeout(() => {
+        setHide(true);
+      }, 3000);
+    }
+  }, [isEnded]);
+
+  return hide ? null : (
+    <VideoContainer fadeIn={!isEnded}>
       <Video ref={videoRef} onEnded={handleEnded}>
         <source src={src} type="video/mp4"></source>
       </Video>
-      {isPlaying && <Fade fadeIn={isFadeIn}/>}
-    </VideoContainer>)
-}
+    </VideoContainer>
+  );
+};
 
 export default VideoAnimation;
