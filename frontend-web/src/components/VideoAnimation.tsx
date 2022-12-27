@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { AppContext } from "src/context";
+import { AppContext } from "../context";
 import styled from "styled-components";
 import { keyframes } from "styled-components";
 
