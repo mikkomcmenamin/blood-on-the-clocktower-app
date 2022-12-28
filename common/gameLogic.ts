@@ -246,14 +246,6 @@ function gameStateActiveReducer(
         // toggle back
         return {
           ...state,
-          players:
-            !player.alive && !player.ghostVote
-              ? state.players.map((p) =>
-                  p.id === player.id ? { ...p, ghostVote: true } : p
-                )
-              : state.players.map((p) =>
-                  p.id === player.id ? { ...p, ghostVote: false } : p
-                ),
           phase: {
             ...state.phase,
             nomination: {
@@ -268,12 +260,6 @@ function gameStateActiveReducer(
 
       return {
         ...state,
-        players:
-          !player.alive && player.ghostVote
-            ? state.players.map((p) =>
-                p.id === player.id ? { ...p, ghostVote: false } : p
-              )
-            : state.players,
         phase: {
           ...state.phase,
           nomination: {
@@ -346,10 +332,17 @@ function gameStateActiveReducer(
 
       const currentMaxVotes = calculateVotesRequired(game) - 1;
 
+      const playersWithGhostVotesDeducted = game.players.map((player) =>
+        !player.alive && game.phase.nomination.voters.includes(player.id)
+          ? { ...player, ghostVote: false }
+          : player
+      );
+
       // No player on the block
       if (game.phase.nomination.voters.length < currentMaxVotes) {
         return {
           ...game,
+          players: playersWithGhostVotesDeducted,
           phase: {
             ...game.phase,
             nomination: { state: "inactive" as const },
@@ -361,6 +354,7 @@ function gameStateActiveReducer(
       if (currentMaxVotes === game.phase.nomination.voters.length) {
         return {
           ...game,
+          players: playersWithGhostVotesDeducted,
           phase: {
             ...game.phase,
             nomination: { state: "inactive" as const },
@@ -373,6 +367,7 @@ function gameStateActiveReducer(
       // New player on the block (no pun intended)
       return {
         ...game,
+        players: playersWithGhostVotesDeducted,
         phase: {
           ...game.phase,
           nomination: { state: "inactive" as const },
