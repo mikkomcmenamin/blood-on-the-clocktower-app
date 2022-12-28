@@ -8,6 +8,27 @@ export const CHARACTERS = {
   BAD_MOON_RISING: BadMoonRising,
 } as const;
 
+export const EDITIONS = {
+  TROUBLE_BREWING: {
+    id: "TROUBLE_BREWING",
+    name: "Trouble Brewing",
+    characters: CHARACTERS.TROUBLE_BREWING,
+  },
+  SECTS_AND_VIOLETS: {
+    id: "SECTS_AND_VIOLETS",
+    name: "Sects and Violets",
+    characters: CHARACTERS.SECTS_AND_VIOLETS,
+  },
+  BAD_MOON_RISING: {
+    id: "BAD_MOON_RISING",
+    name: "Bad Moon Rising",
+    characters: CHARACTERS.BAD_MOON_RISING,
+  },
+} as const;
+
+export type Edition = typeof EDITIONS[keyof typeof EDITIONS];
+export type EditionId = Edition["id"];
+
 export type TroubleBrewingCharacter =
   typeof CHARACTERS.TROUBLE_BREWING[number]["id"];
 export type SectsAndVioletsCharacter =
