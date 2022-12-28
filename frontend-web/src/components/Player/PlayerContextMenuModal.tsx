@@ -2,7 +2,7 @@ import { getCharactersInPlay, isSetup } from "@common/gameLogic";
 import { Game, Player } from "@common/model";
 import Modal, { ModalProps } from "../Modal";
 import styles from "./PlayerContextMenuModal.module.scss";
-import { EDITIONS } from "@common/editions/editions";
+import { EDITIONS, formatCharacterName } from "@common/editions/editions";
 import { classnames } from "@common/util";
 import { AppContext } from "../../context";
 import { useContext } from "react";
@@ -78,7 +78,7 @@ const PlayerContextMenuModal: React.FC<Props> = ({
   return (
     <Modal modalRef={modalRef}>
       <h2>
-        {player.name} ({currentCharacter})
+        {player.name} ({formatCharacterName(currentCharacter)})
       </h2>
 
       <div

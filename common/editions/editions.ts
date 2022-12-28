@@ -41,7 +41,7 @@ export type Character =
   | SectsAndVioletsCharacter
   | BadMoonRisingCharacter;
 
-export const formatCharacterName = (character: Character): string => {
+export const formatCharacterName = (character: string): string => {
   return character
     .split("_")
     .map((word) => word[0].toUpperCase() + word.slice(1))
