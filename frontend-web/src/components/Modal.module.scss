@@ -12,6 +12,7 @@
 }
 
 .modalContent {
+  position: relative;
   background-size: 100% 100%;
   background-image: url("../assets/T_ButtonBg.png");
   background-repeat: no-repeat;
@@ -22,6 +23,19 @@
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+}
+
+.closeModalX {
+  cursor: pointer;
+  position: absolute;
+  top: 0.1rem;
+  right: 0.1rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0.5rem #888;
+  background-color: black;
+  color: white;
 }
 
 // on desktop, make the modal content only 50% and the modal takes into account the 2rem taken by the right side drawer

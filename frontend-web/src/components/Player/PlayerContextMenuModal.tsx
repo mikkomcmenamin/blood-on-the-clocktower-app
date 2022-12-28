@@ -76,7 +76,7 @@ const PlayerContextMenuModal: React.FC<Props> = ({
     ("character" in player && player.character) || "no character";
 
   return (
-    <Modal modalRef={modalRef}>
+    <Modal onClose={onClose} modalRef={modalRef}>
       <h2>
         {player.name} ({formatCharacterName(currentCharacter)})
       </h2>

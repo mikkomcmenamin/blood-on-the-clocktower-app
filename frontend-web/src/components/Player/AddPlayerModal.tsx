@@ -6,7 +6,7 @@ type Props = Omit<ModalProps, "children"> & {
   addPlayer: (name: string) => void;
 };
 
-const AddPlayerModal: React.FC<Props> = ({ addPlayer, modalRef }) => {
+const AddPlayerModal: React.FC<Props> = ({ addPlayer, modalRef, onClose }) => {
   const playerInputRef = useRef<HTMLInputElement>(null);
   const [newPlayerName, setNewPlayerName] = useState("");
 
@@ -30,7 +30,7 @@ const AddPlayerModal: React.FC<Props> = ({ addPlayer, modalRef }) => {
   };
 
   return (
-    <Modal modalRef={modalRef}>
+    <Modal onClose={onClose} modalRef={modalRef}>
       <h2>Add a new player</h2>
       <form id="add-player-form" onSubmit={handleAddPlayer}>
         <input

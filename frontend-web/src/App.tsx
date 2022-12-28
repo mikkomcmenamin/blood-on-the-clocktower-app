@@ -271,6 +271,7 @@ function App() {
       <Menu game={game} dispatch={dispatch} />
       {isAddPlayerModalOpen && (
         <AddPlayerModal
+          onClose={() => setIsAddPlayerModalOpen(false)}
           addPlayer={(p) => addPlayer(p, game.players)}
           modalRef={addPlayerModalRef}
         />
