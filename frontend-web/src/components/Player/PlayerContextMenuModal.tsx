@@ -82,6 +82,18 @@ const PlayerContextMenuModal: React.FC<Props> = ({
       </h2>
 
       <div
+        onClick={() => {
+          if (!isSetup(game)) {
+            return;
+          }
+          onModifyPlayer({
+            ...player,
+            character: undefined,
+          });
+        }}
+        style={{
+          cursor: isSetup(game) && !!player.character ? "pointer" : "default",
+        }}
         className={classnames({
           [styles.character]: true,
           [styles.selected]: currentCharacter !== "no character",
