@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Game } from "@common/model";
 import {
   canTransitionToNight,
@@ -8,6 +8,7 @@ import {
   isNight,
 } from "@common/gameLogic";
 import "./Menu.scss";
+import { AppContext } from "../../context";
 
 type Props = {
   game: Game;
@@ -15,6 +16,7 @@ type Props = {
 };
 
 const Menu: React.FC<Props> = ({ game, dispatch }) => {
+  const globals = useContext(AppContext);
   return (
     <>
       <nav id="controls">
@@ -84,6 +86,20 @@ const Menu: React.FC<Props> = ({ game, dispatch }) => {
               Reset game
             </button>
           )}
+          <button
+            onClick={(e) => {
+              // toggle storyteller mode
+              e.preventDefault();
+              globals.setValue({
+                ...globals.value,
+                storytellerMode: !globals.value.storytellerMode,
+              });
+            }}
+          >
+            {globals.value.storytellerMode
+              ? "Disable ST mode"
+              : "Enable ST mode"}
+          </button>
         </div>
       </nav>
     </>

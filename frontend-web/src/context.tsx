@@ -1,22 +1,13 @@
 import { EditionId } from "@common/editions/editions";
 import React from "react";
 
-type StorytellerContext =
-  | {
-      storytellerMode: false;
-    }
-  | {
-      storytellerMode: true;
-      deathReminders: number[];
-    };
-
-type GeneralSettings = {
+export type Context = {
+  storytellerMode: boolean;
+  deathReminders: number[];
   sound: boolean;
   video: boolean;
   edition: EditionId;
 };
-
-export type Context = StorytellerContext & GeneralSettings;
 
 const isInitiallyMobile = window.innerWidth <= 768;
 
@@ -31,6 +22,7 @@ export const initialCtxValue = isInitiallyMobile
   : {
       storytellerMode: false as const,
       edition: "TROUBLE_BREWING" as const,
+      deathReminders: [],
       sound: true,
       video: true,
     };
