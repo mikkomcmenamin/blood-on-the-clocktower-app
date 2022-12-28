@@ -9,7 +9,7 @@ import { Game, initialGameState } from "./model";
 const e = new EventEmitter();
 
 export function createContext(
-  opts: CreateHTTPContextOptions | CreateWSSContextFnOptions
+  _: CreateHTTPContextOptions | CreateWSSContextFnOptions
 ) {
   return {};
 }
@@ -53,7 +53,7 @@ export const createAppRouter = () => {
     }),
     gameAction: publicProcedure
       .input(gameActionSchema)
-      .mutation(({ input, ctx }) => {
+      .mutation(({ input, ctx: _ }) => {
         console.log("Got game action", input);
         serverState = gameStateReducer(serverState, input);
         e.emit("game", serverState);

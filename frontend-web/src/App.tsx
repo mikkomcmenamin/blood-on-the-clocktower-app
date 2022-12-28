@@ -4,7 +4,6 @@ import type { AppRouter } from "@common/router";
 import "./App.scss";
 import {
   createSetupStagePlayer,
-  Game,
   initialGameState,
   Player,
 } from "@common/model";
@@ -14,7 +13,6 @@ import {
   useHandlePlayerCountChangeUIEffects,
   useWindowInnerWidth,
 } from "./hooks";
-import Modal from "./components/Modal";
 import Background from "./components/Background";
 import GameBoard from "./components/GameBoard/GameBoard";
 import {
@@ -51,7 +49,7 @@ const client = createTRPCProxyClient<AppRouter>({
 });
 
 client.onHeartbeat.subscribe(undefined, {
-  onData: (data) => {
+  onData: () => {
     // console.log("heartbeat", data);
   },
   onError: (err) => {

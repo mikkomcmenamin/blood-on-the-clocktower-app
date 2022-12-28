@@ -4,7 +4,6 @@ import {
   canTransitionToNight,
   GameAction,
   isActiveNomination,
-  isDay,
   isNight,
 } from "@common/gameLogic";
 import "./Menu.scss";

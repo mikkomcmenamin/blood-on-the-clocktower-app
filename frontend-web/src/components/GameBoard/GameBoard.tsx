@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Game, Nomination, Player } from "@common/model";
+import { Game } from "@common/model";
 import { classnames } from "@common/util";
 import PlayerIcon from "../Player/PlayerIcon";
 

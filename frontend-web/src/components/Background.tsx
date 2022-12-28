@@ -1,4 +1,3 @@
-import { Player } from "@common/model";
 import bgVideo from "../assets/bgv.webm";
 import "./Background.scss";
 
