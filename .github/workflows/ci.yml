@@ -12,6 +12,4 @@ jobs:
         with:
           node-version: "16.x"
       - run: npm install
-      - run: npm run format:check
-      - run: npm run lint:check
-      - run: npm run ts:check
+      - run: npm run all:check

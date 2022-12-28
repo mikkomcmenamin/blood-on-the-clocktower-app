@@ -17,6 +17,7 @@
     "lint:check": "eslint --ext .ts,.tsx,.js,.jsx .",
     "lint:fix": "eslint --fix --ext .ts,.tsx,.js,.jsx .",
     "ts:check": "concurrently \"cd frontend-web && tsc --noEmit\" \"cd backend && tsc --noEmit\"",
+    "all:check": "concurrently \"npm run format:check\" \"npm run lint:check\" \"npm run ts:check\"",
     "prepare": "husky install"
   },
   "repository": {
