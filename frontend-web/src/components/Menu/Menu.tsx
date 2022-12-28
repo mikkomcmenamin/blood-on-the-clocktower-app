@@ -3,6 +3,7 @@ import { Game } from "@common/model";
 import {
   canTransitionToNight,
   GameAction,
+  gameCanBeStarted,
   isActiveNomination,
   isNight,
 } from "@common/gameLogic";
@@ -20,6 +21,7 @@ const Menu: React.FC<Props> = ({ game, dispatch }) => {
         <div aria-roledescription="navigation" id="menu">
           {game.stage === "setup" && (
             <button
+              disabled={!gameCanBeStarted(game)}
               onClick={(e) => {
                 e.preventDefault();
                 dispatch({ type: "stageTransitionToActive", stage: "setup" });

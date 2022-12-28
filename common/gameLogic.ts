@@ -142,12 +142,17 @@ function gameStateSetupReducer(
       };
     case "stageTransitionToActive": {
       const game = state;
+      if (!gameCanBeStarted(game)) {
+        throw new Error(
+          "Cannot start game: not enough players or not every player has a name & character"
+        );
+      }
       return {
         ...game,
         players: game.players.map((player) => ({
           ...player,
+          character: player.character as string,
           alive: true as const,
-          character: "Clockmaker", // TODO
           team: "good" as const, // TODO
         })),
         stage: "active" as const,
@@ -563,4 +568,17 @@ export function getCharactersInPlay(game: Game): string[] {
         "character" in player && typeof player.character === "string"
     )
     .map((player) => player.character as string);
+}
+
+export function gameCanBeStarted(game: Game): game is Game & {
+  players: (Player & { name: string; character: string })[];
+} {
+  if (game.stage !== "setup") {
+    return false;
+  }
+
+  return (
+    game.players.length >= 5 &&
+    game.players.every((player) => !!player.name && !!player.character)
+  );
 }
