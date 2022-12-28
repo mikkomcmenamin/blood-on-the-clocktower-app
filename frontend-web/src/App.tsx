@@ -295,13 +295,15 @@ function App() {
                   about to die
                 </p>
               )}
-              {nomination.state === "active" && nomination.voters.length > 0 && (
-                <p>{nomination.voters.length} votes given</p>
-              )}
+              {nomination.state === "active" &&
+                nomination.voters.length > 0 && (
+                  <p>{nomination.voters.length} votes given</p>
+                )}
             </InfoPanel>
-          </div>)}
-      {isNight(game) && <SoundPlayer src={NightLoop} loop={true}/>}
-      {isNight(game) && <VideoAnimation src={ReaperVideo}/>}
+          </div>
+        )}
+      {isNight(game) && <SoundPlayer src={NightLoop} loop={true} />}
+      {isNight(game) && <VideoAnimation src={ReaperVideo} />}
     </div>
   );
 }

@@ -31,8 +31,8 @@ const Panel = styled.div<{ position: InfoPanelPosition }>`
           return `bottom: 0; left: 0;`;
         case "bottom-right":
           return `bottom: 0; right: 0;`;
-          case "top-right-2":
-            return `top: 100px; right: 0;`;
+        case "top-right-2":
+          return `top: 100px; right: 0;`;
       }
     }}
   }
