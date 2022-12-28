@@ -9,6 +9,7 @@
 }
 
 .playerContent {
+  --character-image-url: url("");
   background: radial-gradient(circle at 100px 100px, #555555fc, #000);
   border-radius: 50%;
   --ball-size: calc(2rem + (30rem / var(--num-players)));
@@ -24,6 +25,22 @@
   // shadow etc to make this look like a raised button
   box-shadow: 0 0 1rem rgb(255, 255, 255);
   cursor: pointer;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: var(--character-image-url);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 50%;
+    opacity: 0.3;
+    z-index: -1;
+  }
 
   @media (min-width: 768px) {
     --ball-size: calc(4rem + (50rem / var(--num-players)));

@@ -7,11 +7,14 @@ import {
 } from "@common/gameLogic";
 import { ActiveStagePlayer, Game, Player } from "@common/model";
 import { classnames } from "@common/util";
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { AppContext } from "../../context";
 import { usePressDurationDependentHandlers } from "../../hooks";
 import styles from "./PlayerIcon.module.scss";
 import ghostVoteIcon from "../../assets/T_GhostVote.png";
+
+const CHARACTER_BASE_URL = new URL("../../assets/characters", import.meta.url)
+  .href;
 
 type PlayerIconProps = {
   key: number;
@@ -77,6 +80,25 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
     },
     500
   );
+
+  // set --character-image-url to the character's image in useffect
+  useEffect(() => {
+    if (
+      playerIconRef.current &&
+      player.character &&
+      globals.value.storytellerMode
+    ) {
+      playerIconRef.current.style.setProperty(
+        "--character-image-url",
+        `url(${CHARACTER_BASE_URL}/${player.character}.png)`
+      );
+    } else if (playerIconRef.current && !globals.value.storytellerMode) {
+      playerIconRef.current.style.setProperty(
+        "--character-image-url",
+        `url("")`
+      );
+    }
+  }, [player.character, globals.value.storytellerMode]);
 
   return (
     <div className={styles.playerRotator}>
