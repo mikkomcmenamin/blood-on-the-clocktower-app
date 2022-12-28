@@ -36,7 +36,14 @@ const PlayerIconContainer: React.FC<PlayerIconContainerProps> = ({
   onRightArrowClick,
 }) => {
   return (
-    <div style={{ display: "flex", width: "100%" }}>
+    <div
+      style={{
+        display: "flex",
+        width: "100%",
+        alignItems: "center",
+        position: "relative",
+      }}
+    >
       <button onClick={onLeftArrowClick} className={styles.arrow}>
         {"<"}
       </button>
@@ -49,6 +56,7 @@ const PlayerIconContainer: React.FC<PlayerIconContainerProps> = ({
           width: "100%",
           padding: "1rem",
           justifyContent: "center",
+          overflow: "auto",
         }}
       >
         {children}
