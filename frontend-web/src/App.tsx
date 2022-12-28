@@ -34,6 +34,7 @@ import VideoAnimation from "./components/VideoAnimation";
 import ReaperVideo from "./assets/V_Reaper.mp4";
 import AddPlayerModal from "./components/Player/AddPlayerModal";
 import { AppContext } from "./context";
+import PlayerContextMenuModal from "./components/Player/PlayerContextMenuModal";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -57,9 +58,26 @@ client.onHeartbeat.subscribe(undefined, {
   },
 });
 
+type PlayerContextMenuState =
+  | {
+      open: "false";
+    }
+  | {
+      open: "true";
+      playerId: number;
+    };
+
 function App() {
   const [game, _dispatch] = useReducer(gameStateReducer, initialGameState);
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
+  const [playerContextMenuOpen, setPlayerContextMenuOpen] =
+    useState<PlayerContextMenuState>({ open: "false" });
+
+  const contextMenuRef = useRef<HTMLDivElement>(null);
+
+  useClickOutside(contextMenuRef, () =>
+    setPlayerContextMenuOpen({ open: "false" })
+  );
   const globals = useContext(AppContext);
 
   const dispatch = (action: GameAction) => {
@@ -136,6 +154,8 @@ function App() {
     // open the modal when double-clicking
     const handleDoubleClick = () => {
       if (!isSetup(game)) return;
+      if (playerContextMenuOpen.open) return;
+
       if (!isAddPlayerModalOpen) {
         setIsAddPlayerModalOpen(true);
       }
@@ -232,8 +252,6 @@ function App() {
 
   const onTheBlock = isDay(game) && game.phase.onTheBlock;
 
-  console.log(onTheBlock);
-
   return (
     <div className="App">
       <InfoPanel position={"top-left"}>
@@ -252,19 +270,25 @@ function App() {
         }}
         onDeletePlayer={removePlayer}
         onCancelNomination={() => {
+          if (playerContextMenuOpen.open === "true") {
+            return;
+          }
+
           if (nomination.state !== "inactive") {
             dispatch({ type: "cancelNomination", stage: "active" });
           }
         }}
-        onKillOrResurrect={(playerId: number) => {
-          if (!isNight(game) && !isDay(game)) return;
-          const player = game.players.find((p) => p.id === playerId)!;
-          dispatch({
-            type: "togglePlayerAliveStatus",
-            stage: "active",
-            payload: player,
-          });
-          toggleDeathReminder(playerId, false);
+        onToggleContextMenu={(playerId: number, open: boolean) => {
+          if (open) {
+            setPlayerContextMenuOpen({
+              open: "true",
+              playerId,
+            });
+          } else {
+            setPlayerContextMenuOpen({
+              open: "false",
+            });
+          }
         }}
       />
 
@@ -274,6 +298,33 @@ function App() {
           onClose={() => setIsAddPlayerModalOpen(false)}
           addPlayer={(p) => addPlayer(p, game.players)}
           modalRef={addPlayerModalRef}
+        />
+      )}
+      {playerContextMenuOpen.open === "true" && (
+        <PlayerContextMenuModal
+          onKillOrResurrect={(playerId: number) => {
+            if (!isNight(game) && !isDay(game)) return;
+            const player = game.players.find((p) => p.id === playerId)!;
+            dispatch({
+              type: "togglePlayerAliveStatus",
+              stage: "active",
+              payload: player,
+            });
+            toggleDeathReminder(playerId, false);
+          }}
+          onModifyPlayer={(player) => {
+            dispatch({
+              type: "modifyPlayers",
+              stage: "setup",
+              payload: game.players.map((p) =>
+                p.id === player.id ? player : p
+              ),
+            });
+          }}
+          onClose={() => setPlayerContextMenuOpen({ open: "false" })}
+          playerId={playerContextMenuOpen.playerId}
+          game={game}
+          modalRef={contextMenuRef}
         />
       )}
       {(nomination.state === "active" || onTheBlock) &&

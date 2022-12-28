@@ -1,15 +1,14 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { Game, Player } from "@common/model";
 import { classnames } from "@common/util";
 import PlayerIcon from "../Player/PlayerIcon";
 
 import clockHandMinute from "../../assets/clockhand.png";
 import clockHandHour from "../../assets/clockhand-hour.png";
-import { useClickOutside, useDropzone } from "../../hooks";
+import { useDropzone } from "../../hooks";
 import styles from "./GameBoard.module.scss";
 import { getTwoClosestPlayers } from "../../domHelpers";
 import { isActiveNomination, isPendingNomination } from "@common/gameLogic";
-import PlayerContextMenuModal from "../Player/PlayerContextMenuModal";
 
 type GameBoardProps = {
   game: Game;
@@ -17,17 +16,8 @@ type GameBoardProps = {
   onDeletePlayer: (id: number) => void;
   onModifyPlayers: (players: Player[]) => void;
   onCancelNomination: () => void;
-  onKillOrResurrect: (playerId: number) => void;
+  onToggleContextMenu: (playerId: number, open: boolean) => void;
 };
-
-type ContextMenuState =
-  | {
-      open: "false";
-    }
-  | {
-      open: "true";
-      playerId: number;
-    };
 
 const GameBoard: React.FC<GameBoardProps> = ({
   game,
@@ -35,7 +25,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   onDeletePlayer,
   onModifyPlayers,
   onCancelNomination,
-  onKillOrResurrect,
+  onToggleContextMenu,
 }) => {
   const gameBoardRef = useRef<HTMLDivElement>(null);
 
@@ -121,26 +111,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
       return;
     }
 
-    if (playerContextMenuOpen.open === "true") {
-      return;
-    }
-
-    if (isActiveNomination(game) || isPendingNomination(game)) {
-      onCancelNomination();
-    }
-  }
-
-  const [playerContextMenuOpen, setPlayerContextMenuOpen] =
-    useState<ContextMenuState>({ open: "false" });
-
-  const contextMenuRef = useRef<HTMLDivElement>(null);
-
-  useClickOutside(contextMenuRef, () =>
-    setPlayerContextMenuOpen({ open: "false" })
-  );
-
-  function onModifyPlayer(player: Player) {
-    onModifyPlayers(game.players.map((p) => (p.id === player.id ? player : p)));
+    onCancelNomination();
   }
 
   return (
@@ -149,16 +120,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
       ref={gameBoardContainerRef}
       id={styles.gameBoardContainer}
     >
-      {playerContextMenuOpen.open === "true" && (
-        <PlayerContextMenuModal
-          onKillOrResurrect={onKillOrResurrect}
-          onModifyPlayer={onModifyPlayer}
-          onClose={() => setPlayerContextMenuOpen({ open: "false" })}
-          playerId={playerContextMenuOpen.playerId}
-          game={game}
-          modalRef={contextMenuRef}
-        />
-      )}
       <div id={styles.gameBoard} ref={gameBoardRef}>
         {game.players.map((player) => (
           <PlayerIcon
@@ -167,9 +128,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             game={game}
             selectPlayer={() => onSelectPlayer(player.id)}
             onToggleContextMenu={(open) => {
-              setPlayerContextMenuOpen(
-                open ? { open: "true", playerId: player.id } : { open: "false" }
-              );
+              onToggleContextMenu(player.id, open);
             }}
           />
         ))}
