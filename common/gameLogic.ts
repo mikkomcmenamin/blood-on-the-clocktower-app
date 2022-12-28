@@ -98,9 +98,9 @@ const resetToSetupSchema = z.object({
   type: z.literal("resetToSetup"),
 });
 
-const reorderPlayersSchema = setupActionSchema.merge(
+const modifyPlayersSchema = setupActionSchema.merge(
   z.object({
-    type: z.literal("reorderPlayers"),
+    type: z.literal("modifyPlayers"),
     payload: z.array(setupStagePlayerSchema),
   })
 );
@@ -120,7 +120,7 @@ export const gameActionSchema = z.union([
   stageTransitionToFinishedActionSchema,
   replaceStateSchema,
   resetToSetupSchema,
-  reorderPlayersSchema,
+  modifyPlayersSchema,
 ]);
 
 export type GameAction = z.infer<typeof gameActionSchema>;
@@ -157,7 +157,7 @@ function gameStateSetupReducer(
         },
       };
     }
-    case "reorderPlayers": {
+    case "modifyPlayers": {
       return {
         ...state,
         players: action.payload,
@@ -554,4 +554,13 @@ export function canTransitionToNight(game: Game): game is Game & {
   phase: DayPhase & { nomination: { state: "inactive" } };
 } {
   return isDay(game) && game.phase.nomination.state === "inactive";
+}
+
+export function getCharactersInPlay(game: Game): string[] {
+  return game.players
+    .filter(
+      (player): player is Player & { character: string } =>
+        "character" in player && typeof player.character === "string"
+    )
+    .map((player) => player.character as string);
 }

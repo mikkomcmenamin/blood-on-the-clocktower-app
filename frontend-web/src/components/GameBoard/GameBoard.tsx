@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Game } from "@common/model";
+import { Game, Player } from "@common/model";
 import { classnames } from "@common/util";
 import PlayerIcon from "../Player/PlayerIcon";
 
@@ -15,7 +15,7 @@ type GameBoardProps = {
   game: Game;
   onSelectPlayer: (playerId: number) => void;
   onDeletePlayer: (id: number) => void;
-  onReorderPlayers: (playerIds: number[]) => void;
+  onModifyPlayers: (players: Player[]) => void;
   onCancelNomination: () => void;
   onKillOrResurrect: (playerId: number) => void;
 };
@@ -33,7 +33,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   game,
   onSelectPlayer,
   onDeletePlayer,
-  onReorderPlayers,
+  onModifyPlayers,
   onCancelNomination,
   onKillOrResurrect,
 }) => {
@@ -108,7 +108,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
         reorderedPlayerIds.splice(closestPlayerIndex, 0, droppedPlayerId);
       }
       reorderedPlayerIds.splice(reorderedPlayerIds.indexOf(TEMPORARY_DUMMY), 1);
-      onReorderPlayers(reorderedPlayerIds);
+
+      const reorderedPlayers = reorderedPlayerIds.map(
+        (id) => game.players.find((player) => player.id === id)!
+      )!;
+      onModifyPlayers(reorderedPlayers);
     },
   });
 
@@ -135,6 +139,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
     setPlayerContextMenuOpen({ open: "false" })
   );
 
+  function onModifyPlayer(player: Player) {
+    onModifyPlayers(game.players.map((p) => (p.id === player.id ? player : p)));
+  }
+
   return (
     <section
       onClick={onClickGameBoardContainer}
@@ -144,6 +152,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
       {playerContextMenuOpen.open === "true" && (
         <PlayerContextMenuModal
           onKillOrResurrect={onKillOrResurrect}
+          onModifyPlayer={onModifyPlayer}
           onClose={() => setPlayerContextMenuOpen({ open: "false" })}
           playerId={playerContextMenuOpen.playerId}
           game={game}

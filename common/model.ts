@@ -8,6 +8,7 @@ export type Team = z.infer<typeof teamSchema>;
 export const playerSchema = z.object({
   name: z.string(),
   id: z.number(),
+  character: z.string().optional(),
 });
 
 export type Player = z.infer<typeof playerSchema>;
