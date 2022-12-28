@@ -36,3 +36,11 @@
     box-shadow: 0 0 0.5rem #0f0;
   }
 }
+
+.noCharacter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  color: #888;
+}

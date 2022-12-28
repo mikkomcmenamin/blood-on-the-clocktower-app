@@ -57,6 +57,27 @@ const PlayerContextMenuModal: React.FC<Props> = ({
       <h2>
         {player.name} ({currentCharacter})
       </h2>
+
+      <div
+        className={classnames({
+          [styles.character]: true,
+          [styles.selected]: currentCharacter !== "no character",
+        })}
+      >
+        {(() => {
+          if (currentCharacter === "no character") {
+            return <span className={styles.noCharacter}>?</span>;
+          }
+
+          return (
+            <img
+              src={`${CHARACTER_BASE_URL}/${currentCharacter}.png`}
+              alt={currentCharacter}
+            />
+          );
+        })()}
+      </div>
+
       {(() => {
         if (isSetup(game)) {
           return (
@@ -68,7 +89,9 @@ const PlayerContextMenuModal: React.FC<Props> = ({
                 return (
                   <button
                     key={character.id}
-                    disabled={charactersInPlay.includes(character.id)}
+                    disabled={
+                      !isSelected && charactersInPlay.includes(character.id)
+                    }
                     className={classnames({
                       [styles.character]: true,
                       [styles.selected]: isSelected,
@@ -78,7 +101,10 @@ const PlayerContextMenuModal: React.FC<Props> = ({
                     onClick={() => {
                       onModifyPlayer({
                         ...player,
-                        character: character.id,
+                        character:
+                          currentCharacter === character.id
+                            ? undefined
+                            : character.id,
                       });
                     }}
                   >
