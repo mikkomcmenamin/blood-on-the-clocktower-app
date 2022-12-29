@@ -15,6 +15,7 @@ type Props = Omit<ModalProps, "children"> & {
   game: Game;
   onKillOrResurrect: (playerId: number) => void;
   onModifyPlayer: (player: Player) => void;
+  onRemovePlayer: (playerId: number) => void;
   onClose: () => void;
 };
 
@@ -74,10 +75,16 @@ const PlayerContextMenuModal: React.FC<Props> = ({
   onKillOrResurrect,
   onClose,
   onModifyPlayer,
+  onRemovePlayer,
   modalRef,
 }) => {
   const globals = useContext(AppContext);
-  const player = game.players.find((p) => p.id === playerId)!;
+  const player = game.players.find((p) => p.id === playerId);
+
+  if (!player) {
+    return null;
+  }
+
   const isAlive = "alive" in player && player.alive;
 
   const currentCharacter =
@@ -121,6 +128,15 @@ const PlayerContextMenuModal: React.FC<Props> = ({
         })()}
       </div>
 
+      {isSetup(game) && (
+        <button
+          className={styles.removePlayerButton}
+          onClick={() => onRemovePlayer(player.id)}
+        >
+          Remove player
+        </button>
+      )}
+
       {(() => {
         if (isSetup(game)) {
           return (
@@ -161,13 +177,18 @@ const PlayerContextMenuModal: React.FC<Props> = ({
                         !isSelected && charactersInPlay.includes(character.id),
                     })}
                     onClick={() => {
+                      const didSelectCharacter =
+                        currentCharacter !== character.id;
                       onModifyPlayer({
                         ...player,
-                        character:
-                          currentCharacter === character.id
-                            ? undefined
-                            : character.id,
+                        character: didSelectCharacter
+                          ? character.id
+                          : undefined,
                       });
+
+                      if (didSelectCharacter) {
+                        onClose();
+                      }
                     }}
                   >
                     <img

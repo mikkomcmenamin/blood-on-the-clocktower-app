@@ -2,6 +2,7 @@ import {
   isActiveNomination,
   isDay,
   isPendingNomination,
+  isSetup,
   playerCanBeNominated,
   playerCanNominate,
 } from "@common/gameLogic";
@@ -74,10 +75,12 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
 
   usePressDurationDependentHandlers(
     playerIconRef,
-    {
-      onShortPress: handleSelectPlayer,
-      onLongPress: openContextMenu,
-    },
+    isSetup(game)
+      ? { onShortPress: openContextMenu, onLongPress: undefined }
+      : {
+          onShortPress: handleSelectPlayer,
+          onLongPress: openContextMenu,
+        },
     500
   );
 

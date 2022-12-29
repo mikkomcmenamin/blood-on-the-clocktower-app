@@ -144,16 +144,23 @@ export function usePressDurationDependentHandlers(
 
     const handlePointerUp = (e: PointerEvent) => {
       !longPressFired && handlers.onShortPress?.(e);
+      cancel();
+    };
+
+    const cancel = () => {
       setLongPressFired(false);
       clearTimeout(timer);
     };
 
     ref.current.addEventListener("pointerdown", handlePointerDown);
     ref.current.addEventListener("pointerup", handlePointerUp);
+    // dragging should not count as a long press
+    ref.current.addEventListener("dragstart", cancel);
 
     return () => {
       ref.current?.removeEventListener("pointerdown", handlePointerDown);
       ref.current?.removeEventListener("pointerup", handlePointerUp);
+      ref.current?.removeEventListener("dragstart", cancel);
     };
   }, [ref.current, handlers, timeout]);
 }

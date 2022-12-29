@@ -268,7 +268,6 @@ function App() {
             payload: players,
           });
         }}
-        onDeletePlayer={removePlayer}
         onCancelNomination={() => {
           if (playerContextMenuOpen.open === "true") {
             return;
@@ -312,6 +311,7 @@ function App() {
             });
             toggleDeathReminder(playerId, false);
           }}
+          onRemovePlayer={removePlayer}
           onModifyPlayer={(player) => {
             dispatch({
               type: "modifyPlayers",

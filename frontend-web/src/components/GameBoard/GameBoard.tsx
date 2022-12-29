@@ -13,7 +13,6 @@ import { isActiveNomination, isPendingNomination } from "@common/gameLogic";
 type GameBoardProps = {
   game: Game;
   onSelectPlayer: (playerId: number) => void;
-  onDeletePlayer: (id: number) => void;
   onModifyPlayers: (players: Player[]) => void;
   onCancelNomination: () => void;
   onToggleContextMenu: (playerId: number, open: boolean) => void;
@@ -22,7 +21,6 @@ type GameBoardProps = {
 const GameBoard: React.FC<GameBoardProps> = ({
   game,
   onSelectPlayer,
-  onDeletePlayer,
   onModifyPlayers,
   onCancelNomination,
   onToggleContextMenu,
@@ -32,18 +30,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const showMinuteHand = isActiveNomination(game);
   const showHourHand = isActiveNomination(game) || isPendingNomination(game);
 
-  // When a Player is dropped onto the background in setup, remove them from the game.
   const gameBoardContainerRef = useRef<HTMLElement>(null);
-  useDropzone({
-    ref: gameBoardContainerRef,
-    onDrop: (e) => {
-      const id = e.dataTransfer?.getData("application/botc");
-      if (!id) return;
-      const playerId = parseInt(id);
-      onDeletePlayer(playerId);
-    },
-    exact: true,
-  });
 
   useDropzone({
     ref: gameBoardRef,
