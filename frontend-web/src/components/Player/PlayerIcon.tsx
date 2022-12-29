@@ -1,5 +1,6 @@
 import {
   isActiveNomination,
+  isInactiveNomination,
   isDay,
   isPendingNomination,
   isSetup,
@@ -137,6 +138,22 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
         <div className={styles.name}>{player.name}</div>
         {hasGhostVote && (
           <img className={styles.ghostVote} src={ghostVoteIcon} />
+        )}
+        {isInactiveNomination(game) && !canNominate && (
+          <div
+            className={classnames({
+              [styles.forbiddenCircle]: true,
+              [styles.cannotNominate]: true,
+            })}
+          />
+        )}
+        {isPendingNomination(game) && !canBeNominated && (
+          <div
+            className={classnames({
+              [styles.forbiddenCircle]: true,
+              [styles.cannotBeNominated]: true,
+            })}
+          />
         )}
       </div>
     </div>
