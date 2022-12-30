@@ -6,6 +6,7 @@ import {
   isSetup,
   playerCanBeNominated,
   playerCanNominate,
+  isFinished,
 } from "@common/gameLogic";
 import { ActiveStagePlayer, Game, Player } from "@common/model";
 import { classnames } from "@common/util";
@@ -87,11 +88,13 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
 
   // set --character-image-url to the character's image in useffect
   useEffect(() => {
-    if (
+    const gameIsFinishedAndShouldRevealCharacter =
+      isFinished(game) && game.revealedPlayers.includes(player.id);
+    const shouldRevealCharacter =
       playerIconRef.current &&
       player.character &&
-      globals.value.storytellerMode
-    ) {
+      (globals.value.storytellerMode || gameIsFinishedAndShouldRevealCharacter);
+    if (shouldRevealCharacter) {
       playerIconRef.current.style.setProperty(
         "--character-image-url",
         `url(${CHARACTER_BASE_URL}/${player.character}.png)`
@@ -102,7 +105,12 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
         `url("")`
       );
     }
-  }, [player.character, globals.value.storytellerMode]);
+  }, [
+    playerIconRef.current,
+    player.character,
+    globals.value.storytellerMode,
+    isFinished(game) && game.revealedPlayers.includes(player.id),
+  ]);
 
   return (
     <div className={styles.playerRotator}>

@@ -21,6 +21,7 @@ import {
   GameAction,
   gameStateReducer,
   isDay,
+  isFinished,
   isNight,
   isSetup,
   playerCanBeNominated,
@@ -228,6 +229,12 @@ function App() {
       return;
     } else if (isNight(game)) {
       toggleDeathReminder(playerId);
+    } else if (isFinished(game)) {
+      dispatch({
+        type: "revealPlayer",
+        stage: "finished",
+        payload: playerId,
+      });
     }
   }
 
