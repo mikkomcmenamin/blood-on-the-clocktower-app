@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Game, Nomination, Player } from "@common/model";
 import { playSound, stopAllSounds } from "./components/soundManager";
 import { isActiveNomination, isDay, isNight } from "@common/gameLogic";
@@ -167,6 +167,14 @@ export function usePressDurationDependentHandlers(
   }, [ref.current, handlers, timeout]);
 }
 
+export function usePrevious<T>(value: T) {
+  const ref = useRef<T>();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
 export function useDeclarativeSoundPlayer(game: Game) {
   useEffect(() => {
     if (game.stage === "finished") {
@@ -194,4 +202,22 @@ export function useDeclarativeSoundPlayer(game: Game) {
       playSound("nomination");
     }
   }, [isActiveNomination(game)]);
+
+  const previousPlayers = usePrevious(game.players);
+  useEffect(() => {
+    if (!isDay(game)) return;
+
+    const playerHasDied = game.players.some(
+      (player) =>
+        !player.alive &&
+        previousPlayers?.some(
+          (p) => "alive" in p && p.id === player.id && p.alive
+        )
+    );
+
+    if (playerHasDied) {
+      stopAllSounds();
+      playSound("death");
+    }
+  }, [isDay(game), previousPlayers, game.players]);
 }
