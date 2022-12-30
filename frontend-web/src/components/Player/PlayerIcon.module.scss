@@ -147,15 +147,31 @@
 
   &.onTheBlock {
     background: transparent;
+    animation: pulse 3s ease-out infinite;
+
+    @keyframes pulse {
+      0% {
+        outline: 2px solid #ff646422;
+        box-shadow: 0 0 4rem #ff646422;
+      }
+      50% {
+        outline: 6px solid #ff6464;
+        box-shadow: 0 0 20rem #ff6464;
+      }
+      100% {
+        outline: 2px solid #ff646422;
+        box-shadow: 0 0 4rem #ff646422;
+      }
+    }
   }
 
   &.onTheBlock::before {
     // overlay the skull svg on top of the player icon
     content: "";
     // add a red overlay on top of the skull
-    background-image: linear-gradient(black, rgb(216, 213, 2)),
+    background-image: linear-gradient(black, rgb(189, 189, 189)),
       url("../../assets/skull.svg");
-    background-blend-mode: overlay;
+    background-blend-mode: multiply;
     opacity: 1;
     background-size: contain;
     background-repeat: no-repeat;
