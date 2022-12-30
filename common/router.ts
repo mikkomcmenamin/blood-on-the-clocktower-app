@@ -3,7 +3,7 @@ import { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone";
 import { CreateWSSContextFnOptions } from "@trpc/server/adapters/ws";
 import { observable } from "@trpc/server/observable";
 import { EventEmitter } from "events";
-import { gameActionSchema, gameStateReducer } from "./gameLogic";
+import { GameAction, gameActionSchema, gameStateReducer } from "./gameLogic";
 import { Game, initialGameState } from "./model";
 
 const e = new EventEmitter();
@@ -39,12 +39,15 @@ export const createAppRouter = () => {
       });
     }),
     onGameAction: publicProcedure.subscription(() => {
-      return observable<Game>((emit) => {
+      return observable<{ game: Game; input?: GameAction }>((emit) => {
         console.log("Got subscription to game action");
-        const listener = (game: Game) => {
-          emit.next(game);
+        const listener = (gameAndAction: {
+          game: Game;
+          input?: GameAction;
+        }) => {
+          emit.next(gameAndAction);
         };
-        listener(serverState);
+        listener({ game: serverState });
         e.on("game", listener);
         return () => {
           e.off("game", listener);
@@ -56,7 +59,7 @@ export const createAppRouter = () => {
       .mutation(({ input, ctx: _ }) => {
         // console.log("Got game action", input);
         serverState = gameStateReducer(serverState, input);
-        e.emit("game", serverState);
+        e.emit("game", { game: serverState, input });
         return "ok";
       }),
   });

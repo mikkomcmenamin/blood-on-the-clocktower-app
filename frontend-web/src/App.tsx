@@ -20,6 +20,7 @@ import {
   calculateVotesRequired,
   GameAction,
   gameStateReducer,
+  isActiveNomination,
   isDay,
   isFinished,
   isNight,
@@ -35,6 +36,9 @@ import ReaperVideo from "./assets/V_Reaper.mp4";
 import AddPlayerModal from "./components/Player/AddPlayerModal";
 import { AppContext } from "./context";
 import PlayerContextMenuModal from "./components/Player/PlayerContextMenuModal";
+import VotingRoundModal, {
+  VotingRoundState,
+} from "./components/Player/VotingRoundModal";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -72,6 +76,9 @@ function App() {
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
   const [playerContextMenuOpen, setPlayerContextMenuOpen] =
     useState<PlayerContextMenuState>({ open: "false" });
+  const [votingRoundState, setVotingRoundState] = useState<VotingRoundState>({
+    open: false,
+  });
 
   const contextMenuRef = useRef<HTMLDivElement>(null);
 
@@ -89,8 +96,8 @@ function App() {
   useEffect(() => {
     const unsub = client.onGameAction.subscribe(undefined, {
       onData: (data) => {
-        console.log("Got server state", data);
-        _dispatch({ type: "replaceState", payload: data });
+        console.log("Got server state and action", data);
+        _dispatch({ type: "replaceState", payload: data.game });
       },
       onError: (err) => {
         console.error(err);
@@ -128,6 +135,42 @@ function App() {
   // close the modal when clicking outside of it
   const addPlayerModalRef = useRef<HTMLDivElement>(null);
   useClickOutside(addPlayerModalRef, () => setIsAddPlayerModalOpen(false));
+  const votingRoundModalRef = useRef<HTMLDivElement>(null);
+  useClickOutside(votingRoundModalRef, () => {
+    if (isActiveNomination(game)) {
+      dispatch({ type: "cancelNomination", stage: "active" });
+    }
+  });
+
+  // set voting round state if storyteller mode is on and active nomination has just been set
+  useEffect(() => {
+    if (isActiveNomination(game) && globals.value.storytellerMode) {
+      // The first player to vote is the player who is next in the players array to the nominee.
+      // If the nominee is the last player in the array, the first player to vote is the first player in the array.
+      const nominee = game.phase.nomination.nominee;
+      const nomineeIndex = game.players.findIndex(
+        (player) => player.id === nominee.id
+      );
+      if (nomineeIndex === -1) {
+        throw new Error("Nominee not found in players array");
+      }
+      const firstVoterIndex =
+        nomineeIndex === game.players.length - 1 ? 0 : nomineeIndex + 1;
+
+      const playerVotingOrder = game.players
+        .slice(firstVoterIndex)
+        .concat(game.players.slice(0, firstVoterIndex))
+        .map((player) => player.id);
+
+      setVotingRoundState({
+        open: true,
+        playerVotingOrder,
+        currentIndex: 0,
+      });
+    } else {
+      setVotingRoundState({ open: false });
+    }
+  }, [isActiveNomination(game), globals.value.storytellerMode]);
 
   // handle keyboard and mouse shortcuts
   useEffect(() => {
@@ -331,6 +374,44 @@ function App() {
           playerId={playerContextMenuOpen.playerId}
           game={game}
           modalRef={contextMenuRef}
+        />
+      )}
+      {votingRoundState.open && game.stage === "active" && (
+        <VotingRoundModal
+          votingRoundState={votingRoundState}
+          game={game}
+          onClose={() => {
+            if (isActiveNomination(game)) {
+              dispatch({ type: "cancelNomination", stage: "active" });
+            }
+          }}
+          onVoted={(voted: boolean) => {
+            const { playerVotingOrder, currentIndex } = votingRoundState;
+            const playerId = playerVotingOrder[currentIndex];
+            const player = game.players.find((p) => p.id === playerId)!;
+            if (voted) {
+              dispatch({
+                type: "toggleVote",
+                stage: "active",
+                payload: player,
+              });
+            }
+
+            const isLastIndex = currentIndex === playerVotingOrder.length - 1;
+
+            if (isLastIndex) {
+              dispatch({
+                type: "resolveVote",
+                stage: "active",
+              });
+            } else {
+              setVotingRoundState({
+                ...votingRoundState,
+                currentIndex: currentIndex + 1,
+              });
+            }
+          }}
+          modalRef={votingRoundModalRef}
         />
       )}
       {(nomination.state === "active" || onTheBlock) &&

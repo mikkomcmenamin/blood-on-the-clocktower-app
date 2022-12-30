@@ -1,0 +1,42 @@
+.didPlayerVoteText {
+  font-size: 2rem;
+  font-weight: bold;
+  flex: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.voteButton {
+  border: 1px solid #000000;
+  border-radius: 0.5rem;
+  font-size: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  flex: 1;
+  cursor: pointer;
+  width: 100%;
+
+  &.clicked {
+    animation: flash 0.5s ease-in-out;
+
+    @keyframes flash {
+      0% {
+        background-color: #fff;
+      }
+    }
+  }
+}
+
+.voteYesButton {
+  background-color: #00ff00;
+  color: #000000;
+}
+
+.voteNoButton {
+  background-color: #ff0000;
+  color: #000000;
+}

@@ -2,7 +2,7 @@ import styles from "./Modal.module.scss";
 
 export type ModalProps = {
   children: React.ReactNode;
-  modalRef: React.RefObject<HTMLDivElement>;
+  modalRef?: React.RefObject<HTMLDivElement>;
   onClose: () => void;
 };
 
