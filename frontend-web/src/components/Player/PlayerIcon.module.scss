@@ -171,7 +171,7 @@
     // overlay the skull svg on top of the player icon
     content: "";
     // add a red overlay on top of the skull
-    background-image: linear-gradient(black, rgb(189, 189, 189)),
+    background-image: linear-gradient(#ffdead, #000),
       url("../../assets/skull.svg");
     background-blend-mode: multiply;
     opacity: 1;
