@@ -47,7 +47,7 @@ export function getTwoClosestPlayers(
     }
   }
 
-  if (!closestPlayerId || !secondClosestPlayerId) {
+  if (closestPlayerId == null || secondClosestPlayerId == null) {
     throw Error("Could not find two closest players");
   }
 
