@@ -9,7 +9,6 @@ import {
 } from "@common/gameLogic";
 import "./Menu.scss";
 import { AppContext } from "../../context";
-import { playSound } from "../soundManager";
 
 type Props = {
   game: Game;
@@ -27,7 +26,6 @@ const Menu: React.FC<Props> = ({ game, dispatch }) => {
               disabled={!gameCanBeStarted(game)}
               onClick={(e) => {
                 e.preventDefault();
-                playSound("demonsWin");
                 dispatch({ type: "stageTransitionToActive", stage: "setup" });
               }}
             >
@@ -53,7 +51,6 @@ const Menu: React.FC<Props> = ({ game, dispatch }) => {
               onClick={(e) => {
                 e.preventDefault();
                 dispatch({ type: "phaseTransitionToNight", stage: "active" });
-                playSound("nightloop", true);
               }}
             >
               Transition to night

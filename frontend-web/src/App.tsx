@@ -9,6 +9,7 @@ import {
 } from "@common/model";
 import {
   useClickOutside,
+  useDeclarativeSoundPlayer,
   useHandleNominationUIEffects,
   useHandlePlayerCountChangeUIEffects,
   useWindowInnerWidth,
@@ -104,6 +105,7 @@ function App() {
 
   useHandlePlayerCountChangeUIEffects(game.players);
   useHandleNominationUIEffects(nomination, game.players);
+  useDeclarativeSoundPlayer(game);
 
   const addPlayer = (name: string, existingPlayers: Player[]) => {
     dispatch({

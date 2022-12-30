@@ -54,6 +54,26 @@ export function playSound(soundType: SoundType, loop = false, volume = 1) {
   audio.play();
 }
 
+export function stopSound(soundType: SoundType) {
+  const audio = getSound(soundType);
+  audio.pause();
+  audio.currentTime = 0;
+}
+
+export function stopAllSounds() {
+  Object.values(SOUNDS).forEach((sound) => {
+    if (Array.isArray(sound)) {
+      sound.forEach((s) => {
+        s.pause();
+        s.currentTime = 0;
+      });
+    } else if (sound instanceof HTMLAudioElement) {
+      sound.pause();
+      sound.currentTime = 0;
+    }
+  });
+}
+
 function getSound(type: SoundType): HTMLAudioElement {
   const sound = SOUNDS[type];
   if (Array.isArray(sound)) {

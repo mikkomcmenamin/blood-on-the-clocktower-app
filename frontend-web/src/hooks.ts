@@ -1,5 +1,7 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { Nomination, Player } from "@common/model";
+import { Game, Nomination, Player } from "@common/model";
+import { playSound, stopAllSounds } from "./components/soundManager";
+import { isActiveNomination, isDay, isNight } from "@common/gameLogic";
 
 export function useClickOutside(
   ref: React.RefObject<HTMLElement>,
@@ -163,4 +165,33 @@ export function usePressDurationDependentHandlers(
       ref.current?.removeEventListener("dragstart", cancel);
     };
   }, [ref.current, handlers, timeout]);
+}
+
+export function useDeclarativeSoundPlayer(game: Game) {
+  useEffect(() => {
+    if (game.stage === "finished") {
+      stopAllSounds();
+      playSound("triumph");
+    }
+  }, [game.stage]);
+
+  useEffect(() => {
+    if (isNight(game)) {
+      stopAllSounds();
+      playSound("demonsWin");
+    }
+  }, [isNight(game)]);
+
+  useEffect(() => {
+    if (isDay(game)) {
+      stopAllSounds();
+    }
+  }, [isDay(game)]);
+
+  useEffect(() => {
+    stopAllSounds();
+    if (isActiveNomination(game)) {
+      playSound("nomination");
+    }
+  }, [isActiveNomination(game)]);
 }
