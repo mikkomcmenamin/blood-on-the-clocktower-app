@@ -54,7 +54,7 @@ export const createAppRouter = () => {
     gameAction: publicProcedure
       .input(gameActionSchema)
       .mutation(({ input, ctx: _ }) => {
-        console.log("Got game action", input);
+        // console.log("Got game action", input);
         serverState = gameStateReducer(serverState, input);
         e.emit("game", serverState);
         return "ok";

@@ -81,6 +81,7 @@ function App() {
   const globals = useContext(AppContext);
 
   const dispatch = (action: GameAction) => {
+    console.log("Dispatching action", action);
     _dispatch(action);
     client.gameAction.mutate(action);
   };
@@ -271,7 +272,6 @@ function App() {
         onModifyPlayers={(players) => {
           dispatch({
             type: "modifyPlayers",
-            stage: "setup",
             payload: players,
           });
         }}
@@ -322,7 +322,6 @@ function App() {
           onModifyPlayer={(player) => {
             dispatch({
               type: "modifyPlayers",
-              stage: "setup",
               payload: game.players.map((p) =>
                 p.id === player.id ? player : p
               ),

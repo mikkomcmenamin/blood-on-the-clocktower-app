@@ -115,12 +115,10 @@ const resetToSetupSchema = z.object({
   type: z.literal("resetToSetup"),
 });
 
-const modifyPlayersSchema = setupActionSchema.merge(
-  z.object({
-    type: z.literal("modifyPlayers"),
-    payload: z.array(setupStagePlayerSchema),
-  })
-);
+const modifyPlayersSchema = z.object({
+  type: z.literal("modifyPlayers"),
+  payload: z.array(activeStagePlayerSchema).or(z.array(setupStagePlayerSchema)),
+});
 
 export const gameActionSchema = z.union([
   addPlayerActionSchema,
@@ -179,12 +177,6 @@ function gameStateSetupReducer(
           phase: "night" as const,
           nightNumber: 1,
         },
-      };
-    }
-    case "modifyPlayers": {
-      return {
-        ...state,
-        players: action.payload,
       };
     }
   }
@@ -482,6 +474,27 @@ export function gameStateReducer(state: Game, action: GameAction): Game {
         id,
         name,
       })),
+    };
+  } else if (action.type === "modifyPlayers") {
+    if (state.stage !== "setup") {
+      const activeStagePlayers = z
+        .array(activeStagePlayerSchema)
+        .safeParse(action.payload);
+      if (!activeStagePlayers.success) {
+        throw new Error(
+          "Cannot modify players to be setup stage players when game is not in setup stage"
+        );
+      }
+
+      return {
+        ...state,
+        players: activeStagePlayers.data,
+      };
+    }
+
+    return {
+      ...state,
+      players: action.payload,
     };
   }
   switch (action.stage) {
