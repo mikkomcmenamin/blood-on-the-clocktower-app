@@ -4,8 +4,8 @@
   "description": "Companion app for the game Blood on the Clocktower",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"npm run be:dev\" \"npm run fe:dev\"",
-    "start:prod": "concurrently \"npm run be:prod\" \"npm run fe:prod\"",
+    "start": "concurrently --kill-others \"npm run be:dev\" \"npm run fe:dev\"",
+    "start:prod": "concurrently --kill-others \"npm run be:prod\" \"npm run fe:prod\"",
     "fe:dev": "cd frontend-web && vite",
     "fe:prod": "cd frontend-web && vite build && vite preview",
     "fe:build": "cd frontend-web && tsc && vite build",
