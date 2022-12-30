@@ -54,6 +54,10 @@ export function playSound(soundType: SoundType, loop = false, volume = 1) {
   audio.play();
 }
 
+export function loopSound(soundType: SoundType, volume = 1) {
+  playSound(soundType, true, volume);
+}
+
 export function stopSound(soundType: SoundType) {
   const audio = getSound(soundType);
   audio.pause();

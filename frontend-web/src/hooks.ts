@@ -1,6 +1,11 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Game, Nomination, Player } from "@common/model";
-import { playSound, stopAllSounds } from "./components/soundManager";
+import {
+  loopSound,
+  playSound,
+  stopAllSounds,
+  stopSound,
+} from "./components/soundManager";
 import { isActiveNomination, isDay, isNight } from "@common/gameLogic";
 
 export function useClickOutside(
@@ -189,7 +194,7 @@ export function useDeclarativeSoundPlayer(game: Game) {
   useEffect(() => {
     if (isNight(game)) {
       stopAllSounds();
-      playSound("demonsWin");
+      loopSound("demonsWin");
     }
   }, [isNight(game)]);
 
@@ -228,7 +233,7 @@ export function useDeclarativeSoundPlayer(game: Game) {
     }
   }, [isDay(game), previousPlayers, game.players]);
 
-  // There is an active nomination and a player votes
+  // There is an active nomination and a player votes, play a bojoing sound
   const previousNomination: Nomination | undefined = usePrevious(
     isActiveNomination(game) ? game.phase.nomination : { state: "inactive" }
   );
@@ -243,6 +248,7 @@ export function useDeclarativeSoundPlayer(game: Game) {
       game.phase.nomination.voters.length > previousVoteCount;
 
     if (playerHasVoted) {
+      stopAllSounds();
       playSound("vote");
     }
   }, [
@@ -251,4 +257,14 @@ export function useDeclarativeSoundPlayer(game: Game) {
       ? previousNomination.voters.length
       : 0,
   ]);
+
+  // A player is on the block, and there is no active nomination, play anticipatory music
+  useEffect(() => {
+    if (isDay(game) && !isActiveNomination(game) && game.phase.onTheBlock) {
+      stopAllSounds();
+      loopSound("anticipation", 0.5);
+    } else {
+      stopSound("anticipation");
+    }
+  }, [isDay(game) && isActiveNomination(game) && game.phase.onTheBlock]);
 }
