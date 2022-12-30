@@ -20,6 +20,9 @@ const setupActionSchema = z.object({
 const activeActionSchema = z.object({
   stage: z.literal("active"),
 });
+const finishedActionSchema = z.object({
+  stage: z.literal("finished"),
+});
 
 // Actions are the things that can happen within a specific stage
 const addPlayerActionSchema = setupActionSchema.merge(
@@ -89,6 +92,20 @@ const stageTransitionToFinishedActionSchema = activeActionSchema.merge(
     payload: teamSchema,
   })
 );
+
+const revealPlayerSchema = finishedActionSchema.merge(
+  z.object({
+    type: z.literal("revealPlayer"),
+    payload: z.number(),
+  })
+);
+
+const revealAllPlayersSchema = finishedActionSchema.merge(
+  z.object({
+    type: z.literal("revealAllPlayers"),
+  })
+);
+
 const replaceStateSchema = z.object({
   type: z.literal("replaceState"),
   payload: gameSchema,
@@ -118,6 +135,8 @@ export const gameActionSchema = z.union([
   phaseTransitionToDayActionSchema,
   stageTransitionToActiveActionSchema,
   stageTransitionToFinishedActionSchema,
+  revealPlayerSchema,
+  revealAllPlayersSchema,
   replaceStateSchema,
   resetToSetupSchema,
   modifyPlayersSchema,
@@ -422,7 +441,32 @@ function gameStateActiveReducer(
       return {
         ...game,
         stage: "finished" as const,
+        revealedPlayers: [],
         winningTeam: action.payload,
+      };
+    }
+  }
+}
+
+export function gameStateFinishedReducer(
+  state: Extract<Game, { stage: "finished" }>,
+  action: Extract<GameAction, { stage: "finished" }>
+): Extract<Game, { stage: "finished" }> {
+  switch (action.type) {
+    case "revealPlayer": {
+      const playerId = action.payload;
+      if (state.revealedPlayers.includes(playerId)) {
+        return state;
+      }
+      return {
+        ...state,
+        revealedPlayers: state.revealedPlayers.concat(playerId),
+      };
+    }
+    case "revealAllPlayers": {
+      return {
+        ...state,
+        revealedPlayers: state.players.map((p) => p.id),
       };
     }
   }
@@ -455,6 +499,13 @@ export function gameStateReducer(state: Game, action: GameAction): Game {
         );
       }
       return gameStateActiveReducer(state, action);
+    case "finished":
+      if (state.stage !== "finished") {
+        throw new Error(
+          `Cannot perform action ${action.type} when game is not in finished stage`
+        );
+      }
+      return gameStateFinishedReducer(state, action);
   }
 }
 

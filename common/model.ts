@@ -90,6 +90,7 @@ export const gameSchema = z.union([
   z.object({
     stage: z.literal("finished"),
     players: z.array(activeStagePlayerSchema),
+    revealedPlayers: z.array(z.number()),
     winningTeam: teamSchema,
   }),
 ]);
