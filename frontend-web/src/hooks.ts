@@ -176,6 +176,8 @@ export function usePrevious<T>(value: T) {
 }
 
 export function useDeclarativeSoundPlayer(game: Game) {
+  // Victory music when the game is over
+  // TODO: play a different sound if the evil team wins
   useEffect(() => {
     if (game.stage === "finished") {
       stopAllSounds();
@@ -183,6 +185,7 @@ export function useDeclarativeSoundPlayer(game: Game) {
     }
   }, [game.stage]);
 
+  // Night music
   useEffect(() => {
     if (isNight(game)) {
       stopAllSounds();
@@ -190,12 +193,15 @@ export function useDeclarativeSoundPlayer(game: Game) {
     }
   }, [isNight(game)]);
 
+  // Stop sounds when day starts
+  // TODO: day ambience or a sound to indicate the start of the day?
   useEffect(() => {
     if (isDay(game)) {
       stopAllSounds();
     }
   }, [isDay(game)]);
 
+  // Nomination starts
   useEffect(() => {
     stopAllSounds();
     if (isActiveNomination(game)) {
@@ -203,6 +209,7 @@ export function useDeclarativeSoundPlayer(game: Game) {
     }
   }, [isActiveNomination(game)]);
 
+  // Player has died, play a random death sound
   const previousPlayers = usePrevious(game.players);
   useEffect(() => {
     if (!isDay(game)) return;
@@ -220,4 +227,28 @@ export function useDeclarativeSoundPlayer(game: Game) {
       playSound("death");
     }
   }, [isDay(game), previousPlayers, game.players]);
+
+  // There is an active nomination and a player votes
+  const previousNomination: Nomination | undefined = usePrevious(
+    isActiveNomination(game) ? game.phase.nomination : { state: "inactive" }
+  );
+  useEffect(() => {
+    if (!isActiveNomination(game)) return;
+
+    const previousVoteCount =
+      previousNomination?.state === "active"
+        ? previousNomination.voters.length
+        : 0;
+    const playerHasVoted =
+      game.phase.nomination.voters.length > previousVoteCount;
+
+    if (playerHasVoted) {
+      playSound("vote");
+    }
+  }, [
+    isActiveNomination(game) ? game.phase.nomination.voters.length : 0,
+    previousNomination?.state === "active"
+      ? previousNomination.voters.length
+      : 0,
+  ]);
 }

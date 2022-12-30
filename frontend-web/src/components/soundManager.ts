@@ -11,7 +11,7 @@ import DemonsWin from "../assets/sounds/S_DemonsWin.mp3";
 import NewDay from "../assets/sounds/S_NewDay.mp3";
 import Nomination from "../assets/sounds/S_Nomination1.mp3";
 import Nomination2 from "../assets/sounds/S_Nomination2.mp3";
-import NominationInitiated from "../assets/sounds/S_NominationInitiated.mp3";
+import Vote from "../assets/sounds/S_Vote.mp3";
 import Triumph from "../assets/sounds/S_Triumph.mp3";
 import VoteCountdown from "../assets/sounds/S_VoteCountdown.mp3";
 
@@ -28,7 +28,7 @@ const SOUNDS = {
   deathDemon: new Audio(DeathDemon),
   nomination: new Audio(Nomination),
   nomination2: new Audio(Nomination2),
-  nominationInitiated: new Audio(NominationInitiated),
+  vote: new Audio(Vote),
   newDay: new Audio(NewDay),
   triumph: new Audio(Triumph),
   voteCountdown: new Audio(VoteCountdown),
