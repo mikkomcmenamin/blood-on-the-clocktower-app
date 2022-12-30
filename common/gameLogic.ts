@@ -433,7 +433,6 @@ export function gameStateReducer(state: Game, action: GameAction): Game {
     return action.payload;
   } else if (action.type === "resetToSetup") {
     return {
-      ...state,
       stage: "setup",
       players: state.players.map(({ id, name }) => ({
         id,
