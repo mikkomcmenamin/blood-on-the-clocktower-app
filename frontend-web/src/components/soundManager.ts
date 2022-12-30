@@ -15,69 +15,52 @@ import NominationInitiated from "../assets/sounds/S_NominationInitiated.mp3";
 import Triumph from "../assets/sounds/S_Triumph.mp3";
 import VoteCountdown from "../assets/sounds/S_VoteCountdown.mp3";
 
-type soundType =
-  "nightloop"
-  | "death"
-  | "deathdemon"
-  | "nomination"
-  | "newday"
-  | "triumph"
-  | "votecountdown"
-  | "anticipation"
-  | "demonswin";
+const SOUNDS = {
+  nightloop: new Audio(NightLoop),
+  death: [
+    new Audio(DeathFemale1),
+    new Audio(DeathFemale2),
+    new Audio(DeathFemale3),
+    new Audio(DeathMale1),
+    new Audio(DeathMale2),
+    new Audio(DeathMale3),
+  ],
+  deathDemon: new Audio(DeathDemon),
+  nomination: new Audio(Nomination),
+  nomination2: new Audio(Nomination2),
+  nominationInitiated: new Audio(NominationInitiated),
+  newDay: new Audio(NewDay),
+  triumph: new Audio(Triumph),
+  voteCountdown: new Audio(VoteCountdown),
+  anticipation: new Audio(Anticipation),
+  demonsWin: new Audio(DemonsWin),
+} as const;
 
+type SoundType = keyof typeof SOUNDS;
 
 let isSoundsEnabled = true;
 
-export function enableSounds(enable: boolean){
+export function toggleSounds(enable: boolean) {
   isSoundsEnabled = enable;
 }
 
-//TODO: don't create a new audio object everytime
-export function playSound(soundType: soundType, loop = false, volume = 1){
+export function playSound(soundType: SoundType, loop = false, volume = 1) {
+  if (!isSoundsEnabled) return;
 
-  if(!isSoundsEnabled) return;
-
-  const audio = new Audio(getSource(soundType));
+  const audio = getSound(soundType);
   audio.currentTime = 0;
   audio.loop = loop;
-  audio.volume = 1;
+  audio.volume = volume;
   audio.play();
 }
 
-function getSource(soundType: soundType): string {
-  switch (soundType) {
-    case "nightloop":
-      return NightLoop;
-    case "death":
-      return getRandomDeathSound();
-    case "deathdemon":
-      return DeathDemon;
-    case "nomination":
-      return Nomination;
-    case "newday":
-      return NewDay;
-    case "triumph":
-      return Triumph;
-    case "votecountdown":
-      return VoteCountdown;
-    case "anticipation":
-      return Anticipation;
-    case "demonswin":
-      return DemonsWin;
+function getSound(type: SoundType): HTMLAudioElement {
+  const sound = SOUNDS[type];
+  if (Array.isArray(sound)) {
+    return sound[Math.floor(Math.random() * sound.length)];
+  } else if (sound instanceof HTMLAudioElement) {
+    return sound;
   }
-}
 
-function getRandomDeathSound(): string {
-
-  const deathSounds: string[] = [
-    DeathFemale1,
-    DeathFemale2,
-    DeathFemale3,
-    DeathMale1,
-    DeathMale2,
-    DeathMale3,
-    ];
-
-  return deathSounds[Math.floor(Math.random() * deathSounds.length)];
+  throw new Error("Why doesnt typescript know this check is exhaustive");
 }

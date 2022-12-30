@@ -3,12 +3,12 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { AppContext, Context, initialCtxValue } from "./context";
 import "./index.css";
-import {enableSounds} from "./components/soundManager";
+import { toggleSounds } from "./components/soundManager";
 
 const ContextAwareApp: React.FC = () => {
   const [value, setValue] = React.useState<Context>(initialCtxValue);
 
-  enableSounds(value.sound);
+  toggleSounds(value.sound);
 
   return (
     <AppContext.Provider value={{ value, setValue }}>
