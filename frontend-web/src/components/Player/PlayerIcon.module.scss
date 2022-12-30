@@ -10,7 +10,9 @@
 
 .playerContent {
   --character-image-url: url("");
-  background: radial-gradient(circle at 100px 100px, #555555fc, #000);
+  // linear gradient from wooden brown to black
+  background: linear-gradient(#ffdead, #000);
+  border: 0.5rem solid #000000;
   border-radius: 50%;
   --ball-size: calc(2rem + (30rem / var(--num-players)));
   width: clamp(3rem, var(--ball-size), 7rem);
@@ -23,7 +25,7 @@
   text-align: center;
   transition: scale 0.5s ease-in-out;
   // shadow etc to make this look like a raised button
-  box-shadow: 0 0 1rem rgb(255, 255, 255);
+  box-shadow: 0 0 1rem rgb(255, 255, 255, 0.5);
   cursor: pointer;
 
   & > .characterUnderlay {
@@ -141,7 +143,7 @@
         // red border
       }
     }
-    border: 0.5rem solid #ff6464aa;
+    border: 0.5rem solid #ff6464;
     scale: 1.1;
   }
 
