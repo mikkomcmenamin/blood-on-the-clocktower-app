@@ -601,10 +601,7 @@ export function playerCanBeNominated(
   );
 }
 
-export function playerCanVote(
-  player: Player,
-  game: Game
-): player is ActiveStagePlayer {
+export function playerCanVote(player: Player, game: Game) {
   return (
     "alive" in player &&
     isActiveNomination(game) &&

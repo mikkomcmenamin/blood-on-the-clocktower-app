@@ -1,3 +1,4 @@
+import { playerCanVote } from "@common/gameLogic";
 import { Game } from "@common/model";
 import { classnames } from "@common/util";
 import React from "react";
@@ -32,9 +33,10 @@ const VotingRoundModal: React.FC<Props> = ({
   // onclick, set the .clicked class to the button that was clicked
   // and timeout to remove it later. This is for animation purposes.
   const onClick = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     voted: boolean
   ) => {
+    e.preventDefault();
     const target = e.target as HTMLDivElement;
     target.classList.add(styles.clicked);
     setTimeout(() => {
@@ -56,21 +58,29 @@ const VotingRoundModal: React.FC<Props> = ({
     (player) => player.id === currentPlayerId
   )!;
 
+  const canVote = playerCanVote(currentPlayer, game);
+
   return (
     <Modal onClose={onClose} modalRef={modalRef}>
-      <div
-        onClick={(e) => onClick(e, true)}
-        className={classnames({
-          [styles.voteButton]: true,
-          [styles.voteYesButton]: true,
-        })}
-      >
-        YES
-      </div>
+      {canVote && (
+        <button
+          disabled={!canVote}
+          onClick={(e) => onClick(e, true)}
+          className={classnames({
+            [styles.voteButton]: true,
+            [styles.voteYesButton]: true,
+            [styles.disabled]: !canVote,
+          })}
+        >
+          YES
+        </button>
+      )}
       <div className={styles.didPlayerVoteText}>
-        {currentPlayer.name} voted?
+        {canVote
+          ? `${currentPlayer.name} voted?`
+          : `${currentPlayer.name} can't vote`}
       </div>
-      <div
+      <button
         onClick={(e) => onClick(e, false)}
         className={classnames({
           [styles.voteButton]: true,
@@ -78,7 +88,7 @@ const VotingRoundModal: React.FC<Props> = ({
         })}
       >
         NO
-      </div>
+      </button>
     </Modal>
   );
 };

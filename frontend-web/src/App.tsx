@@ -71,6 +71,11 @@ type PlayerContextMenuState =
       playerId: number;
     };
 
+const semaphore = {
+  lock: Promise.resolve(),
+  unlock: () => {},
+};
+
 function App() {
   const [game, _dispatch] = useReducer(gameStateReducer, initialGameState);
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
@@ -87,10 +92,14 @@ function App() {
   );
   const globals = useContext(AppContext);
 
-  const dispatch = (action: GameAction) => {
+  const dispatch = async (action: GameAction) => {
+    await semaphore.lock;
     console.log("Dispatching action", action);
     _dispatch(action);
     client.gameAction.mutate(action);
+    semaphore.lock = new Promise((resolve) => {
+      semaphore.unlock = resolve;
+    });
   };
 
   useEffect(() => {
@@ -98,6 +107,7 @@ function App() {
       onData: (data) => {
         console.log("Got server state and action", data);
         _dispatch({ type: "replaceState", payload: data.game });
+        semaphore.unlock();
       },
       onError: (err) => {
         console.error(err);
