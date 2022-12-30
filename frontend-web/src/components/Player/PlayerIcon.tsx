@@ -163,6 +163,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
             })}
           />
         )}
+        <div className={styles.characterUnderlay} />
       </div>
     </div>
   );
