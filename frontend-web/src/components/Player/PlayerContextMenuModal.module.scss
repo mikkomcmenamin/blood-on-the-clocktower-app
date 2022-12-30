@@ -46,13 +46,14 @@
 }
 
 .arrow {
-  padding: 1rem;
+  padding: 1rem 0.5rem;
   font-size: 2rem;
   border-radius: 0.5rem;
   box-shadow: 0 0 0.5rem #888;
   background-color: black;
   color: white;
   height: 50%;
+  align-self: center;
 }
 
 .removePlayerButton {
@@ -63,4 +64,5 @@
   background-color: red;
   color: white;
   font-size: 1rem;
+  flex: none;
 }
