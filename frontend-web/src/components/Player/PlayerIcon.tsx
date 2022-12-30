@@ -99,7 +99,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
         "--character-image-url",
         `url(${CHARACTER_BASE_URL}/${player.character}.png)`
       );
-    } else if (playerIconRef.current && !globals.value.storytellerMode) {
+    } else if (playerIconRef.current) {
       playerIconRef.current.style.setProperty(
         "--character-image-url",
         `url("")`
