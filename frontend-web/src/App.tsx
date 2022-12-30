@@ -28,7 +28,6 @@ import {
 } from "@common/gameLogic";
 import Menu from "./components/Menu/Menu";
 import InfoPanel from "./components/InfoPanel";
-import SoundPlayer from "./components/SoundPlayer";
 import VideoAnimation from "./components/VideoAnimation";
 import ReaperVideo from "./assets/V_Reaper.mp4";
 import AddPlayerModal from "./components/Player/AddPlayerModal";
@@ -346,7 +345,6 @@ function App() {
             </InfoPanel>
           </div>
         )}
-      {isNight(game) && <SoundPlayer soundType="nightloop" loop={true} />}
       {isNight(game) && <VideoAnimation src={ReaperVideo} />}
     </div>
   );

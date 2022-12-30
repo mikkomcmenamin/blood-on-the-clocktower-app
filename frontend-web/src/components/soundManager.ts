@@ -1,6 +1,3 @@
-import React, {useContext, useEffect, useRef} from "react";
-import {AppContext} from "../context";
-
 import NightLoop from "../assets/sounds/S_NightLoop.mp3";
 import Anticipation from "../assets/sounds/S_Anticipation.mp3";
 import DeathDemon from "../assets/sounds/S_DeathDemon.mp3";
@@ -29,34 +26,26 @@ type soundType =
   | "anticipation"
   | "demonswin";
 
-type SoundPlayerProps = {
-  soundType: soundType;
-  volume?: number;
-  loop?: boolean;
-};
 
-const SoundPlayer: React.FC<SoundPlayerProps> = ({
-  soundType,
-  volume = 1,
-  loop = true,
-}) => {
-  const globals = useContext(AppContext);
-  const audioElement = useRef<HTMLAudioElement>(null);
+let isSoundsEnabled = true;
 
-  useEffect(() => {
-    const audio = audioElement.current;
-    if (audio && globals.value.sound) {
-      audio.volume = volume;
-      audio.loop = loop;
-      audio.src = getSource(soundType);
-      audio.play();
-    }
-  }, [soundType, volume, loop]);
+export function enableSounds(enable: boolean){
+  isSoundsEnabled = enable;
+}
 
-  return <audio ref={audioElement}/>;
-};
+//TODO: don't create a new audio object everytime
+export function playSound(soundType: soundType, loop = false, volume = 1){
 
-function getSource(soundType: soundType) {
+  if(!isSoundsEnabled) return;
+
+  const audio = new Audio(getSource(soundType));
+  audio.currentTime = 0;
+  audio.loop = loop;
+  audio.volume = 1;
+  audio.play();
+}
+
+function getSource(soundType: soundType): string {
   switch (soundType) {
     case "nightloop":
       return NightLoop;
@@ -88,9 +77,7 @@ function getRandomDeathSound(): string {
     DeathMale1,
     DeathMale2,
     DeathMale3,
-  ];
+    ];
 
   return deathSounds[Math.floor(Math.random() * deathSounds.length)];
 }
-
-export default SoundPlayer;
