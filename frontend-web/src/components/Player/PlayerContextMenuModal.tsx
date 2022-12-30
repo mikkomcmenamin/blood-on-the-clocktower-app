@@ -176,15 +176,20 @@ const PlayerContextMenuModal: React.FC<Props> = ({
           const isSelected = currentCharacter === character.id;
 
           const charactersInPlay = getCharactersInPlay(game);
+
+          // Duplicate characters are disallowed in setup, but allowed in play
+          // Due to characters like imp or fang-gu who can have multiple copies
+          const disabled = isSetup(game)
+            ? !isSelected && charactersInPlay.includes(character.id)
+            : false;
           return (
             <button
               key={character.id}
-              disabled={!isSelected && charactersInPlay.includes(character.id)}
+              disabled={disabled}
               className={classnames({
                 [styles.character]: true,
                 [styles.selected]: isSelected,
-                [styles.disabled]:
-                  !isSelected && charactersInPlay.includes(character.id),
+                [styles.disabled]: disabled,
               })}
               onClick={() => {
                 const didSelectCharacter = currentCharacter !== character.id;
