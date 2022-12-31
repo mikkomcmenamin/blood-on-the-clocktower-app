@@ -6,7 +6,27 @@ import { EventEmitter } from "events";
 import { GameAction, gameActionSchema, gameStateReducer } from "./gameLogic";
 import { Game, initialGameState } from "./model";
 
-const e = new EventEmitter();
+type Event = "game";
+type Payload<E extends Event> = E extends "game"
+  ? { game: Game; input?: GameAction }
+  : never;
+
+class TypesafeEventEmitter extends EventEmitter {
+  emit<E extends Event>(event: E, payload: Payload<E>): boolean {
+    return super.emit(event, payload);
+  }
+  on<E extends Event>(event: E, listener: (payload: Payload<E>) => void): this {
+    return super.on(event, listener);
+  }
+  off<E extends Event>(
+    event: E,
+    listener: (payload: Payload<E>) => void
+  ): this {
+    return super.off(event, listener);
+  }
+}
+
+const e = new TypesafeEventEmitter();
 
 export function createContext(
   _: CreateHTTPContextOptions | CreateWSSContextFnOptions
