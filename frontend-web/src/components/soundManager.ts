@@ -66,12 +66,12 @@ export function stopSound(soundType: SoundType) {
 
 export function stopAllSounds() {
   Object.values(SOUNDS).forEach((sound) => {
-    if (Array.isArray(sound)) {
+    if (sound instanceof Array) {
       sound.forEach((s) => {
         s.pause();
         s.currentTime = 0;
       });
-    } else if (sound instanceof HTMLAudioElement) {
+    } else {
       sound.pause();
       sound.currentTime = 0;
     }
