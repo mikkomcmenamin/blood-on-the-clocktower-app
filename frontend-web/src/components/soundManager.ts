@@ -34,7 +34,7 @@ const SOUNDS = {
   voteCountdown: new Audio(VoteCountdown),
   anticipation: new Audio(Anticipation),
   demonsWin: new Audio(DemonsWin),
-} as const;
+};
 
 type SoundType = keyof typeof SOUNDS;
 
@@ -80,11 +80,9 @@ export function stopAllSounds() {
 
 function getSound(type: SoundType): HTMLAudioElement {
   const sound = SOUNDS[type];
-  if (Array.isArray(sound)) {
+  if (sound instanceof Array) {
     return sound[Math.floor(Math.random() * sound.length)];
-  } else if (sound instanceof HTMLAudioElement) {
+  } else {
     return sound;
   }
-
-  throw new Error("Why doesnt typescript know this check is exhaustive");
 }
