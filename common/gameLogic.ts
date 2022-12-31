@@ -618,11 +618,8 @@ export function canTransitionToNight(game: Game): game is Game & {
 
 export function getCharactersInPlay(game: Game): string[] {
   return game.players
-    .filter(
-      (player): player is Player & { character: string } =>
-        "character" in player && typeof player.character === "string"
-    )
-    .map((player) => player.character as string);
+    .map((player) => player.character)
+    .filter((character): character is string => !!character);
 }
 
 export function gameCanBeStarted(game: Game): game is Game & {
