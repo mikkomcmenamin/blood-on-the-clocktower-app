@@ -18,7 +18,7 @@
   --player-bgcolor-dead: #888;
   --player-textcolor-dead: #fff;
   // linear gradient from wooden brown to black
-  background: linear-gradient(var(--player-bgcolor-normal), #fff);
+  background: linear-gradient(#fff, var(--player-bgcolor-normal));
   border: 0;
   border-radius: 50%;
   --ball-size: calc(2rem + (30rem / var(--num-players)));
