@@ -1,12 +1,27 @@
 import { EditionId } from "@common/editions/editions";
 import React from "react";
 
+const makeRandomString = (length: number) =>
+  Math.random()
+    .toString(36)
+    .substring(2, length + 2);
+
+const urlPathPart = window.location.pathname.split("/")[1];
+
+// The url should always have a six-character gameId in it, but if it doesn't, we'll
+// generate a random one and redirect to it.
+if (!urlPathPart || urlPathPart.length < 6) {
+  const gameId = makeRandomString(6);
+  window.location.replace(`/${gameId}`);
+}
+
 export type Context = {
   storytellerMode: boolean;
   deathReminders: number[];
   sound: boolean;
   video: boolean;
   edition: EditionId;
+  gameId: string;
 };
 
 const isInitiallyMobile = window.innerWidth <= 768;
@@ -18,6 +33,7 @@ export const initialCtxValue = isInitiallyMobile
       deathReminders: [],
       sound: false,
       video: false,
+      gameId: urlPathPart,
     }
   : {
       storytellerMode: false as const,
@@ -25,6 +41,7 @@ export const initialCtxValue = isInitiallyMobile
       deathReminders: [],
       sound: true,
       video: true,
+      gameId: urlPathPart,
     };
 
 export const AppContext = React.createContext<{

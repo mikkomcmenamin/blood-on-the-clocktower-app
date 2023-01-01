@@ -53,15 +53,6 @@ const client = createTRPCProxyClient<AppRouter>({
   ],
 });
 
-client.onHeartbeat.subscribe(undefined, {
-  onData: () => {
-    // console.log("heartbeat", data);
-  },
-  onError: (err) => {
-    console.error(err);
-  },
-});
-
 type PlayerContextMenuState =
   | {
       open: "false";
@@ -77,6 +68,28 @@ const semaphore = {
 };
 
 function App() {
+  const globals = useContext(AppContext);
+  const gameId = globals.value.gameId;
+
+  useEffect(() => {
+    const unsub = client.onGameAction.subscribe(
+      { gameId },
+      {
+        onData: (data) => {
+          console.log("Got server state and action", data);
+          _dispatch({ type: "replaceState", payload: data.game });
+          semaphore.unlock();
+        },
+        onError: (err) => {
+          console.error(err);
+        },
+      }
+    );
+    return () => {
+      unsub.unsubscribe();
+    };
+  }, [client, gameId]);
+
   const [game, _dispatch] = useReducer(gameStateReducer, initialGameState);
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
   const [playerContextMenuOpen, setPlayerContextMenuOpen] =
@@ -90,33 +103,16 @@ function App() {
   useClickOutside(contextMenuRef, () =>
     setPlayerContextMenuOpen({ open: "false" })
   );
-  const globals = useContext(AppContext);
 
   const dispatch = async (action: GameAction) => {
     await semaphore.lock;
     console.log("Dispatching action", action);
     _dispatch(action);
-    client.gameAction.mutate(action);
+    client.gameAction.mutate({ gameId, action });
     semaphore.lock = new Promise((resolve) => {
       semaphore.unlock = resolve;
     });
   };
-
-  useEffect(() => {
-    const unsub = client.onGameAction.subscribe(undefined, {
-      onData: (data) => {
-        console.log("Got server state and action", data);
-        _dispatch({ type: "replaceState", payload: data.game });
-        semaphore.unlock();
-      },
-      onError: (err) => {
-        console.error(err);
-      },
-    });
-    return () => {
-      unsub.unsubscribe();
-    };
-  }, []);
 
   const nomination = isDay(game)
     ? game.phase.nomination
