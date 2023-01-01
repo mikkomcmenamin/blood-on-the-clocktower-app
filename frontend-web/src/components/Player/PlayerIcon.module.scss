@@ -11,8 +11,8 @@
 .playerContent {
   --character-image-url: url("");
   // linear gradient from wooden brown to black
-  background: linear-gradient(#ffdead, #000);
-  border: 0.5rem solid #000000;
+  background: linear-gradient(#ffb84d, #000);
+  border: 0.1rem solid #000000;
   border-radius: 50%;
   --ball-size: calc(2rem + (30rem / var(--num-players)));
   width: clamp(3rem, var(--ball-size), 7rem);
@@ -48,6 +48,8 @@
     --ball-size: calc(4rem + (50rem / var(--num-players)));
     width: clamp(8rem, var(--ball-size), 18rem);
     height: clamp(8rem, var(--ball-size), 18rem);
+
+    border-width: 0.2rem;
   }
 
   & > * {
@@ -57,6 +59,7 @@
   &.shroud {
     box-shadow: none;
     border: none;
+    background: linear-gradient(#888, #000);
   }
 
   &.nightDeath::after {
@@ -171,7 +174,7 @@
     // overlay the skull svg on top of the player icon
     content: "";
     // add a red overlay on top of the skull
-    background-image: linear-gradient(#ffdead, #000),
+    background-image: linear-gradient(#ffb84d, #000),
       url("../../assets/skull.svg");
     background-blend-mode: multiply;
     opacity: 1;
