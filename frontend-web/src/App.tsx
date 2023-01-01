@@ -39,6 +39,7 @@ import PlayerContextMenuModal from "./components/Player/PlayerContextMenuModal";
 import VotingRoundModal, {
   VotingRoundState,
 } from "./components/Player/VotingRoundModal";
+import EditionModal from "./components/Menu/EditionModal";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -97,6 +98,7 @@ function App() {
   const [votingRoundState, setVotingRoundState] = useState<VotingRoundState>({
     open: false,
   });
+  const [isEditionModalOpen, setIsEditionModalOpen] = useState(true);
 
   const contextMenuRef = useRef<HTMLDivElement>(null);
 
@@ -322,6 +324,9 @@ function App() {
 
   return (
     <div className="App">
+      {isEditionModalOpen && (
+        <EditionModal onClose={() => setIsEditionModalOpen(false)}/>
+      )}
       <InfoPanel position={"top-left"}>
         <p>{getGameStateText()}</p>
       </InfoPanel>
