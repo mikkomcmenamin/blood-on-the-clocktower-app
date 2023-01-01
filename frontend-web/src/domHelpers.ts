@@ -7,7 +7,7 @@ type Coords = {
   y: number;
 };
 
-type Player = {
+type PlayerHTMLElement = {
   id: number;
   element: HTMLElement;
 };
@@ -19,7 +19,7 @@ export function getTwoClosestPlayers(
   const playerElementsArray = Array.from(playerElements).filter(
     (el): el is HTMLElement => el instanceof HTMLElement
   );
-  const players: Player[] = playerElementsArray.map((element) => {
+  const players: PlayerHTMLElement[] = playerElementsArray.map((element) => {
     const id = element.getAttribute("data-playerid");
     if (!id) {
       throw new Error("Player element has no data-playerid attribute");
@@ -30,7 +30,7 @@ export function getTwoClosestPlayers(
     };
   });
 
-  const getCenter = (player: Player): Coords => {
+  const getCenter = (player: PlayerHTMLElement): Coords => {
     const { left, top, width, height } = player.element.getBoundingClientRect();
     return {
       x: left + width / 2,
@@ -38,7 +38,7 @@ export function getTwoClosestPlayers(
     };
   };
 
-  const getDistanceToCoords = (player: Player): number => {
+  const getDistanceToCoords = (player: PlayerHTMLElement): number => {
     const center = getCenter(player);
     return getDistance(coords.x, coords.y, center.x, center.y);
   };
