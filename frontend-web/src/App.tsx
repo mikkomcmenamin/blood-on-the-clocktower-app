@@ -443,27 +443,31 @@ function App() {
           modalRef={votingRoundModalRef}
         />
       )}
-      {(nomination.state === "active" || onTheBlock) &&
-        windowInnerWidth > MOBILE_THRESHOLD && (
-          <div>
-            <InfoPanel position={"top-right"}>
-              <p>Votes required: {calculateVotesRequired(game)}</p>
-            </InfoPanel>
-            <InfoPanel position={"top-right-2"}>
-              {onTheBlock && (
-                <p>
-                  {game.players.find((p) => p.id === onTheBlock.playerId)!.name}{" "}
-                  about to die
-                </p>
-              )}
-              {nomination.state === "active" &&
-                nomination.voters.length > 0 && (
-                  <p>{nomination.voters.length} votes given</p>
-                )}
-            </InfoPanel>
-          </div>
+      {nomination.state === "active" && windowInnerWidth > MOBILE_THRESHOLD && (
+        <div>
+          <InfoPanel position={"top-right"}>
+            <p>Votes required: {calculateVotesRequired(game)}</p>
+          </InfoPanel>
+          {(<InfoPanel position={"top-right-2"}>
+            {nomination.voters.length > 0 && (
+              <p>{nomination.voters.length} votes given</p>
+            )}
+          </InfoPanel>)}
+        </div>
         )}
-      {isNight(game) && <VideoAnimation src={ReaperVideo} />}
+      {onTheBlock && windowInnerWidth > MOBILE_THRESHOLD && (
+        <div>
+          {(<InfoPanel position={"bottom-right"}>
+            {onTheBlock && (
+              <p>
+                {game.players.find((p) => p.id === onTheBlock.playerId)!.name}{" "}
+                about to die
+              </p>
+            )}
+          </InfoPanel>)}
+        </div>
+      )}
+      {isNight(game) && <VideoAnimation src={ReaperVideo}/>}
     </div>
   );
 }

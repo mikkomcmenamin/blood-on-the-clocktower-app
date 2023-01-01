@@ -7,7 +7,8 @@ type InfoPanelPosition =
   | "top-right"
   | "bottom-left"
   | "bottom-right"
-  | "top-right-2";
+  | "top-right-2"
+  | "top-right-3";
 
 const Panel = styled.div<{ position: InfoPanelPosition }>`
   background-image: url(${InfoPanelImage});
@@ -32,7 +33,9 @@ const Panel = styled.div<{ position: InfoPanelPosition }>`
         case "bottom-right":
           return `bottom: 0; right: 0;`;
         case "top-right-2":
-          return `top: 100px; right: 0;`;
+          return `top: 80px; right: 0;`;
+        case "top-right-3":
+          return `top: 160px; right: 0;`;
       }
     }}
   }
@@ -44,6 +47,7 @@ type Props = {
 };
 
 const InfoPanel: React.FC<Props> = ({ children, position }) => {
+  if (!children) return null; //return null if no text to render
   return <Panel position={position}>{children}</Panel>;
 };
 
