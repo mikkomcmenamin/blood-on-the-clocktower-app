@@ -2,13 +2,15 @@ import { getCharactersInPlay, isSetup } from "@common/gameLogic";
 import { Game, Player } from "@common/model";
 import Modal, { ModalProps } from "../Modal";
 import styles from "./PlayerContextMenuModal.module.scss";
-import { EDITIONS, formatCharacterName } from "@common/editions/editions";
+import {
+  Character,
+  EDITIONS,
+  formatCharacterName,
+} from "@common/editions/editions";
 import { classnames } from "@common/util";
 import { AppContext } from "../../context";
 import { useContext } from "react";
-
-const CHARACTER_BASE_URL = new URL("../../assets/characters", import.meta.url)
-  .href;
+import { CHARACTER_IMAGES } from "../../assets/characters/characterImages";
 
 type Props = Omit<ModalProps, "children"> & {
   playerId: number;
@@ -128,7 +130,7 @@ const PlayerContextMenuModal: React.FC<Props> = ({
 
           return (
             <img
-              src={`${CHARACTER_BASE_URL}/${currentCharacter}.png`}
+              src={CHARACTER_IMAGES[currentCharacter as Character]}
               alt={currentCharacter}
             />
           );
@@ -212,10 +214,7 @@ const PlayerContextMenuModal: React.FC<Props> = ({
                 }
               }}
             >
-              <img
-                src={`${CHARACTER_BASE_URL}/${character.id}.png`}
-                alt={character.id}
-              />
+              <img src={CHARACTER_IMAGES[character.id]} alt={character.id} />
             </button>
           );
         })}

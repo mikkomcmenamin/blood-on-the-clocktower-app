@@ -15,9 +15,8 @@ import { AppContext } from "../../context";
 import { usePressDurationDependentHandlers } from "../../hooks";
 import styles from "./PlayerIcon.module.scss";
 import ghostVoteIcon from "../../assets/T_GhostVote.png";
-
-const CHARACTER_BASE_URL = new URL("../../assets/characters", import.meta.url)
-  .href;
+import { CHARACTER_IMAGES } from "../../assets/characters/characterImages";
+import { Character } from "@common/editions/editions";
 
 type PlayerIconProps = {
   key: number;
@@ -97,7 +96,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
     if (shouldRevealCharacter) {
       playerIconRef.current.style.setProperty(
         "--character-image-url",
-        `url(${CHARACTER_BASE_URL}/${player.character}.png)`
+        `url(${CHARACTER_IMAGES[player.character as Character]})`
       );
     } else if (playerIconRef.current) {
       playerIconRef.current.style.setProperty(
