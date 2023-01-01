@@ -147,24 +147,27 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
         {hasGhostVote && (
           <img className={styles.ghostVote} src={ghostVoteIcon} />
         )}
-        {isInactiveNomination(game) && !canNominate && (
-          <div
-            className={classnames({
-              [styles.forbiddenCircle]: true,
-              [styles.cannotNominate]: true,
-            })}
-          />
-        )}
-        {isPendingNomination(game) && !canBeNominated && (
-          <div
-            className={classnames({
-              [styles.forbiddenCircle]: true,
-              [styles.cannotBeNominated]: true,
-            })}
-          />
-        )}
         <div className={styles.characterUnderlay} />
       </div>
+      {isDay(game) && isInactiveNomination(game) && !canNominate && !isDead && (
+        <div
+          className={classnames({
+            [styles.forbiddenCircle]: true,
+          })}
+        >
+          <span>😡</span>
+        </div>
+      )}
+      {isDay(game) && !isActiveNomination(game) && !canBeNominated && (
+        <div
+          className={classnames({
+            [styles.forbiddenCircle]: true,
+            [styles.cannotBeNominated]: true,
+          })}
+        >
+          <span>😨</span>
+        </div>
+      )}
     </div>
   );
 };

@@ -596,7 +596,7 @@ export function playerCanBeNominated(
 ): player is ActiveStagePlayer {
   return (
     "alive" in player &&
-    isPendingNomination(game) &&
+    isDay(game) &&
     !game.phase.nominationBookkeeping.hasBeenNominated.includes(player.id)
   );
 }
