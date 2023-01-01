@@ -21,8 +21,8 @@ type Props = Omit<ModalProps, "children"> & {
 
 type PlayerIconContainerProps = {
   children: React.ReactNode;
-  onLeftArrowClick: () => void;
-  onRightArrowClick: () => void;
+  onLeftArrowClick: (e: any) => void;
+  onRightArrowClick: (e: any) => void;
 };
 
 const EDITION_IDS = [
@@ -103,7 +103,8 @@ const PlayerContextMenuModal: React.FC<Props> = ({
       </h2>
 
       <div
-        onClick={() => {
+        onClick={(e) => {
+          e.preventDefault();
           if (!isSetup(game)) {
             return;
           }
@@ -137,7 +138,10 @@ const PlayerContextMenuModal: React.FC<Props> = ({
       {isSetup(game) && (
         <button
           className={styles.removePlayerButton}
-          onClick={() => onRemovePlayer(player.id)}
+          onClick={(e) => {
+            e.preventDefault();
+            onRemovePlayer(player.id);
+          }}
         >
           Remove player
         </button>
@@ -145,7 +149,8 @@ const PlayerContextMenuModal: React.FC<Props> = ({
       {!isSetup(game) && (
         <button
           className={styles.button}
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault();
             onKillOrResurrect(player.id);
             onClose();
           }}
@@ -155,7 +160,8 @@ const PlayerContextMenuModal: React.FC<Props> = ({
       )}
 
       <PlayerIconContainer
-        onLeftArrowClick={() => {
+        onLeftArrowClick={(e) => {
+          e.preventDefault();
           const curIdx = EDITION_IDS.indexOf(globals.value.edition);
           const newIdx = curIdx === 0 ? EDITION_IDS.length - 1 : curIdx - 1;
           globals.setValue({
@@ -163,7 +169,8 @@ const PlayerContextMenuModal: React.FC<Props> = ({
             edition: EDITION_IDS[newIdx],
           });
         }}
-        onRightArrowClick={() => {
+        onRightArrowClick={(e) => {
+          e.preventDefault();
           const curIdx = EDITION_IDS.indexOf(globals.value.edition);
           const newIdx = curIdx === EDITION_IDS.length - 1 ? 0 : curIdx + 1;
           globals.setValue({
@@ -191,7 +198,9 @@ const PlayerContextMenuModal: React.FC<Props> = ({
                 [styles.selected]: isSelected,
                 [styles.disabled]: disabled,
               })}
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const didSelectCharacter = currentCharacter !== character.id;
                 onModifyPlayer({
                   ...player,

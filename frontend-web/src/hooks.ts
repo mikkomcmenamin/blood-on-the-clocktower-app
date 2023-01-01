@@ -143,6 +143,8 @@ export function usePressDurationDependentHandlers(
     let timer: NodeJS.Timeout;
 
     const handlePointerDown = (e: PointerEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
       timer = setTimeout(() => {
         handlers.onLongPress?.(e);
         setLongPressFired(true);
@@ -150,6 +152,8 @@ export function usePressDurationDependentHandlers(
     };
 
     const handlePointerUp = (e: PointerEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
       !longPressFired && handlers.onShortPress?.(e);
       cancel();
     };
