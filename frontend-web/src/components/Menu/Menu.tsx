@@ -113,6 +113,7 @@ const Menu: React.FC<Props> = ({
                 ...globals.value,
                 storytellerMode: !globals.value.storytellerMode,
                 sound: globals.value.storytellerMode,
+                video: globals.value.storytellerMode,
               });
             }}
           >
