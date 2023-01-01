@@ -29,6 +29,8 @@ nav {
     border: 1px solid #888;
     box-shadow: 0 0 0.5rem #888;
     flex: 1;
+    background: black;
+    color: white;
   }
 }
 
@@ -63,6 +65,9 @@ nav {
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      & > button {
+        flex: 1;
+      }
     }
   }
 }
