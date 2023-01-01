@@ -153,34 +153,45 @@ function App() {
   });
 
   // set voting round state if storyteller mode is on and active nomination has just been set
-  useEffect(() => {
-    if (isActiveNomination(game) && globals.value.storytellerMode) {
-      // The first player to vote is the player who is next in the players array to the nominee.
-      // If the nominee is the last player in the array, the first player to vote is the first player in the array.
-      const nominee = game.phase.nomination.nominee;
-      const nomineeIndex = game.players.findIndex(
-        (player) => player.id === nominee.id
-      );
-      if (nomineeIndex === -1) {
-        throw new Error("Nominee not found in players array");
-      }
-      const firstVoterIndex =
-        nomineeIndex === game.players.length - 1 ? 0 : nomineeIndex + 1;
-
-      const playerVotingOrder = game.players
-        .slice(firstVoterIndex)
-        .concat(game.players.slice(0, firstVoterIndex))
-        .map((player) => player.id);
-
-      setVotingRoundState({
-        open: true,
-        playerVotingOrder,
-        currentIndex: 0,
-      });
-    } else {
-      setVotingRoundState({ open: false });
+  function startVotingRound() {
+    if (
+      !isActiveNomination(game) ||
+      !globals.value.storytellerMode ||
+      votingRoundState.open
+    ) {
+      return;
     }
-  }, [isActiveNomination(game), globals.value.storytellerMode]);
+    // The first player to vote is the player who is next in the players array to the nominee.
+    // If the nominee is the last player in the array, the first player to vote is the first player in the array.
+    const nominee = game.phase.nomination.nominee;
+    const nomineeIndex = game.players.findIndex(
+      (player) => player.id === nominee.id
+    );
+    if (nomineeIndex === -1) {
+      throw new Error("Nominee not found in players array");
+    }
+    const firstVoterIndex =
+      nomineeIndex === game.players.length - 1 ? 0 : nomineeIndex + 1;
+
+    const playerVotingOrder = game.players
+      .slice(firstVoterIndex)
+      .concat(game.players.slice(0, firstVoterIndex))
+      .map((player) => player.id);
+
+    setVotingRoundState({
+      open: true,
+      playerVotingOrder,
+      currentIndex: 0,
+    });
+  }
+
+  useEffect(() => {
+    if (isActiveNomination(game)) {
+      return;
+    }
+
+    setVotingRoundState({ open: false });
+  }, [isActiveNomination(game)]);
 
   // handle keyboard and mouse shortcuts
   useEffect(() => {
@@ -351,7 +362,15 @@ function App() {
         }}
       />
 
-      <Menu game={game} dispatch={dispatch} />
+      <Menu
+        votingRoundState={votingRoundState}
+        onStartVotingRound={() => {
+          if (votingRoundState.open) return;
+          startVotingRound();
+        }}
+        game={game}
+        dispatch={dispatch}
+      />
       {isAddPlayerModalOpen && (
         <AddPlayerModal
           onClose={() => setIsAddPlayerModalOpen(false)}

@@ -9,13 +9,21 @@ import {
 } from "@common/gameLogic";
 import "./Menu.scss";
 import { AppContext } from "../../context";
+import type { VotingRoundState } from "../Player/VotingRoundModal";
 
 type Props = {
   game: Game;
   dispatch: (action: GameAction) => void;
+  votingRoundState: VotingRoundState;
+  onStartVotingRound: () => void;
 };
 
-const Menu: React.FC<Props> = ({ game, dispatch }) => {
+const Menu: React.FC<Props> = ({
+  game,
+  dispatch,
+  votingRoundState,
+  onStartVotingRound,
+}) => {
   const globals = useContext(AppContext);
   return (
     <>
@@ -32,7 +40,7 @@ const Menu: React.FC<Props> = ({ game, dispatch }) => {
               Start game
             </button>
           )}
-          {game.stage === "active" && (
+          {game.stage === "active" && !isActiveNomination(game) && (
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -46,6 +54,17 @@ const Menu: React.FC<Props> = ({ game, dispatch }) => {
               Finish game
             </button>
           )}
+          {game.stage === "active" &&
+            isActiveNomination(game) &&
+            !votingRoundState.open && (
+              <button
+                onClick={() => {
+                  onStartVotingRound();
+                }}
+              >
+                Voting round
+              </button>
+            )}
           {canTransitionToNight(game) && (
             <button
               onClick={(e) => {
@@ -66,7 +85,7 @@ const Menu: React.FC<Props> = ({ game, dispatch }) => {
               Transition to day
             </button>
           )}
-          {isActiveNomination(game) && (
+          {isActiveNomination(game) && !votingRoundState.open && (
             <button
               onClick={(e) => {
                 e.preventDefault();
