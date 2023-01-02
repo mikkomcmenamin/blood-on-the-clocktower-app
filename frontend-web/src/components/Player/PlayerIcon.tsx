@@ -128,6 +128,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
             e.preventDefault();
             return;
           }
+
           e.dataTransfer.setData("application/botc", player.id.toString());
         }}
         className={classnames({

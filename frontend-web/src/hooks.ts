@@ -254,8 +254,8 @@ export function useDeclarativeSoundPlayer(game: Game) {
   // Nomination starts
   const activeNomination = isActiveNomination(game);
   useEffect(() => {
-    stopAllSounds();
     if (activeNomination) {
+      stopAllSounds();
       playSound("nomination");
     }
   }, [activeNomination]);
@@ -294,7 +294,6 @@ export function useDeclarativeSoundPlayer(game: Game) {
       game.phase.nomination.voters.length > previousVoteCount;
 
     if (playerHasVoted) {
-      stopAllSounds();
       playSound("vote");
     }
   }, [game, previousNomination]);
@@ -302,7 +301,7 @@ export function useDeclarativeSoundPlayer(game: Game) {
   // A player is on the block, and there is no active nomination, play anticipatory music
   useEffect(() => {
     if (isDay(game) && !isActiveNomination(game) && game.phase.onTheBlock) {
-      stopAllSounds();
+      stopSound("anticipation");
       loopSound("anticipation", 0.5);
     } else {
       stopSound("anticipation");
