@@ -143,7 +143,7 @@ const PlayerContextMenuModal: React.FC<Props> = ({
       )}
 
       <PlayerIconContainer>
-        {game.stage == "setup" &&
+        {(game.stage === "setup" || game.stage === "active") &&
           EDITIONS[game.globalSettings.editionId].characters.map(
             (character) => {
               const isSelected = currentCharacter === character.id;

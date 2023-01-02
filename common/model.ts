@@ -97,6 +97,7 @@ export const gameSchema = z.union([
     stage: z.literal("active"),
     players: z.array(activeStagePlayerSchema),
     phase: phaseSchema,
+    globalSettings: globalSettingsSchema,
   }),
   z.object({
     stage: z.literal("finished"),
