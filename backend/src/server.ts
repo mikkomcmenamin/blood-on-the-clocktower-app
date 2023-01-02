@@ -16,6 +16,8 @@ const server = http.createServer((req, res) => {
     res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
   }
 
+  console.log("Got request", req.method, req.url, JSON.stringify(req.headers));
+
   if (req.method === "OPTIONS") {
     res.writeHead(200);
     res.end();
@@ -41,4 +43,5 @@ applyWSSHandler<AppRouter>({
 });
 
 // listen on 0.0.0.0 to allow e.g. mobile phone on same network to connect
-server.listen(2022, "0.0.0.0");
+const PORT = Number(process.env.PORT) || 2022;
+server.listen(PORT, "0.0.0.0");
