@@ -114,14 +114,16 @@ export function useDropzone({
       }
     };
 
+    const preventDefault = (e: DragEvent) => e.preventDefault();
+
     ref.current.addEventListener("drop", handleDrop);
-    ref.current.addEventListener("dragover", (e) => e.preventDefault());
+    ref.current.addEventListener("dragover", preventDefault);
 
     const current = ref.current;
 
     return () => {
       current.removeEventListener("drop", handleDrop);
-      current.removeEventListener("dragover", (e) => e.preventDefault());
+      current.removeEventListener("dragover", preventDefault);
     };
   }, [ref, onDrop, exact]);
 }
