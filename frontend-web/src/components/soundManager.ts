@@ -14,6 +14,7 @@ import Nomination2 from "../assets/sounds/S_Nomination2.mp3";
 import Vote from "../assets/sounds/S_Vote.mp3";
 import Triumph from "../assets/sounds/S_Triumph.mp3";
 import VoteCountdown from "../assets/sounds/S_VoteCountdown.mp3";
+import { soundVolume } from "src/context";
 
 const SOUNDS = {
   nightloop: new Audio(NightLoop),
@@ -38,19 +39,17 @@ const SOUNDS = {
 
 type SoundType = keyof typeof SOUNDS;
 
-let isSoundsEnabled = true;
-
-export function toggleSounds(enable: boolean) {
-  isSoundsEnabled = enable;
+let globalVolume = 1;
+export function setGlobalVolume(volume: soundVolume) {
+  globalVolume = volume;
+  changeVolumeForAllSounds();
 }
 
 export function playSound(soundType: SoundType, loop = false, volume = 1) {
-  if (!isSoundsEnabled) return;
-
   const audio = getSound(soundType);
   audio.currentTime = 0;
   audio.loop = loop;
-  audio.volume = volume;
+  audio.volume = globalVolume * volume;
   audio.play();
 }
 
@@ -74,6 +73,18 @@ export function stopAllSounds() {
     } else {
       sound.pause();
       sound.currentTime = 0;
+    }
+  });
+}
+
+export function changeVolumeForAllSounds() {
+  Object.values(SOUNDS).forEach((sound) => {
+    if (sound instanceof Array) {
+      sound.forEach((s) => {
+        s.volume = globalVolume;
+      });
+    } else {
+      sound.volume = globalVolume;
     }
   });
 }

@@ -14,10 +14,12 @@ if (!urlPathPart || urlPathPart.length < 6) {
   window.location.replace(`/${gameId}`);
 }
 
+export type soundVolume = 0 | 0.5 | 1;
+
 export type Context = {
   storytellerMode: boolean;
   deathReminders: number[];
-  sound: boolean;
+  soundVolume: 0 | 0.5 | 1;
   video: boolean;
   gameId: string;
 };
@@ -28,14 +30,14 @@ export const initialCtxValue = isInitiallyMobile
   ? {
       storytellerMode: true as const,
       deathReminders: [],
-      sound: false,
+      soundVolume: 0 as soundVolume,
       video: false,
       gameId: urlPathPart,
     }
   : {
       storytellerMode: false as const,
       deathReminders: [],
-      sound: true,
+      soundVolume: 1 as soundVolume,
       video: true,
       gameId: urlPathPart,
     };

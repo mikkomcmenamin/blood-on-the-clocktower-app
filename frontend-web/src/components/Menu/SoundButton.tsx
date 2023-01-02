@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import { stopAllSounds } from "../soundManager";
 import { AppContext } from "../../context";
 import styled from "styled-components";
 import SoundButtonOn from "../../assets/T_SoundButtonOn.png";
@@ -30,19 +29,15 @@ const SoundButton: React.FC = () => {
   const globals = useContext(AppContext);
 
   const handleClick = () => {
-    if (globals.value.sound) {
-      stopAllSounds();
-    }
-
     globals.setValue({
       ...globals.value,
-      sound: !globals.value.sound,
+      soundVolume: globals.value.soundVolume > 0 ? 0 : 1,
     });
   };
 
   return (
     <Button
-      isOn={globals.value.sound}
+      isOn={globals.value.soundVolume > 0}
       onClick={(e) => {
         e.preventDefault();
         handleClick();

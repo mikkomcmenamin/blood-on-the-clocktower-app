@@ -124,7 +124,7 @@ const Menu: React.FC<Props> = ({
               globals.setValue({
                 ...globals.value,
                 storytellerMode: !globals.value.storytellerMode,
-                sound: globals.value.storytellerMode,
+                soundVolume: globals.value.storytellerMode ? 1 : 0,
                 video: globals.value.storytellerMode,
               });
             }}
