@@ -27,7 +27,7 @@ const EditionModal: React.FC<Props> = ({ onClose }) => {
       <h1 className={styles.title}>Choose Edition</h1>
 
       {editions.map((edition) => (
-        <Button onClick={() => handleButtonClick(edition.id)}>
+        <Button key={edition.id} onClick={() => handleButtonClick(edition.id)}>
           {edition.name}
         </Button>
       ))}
