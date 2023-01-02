@@ -12,7 +12,7 @@
     "fe:preview": "cd frontend-web && vite preview",
     "be:dev": "cd backend && nodemon --watch . --watch ../common src/server.ts",
     "be:build": "cd backend && tsc",
-    "be:prod": "cd backend && node dist/server.ts",
+    "be:prod": "cd backend && node dist/server.js",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
     "format:fix": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
     "lint:check": "eslint --ext .ts,.tsx,.js,.jsx .",
