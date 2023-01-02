@@ -22,6 +22,13 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // health endpoint required for deployment
+  if (req.url === "/health") {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+
   return handler(req, res);
 });
 
