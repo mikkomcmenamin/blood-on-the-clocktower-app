@@ -11,7 +11,19 @@ const handler = createHTTPHandler({
   createContext,
 });
 
-const server = http.createServer(handler);
+const server = http.createServer((req, res) => {
+  if (process.env.FRONTEND_URL) {
+    res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
+  }
+
+  if (req.method === "OPTIONS") {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+
+  return handler(req, res);
+});
 
 // ws server
 const wss = new ws.Server({ server });
