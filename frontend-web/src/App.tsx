@@ -197,7 +197,9 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // open the modal when pressing the "+" or Space key
+      // but only when command key is not pressed
       if (e.key === "+" || e.key === " ") {
+        if (e.metaKey) return;
         if (isSetup(game) && !isAddPlayerModalOpen) {
           e.preventDefault();
           setIsAddPlayerModalOpen(true);
