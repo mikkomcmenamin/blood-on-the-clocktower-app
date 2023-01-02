@@ -53,6 +53,7 @@
     "@vitejs/plugin-react": "^3.0.0",
     "concurrently": "^7.6.0",
     "eslint": "^8.30.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "husky": "^8.0.0",
     "nodemon": "^2.0.20",

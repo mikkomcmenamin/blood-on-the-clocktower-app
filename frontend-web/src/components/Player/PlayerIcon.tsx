@@ -109,10 +109,11 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
     }
   }, [
     conditionalShow,
-    playerIconRef.current,
+    playerIconRef,
     player.character,
     globals.value.storytellerMode,
-    isFinished(game) && game.revealedPlayers.includes(player.id),
+    game,
+    player.id,
   ]);
 
   return (

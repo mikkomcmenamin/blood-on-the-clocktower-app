@@ -1,4 +1,11 @@
-import { useContext, useEffect, useReducer, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { createTRPCProxyClient, createWSClient, wsLink } from "@trpc/client";
 import type { AppRouter } from "@common/router";
 import "./App.scss";
@@ -92,7 +99,7 @@ function App() {
     return () => {
       unsub.unsubscribe();
     };
-  }, [client, gameId]);
+  }, [gameId]);
 
   const [game, _dispatch] = useReducer(gameStateReducer, initialGameState);
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
@@ -109,15 +116,18 @@ function App() {
     setPlayerContextMenuOpen({ open: "false" })
   );
 
-  const dispatch = async (action: GameAction) => {
-    await semaphore.lock;
-    console.log("Dispatching action", action);
-    _dispatch(action);
-    client.gameAction.mutate({ gameId, action });
-    semaphore.lock = new Promise((resolve) => {
-      semaphore.unlock = resolve;
-    });
-  };
+  const dispatch = useCallback(
+    async (action: GameAction) => {
+      await semaphore.lock;
+      console.log("Dispatching action", action);
+      _dispatch(action);
+      client.gameAction.mutate({ gameId, action });
+      semaphore.lock = new Promise((resolve) => {
+        semaphore.unlock = resolve;
+      });
+    },
+    [gameId]
+  );
 
   const nomination = isDay(game)
     ? game.phase.nomination
@@ -192,7 +202,7 @@ function App() {
     }
 
     setVotingRoundState({ open: false });
-  }, [isActiveNomination(game)]);
+  }, [game]);
 
   // handle keyboard and mouse shortcuts
   useEffect(() => {
@@ -237,7 +247,7 @@ function App() {
       window.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("dblclick", handleDoubleClick);
     };
-  }, [isAddPlayerModalOpen, game]);
+  }, [isAddPlayerModalOpen, game, dispatch, playerContextMenuOpen.open]);
 
   function handleNomination(playerId: number) {
     if (!isDay(game)) return;

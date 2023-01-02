@@ -53,7 +53,7 @@ const VideoAnimation: React.FC<VideoAnimationProps> = ({ src }) => {
         videoRef.current?.play();
       }, 2000);
     }
-  }, [videoRef.current, globals.value.video]);
+  }, [videoRef, globals.value.video]);
 
   const handleEnded = () => {
     setIsEnded(true);

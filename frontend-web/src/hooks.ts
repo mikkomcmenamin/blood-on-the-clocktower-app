@@ -67,7 +67,7 @@ export function useHandleNominationUIEffects(
       );
       return;
     }
-  }, [nomination]);
+  }, [nomination, players]);
 }
 
 export function useHandlePlayerCountChangeUIEffects(players: Player[]) {
@@ -117,11 +117,13 @@ export function useDropzone({
     ref.current.addEventListener("drop", handleDrop);
     ref.current.addEventListener("dragover", (e) => e.preventDefault());
 
+    const current = ref.current;
+
     return () => {
-      ref.current?.removeEventListener("drop", handleDrop);
-      ref.current?.removeEventListener("dragover", (e) => e.preventDefault());
+      current.removeEventListener("drop", handleDrop);
+      current.removeEventListener("dragover", (e) => e.preventDefault());
     };
-  }, [ref.current, onDrop, exact]);
+  }, [ref, onDrop, exact]);
 }
 
 type PressHandlers = {
@@ -168,12 +170,14 @@ export function usePressDurationDependentHandlers(
     // dragging should not count as a long press
     ref.current.addEventListener("dragstart", cancel);
 
+    const current = ref.current;
+
     return () => {
-      ref.current?.removeEventListener("pointerdown", handlePointerDown);
-      ref.current?.removeEventListener("pointerup", handlePointerUp);
-      ref.current?.removeEventListener("dragstart", cancel);
+      current.removeEventListener("pointerdown", handlePointerDown);
+      current.removeEventListener("pointerup", handlePointerUp);
+      current.removeEventListener("dragstart", cancel);
     };
-  }, [ref.current, handlers, timeout]);
+  }, [ref, handlers, timeout, longPressFired]);
 }
 
 export function useWhilePressed(
@@ -200,11 +204,13 @@ export function useWhilePressed(
     ref.current.addEventListener("pointerdown", handlePointerDown);
     ref.current.addEventListener("pointerup", handlePointerUp);
 
+    const current = ref.current;
+
     return () => {
-      ref.current?.removeEventListener("pointerdown", handlePointerDown);
-      ref.current?.removeEventListener("pointerup", handlePointerUp);
+      current.removeEventListener("pointerdown", handlePointerDown);
+      current.removeEventListener("pointerup", handlePointerUp);
     };
-  }, [ref.current, onPressStart, onPressEnd, enabled]);
+  }, [ref, onPressStart, onPressEnd, enabled]);
 }
 
 export function usePrevious<T>(value: T) {
@@ -226,28 +232,31 @@ export function useDeclarativeSoundPlayer(game: Game) {
   }, [game.stage]);
 
   // Night music
+  const night = isNight(game);
   useEffect(() => {
-    if (isNight(game)) {
+    if (night) {
       stopAllSounds();
       loopSound("demonsWin");
     }
-  }, [isNight(game)]);
+  }, [night]);
 
   // Stop sounds when day starts
   // TODO: day ambience or a sound to indicate the start of the day?
+  const day = isDay(game);
   useEffect(() => {
-    if (isDay(game)) {
+    if (day) {
       stopAllSounds();
     }
-  }, [isDay(game)]);
+  }, [day]);
 
   // Nomination starts
+  const activeNomination = isActiveNomination(game);
   useEffect(() => {
     stopAllSounds();
-    if (isActiveNomination(game)) {
+    if (activeNomination) {
       playSound("nomination");
     }
-  }, [isActiveNomination(game)]);
+  }, [activeNomination]);
 
   // Player has died, play a random death sound
   const previousPlayers = usePrevious(game.players);
@@ -266,7 +275,7 @@ export function useDeclarativeSoundPlayer(game: Game) {
       stopAllSounds();
       playSound("death");
     }
-  }, [isDay(game), previousPlayers, game.players]);
+  }, [game, previousPlayers]);
 
   // There is an active nomination and a player votes, play a bojoing sound
   const previousNomination: Nomination | undefined = usePrevious(
@@ -286,12 +295,7 @@ export function useDeclarativeSoundPlayer(game: Game) {
       stopAllSounds();
       playSound("vote");
     }
-  }, [
-    isActiveNomination(game) ? game.phase.nomination.voters.length : 0,
-    previousNomination?.state === "active"
-      ? previousNomination.voters.length
-      : 0,
-  ]);
+  }, [game, previousNomination]);
 
   // A player is on the block, and there is no active nomination, play anticipatory music
   useEffect(() => {
@@ -301,5 +305,5 @@ export function useDeclarativeSoundPlayer(game: Game) {
     } else {
       stopSound("anticipation");
     }
-  }, [isDay(game) && isActiveNomination(game) && game.phase.onTheBlock]);
+  }, [game]);
 }

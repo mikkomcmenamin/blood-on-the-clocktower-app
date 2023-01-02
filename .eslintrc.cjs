@@ -1,9 +1,13 @@
 /* eslint-disable */
 
 module.exports = {
-  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react-hooks/recommended",
+  ],
   parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint", "unused-imports"],
+  plugins: ["@typescript-eslint", "unused-imports", "react-hooks"],
   rules: {
     // allow @ts-ignore
     "@typescript-eslint/ban-ts-comment": "off",
@@ -30,6 +34,7 @@ module.exports = {
         argsIgnorePattern: "^_",
       },
     ],
+    "react-hooks/exhaustive-deps": "warn",
   },
   ignorePatterns: ["node_modules", "dist", "public"],
 };
