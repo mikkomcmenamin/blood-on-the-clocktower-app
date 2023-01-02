@@ -66,10 +66,10 @@ const client = createTRPCProxyClient<AppRouter>({
 
 type PlayerContextMenuState =
   | {
-      open: "false";
+      open: false;
     }
   | {
-      open: "true";
+      open: true;
       playerId: number;
     };
 
@@ -104,7 +104,7 @@ function App() {
   const [game, _dispatch] = useReducer(gameStateReducer, initialGameState);
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
   const [playerContextMenuOpen, setPlayerContextMenuOpen] =
-    useState<PlayerContextMenuState>({ open: "false" });
+    useState<PlayerContextMenuState>({ open: false });
   const [votingRoundState, setVotingRoundState] = useState<VotingRoundState>({
     open: false,
   });
@@ -113,7 +113,7 @@ function App() {
   const contextMenuRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(contextMenuRef, () =>
-    setPlayerContextMenuOpen({ open: "false" })
+    setPlayerContextMenuOpen({ open: false })
   );
 
   const dispatch = useCallback(
@@ -373,7 +373,7 @@ function App() {
           });
         }}
         onCancelNomination={() => {
-          if (playerContextMenuOpen.open === "true") {
+          if (playerContextMenuOpen.open) {
             return;
           }
 
@@ -384,12 +384,12 @@ function App() {
         onToggleContextMenu={(playerId: number, open: boolean) => {
           if (open) {
             setPlayerContextMenuOpen({
-              open: "true",
+              open: true,
               playerId,
             });
           } else {
             setPlayerContextMenuOpen({
-              open: "false",
+              open: false,
             });
           }
         }}
@@ -411,7 +411,7 @@ function App() {
           modalRef={addPlayerModalRef}
         />
       )}
-      {playerContextMenuOpen.open === "true" && (
+      {playerContextMenuOpen.open && (
         <PlayerContextMenuModal
           onKillOrResurrect={(playerId: number) => {
             if (!isNight(game) && !isDay(game)) return;
@@ -432,7 +432,7 @@ function App() {
               ),
             });
           }}
-          onClose={() => setPlayerContextMenuOpen({ open: "false" })}
+          onClose={() => setPlayerContextMenuOpen({ open: false })}
           playerId={playerContextMenuOpen.playerId}
           game={game}
           modalRef={contextMenuRef}
