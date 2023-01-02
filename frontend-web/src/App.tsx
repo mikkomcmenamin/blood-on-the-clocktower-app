@@ -40,6 +40,7 @@ import VotingRoundModal, {
   VotingRoundState,
 } from "./components/Player/VotingRoundModal";
 import EditionModal from "./components/Menu/EditionModal";
+import SettingsButton from "./components/Menu/SettingsButton";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -99,7 +100,7 @@ function App() {
   const [votingRoundState, setVotingRoundState] = useState<VotingRoundState>({
     open: false,
   });
-  const [isEditionModalOpen, setIsEditionModalOpen] = useState(true);
+  const [isEditionModalOpen, setIsEditionModalOpen] = useState(false);
 
   const contextMenuRef = useRef<HTMLDivElement>(null);
 
@@ -339,6 +340,9 @@ function App() {
           }}
         />
       )}
+      <SettingsButton
+        handleClick={() => setIsEditionModalOpen(!isEditionModalOpen)}
+      />
       <InfoPanel position={"top-left"}>
         <p>{getGameStateText()}</p>
       </InfoPanel>
