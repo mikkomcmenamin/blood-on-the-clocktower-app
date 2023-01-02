@@ -60,13 +60,21 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1.5rem;
+  font-size: 0.8rem;
   color: white;
   text-shadow: 0 0 0.5rem black;
   text-align: center;
-  padding: 1rem;
+  padding: 0.5rem;
   border-radius: 0.5rem;
   background: rgba(0, 0, 0, 0.6);
   box-shadow: 0 0 0.5rem black;
   cursor: pointer;
+  line-height: 1rem;
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 768px) {
+    line-height: inherit;
+    font-size: 1.5rem;
+  }
 }
