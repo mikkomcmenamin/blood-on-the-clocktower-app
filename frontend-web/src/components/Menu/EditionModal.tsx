@@ -1,24 +1,18 @@
-import React, { useContext } from "react";
 import { EditionId, EDITIONS } from "@common/editions/editions";
 import Modal from "../Modal";
 import styles from "./EditionModal.module.scss";
 import Button from "../Reusable/Button";
-import { AppContext } from "../../context";
 
 type Props = {
   onClose: () => void;
+  onEditionChosen: (edition: EditionId) => void;
 };
 
-const EditionModal: React.FC<Props> = ({ onClose }) => {
+const EditionModal: React.FC<Props> = ({ onClose, onEditionChosen }) => {
   const editions = Object.values(EDITIONS);
-  const globals = useContext(AppContext);
 
   const handleButtonClick = (edition: EditionId) => {
-    globals.setValue({
-      ...globals.value,
-      edition: edition,
-    });
-
+    onEditionChosen(edition);
     onClose();
   };
 

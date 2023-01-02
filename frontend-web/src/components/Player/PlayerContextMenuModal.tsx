@@ -8,8 +8,6 @@ import {
   formatCharacterName,
 } from "@common/editions/editions";
 import { classnames } from "@common/util";
-import { AppContext } from "../../context";
-import { useContext } from "react";
 import { CHARACTER_IMAGES } from "../../assets/characters/characterImages";
 
 type Props = Omit<ModalProps, "children"> & {
@@ -70,7 +68,6 @@ const PlayerContextMenuModal: React.FC<Props> = ({
   onRemovePlayer,
   modalRef,
 }) => {
-  const globals = useContext(AppContext);
   const player = game.players.find((p) => p.id === playerId);
 
   if (!player) {
@@ -146,43 +143,50 @@ const PlayerContextMenuModal: React.FC<Props> = ({
       )}
 
       <PlayerIconContainer>
-        {EDITIONS[globals.value.edition].characters.map((character) => {
-          const isSelected = currentCharacter === character.id;
+        {game.stage == "setup" &&
+          EDITIONS[game.globalSettings.editionId].characters.map(
+            (character) => {
+              const isSelected = currentCharacter === character.id;
 
-          const charactersInPlay = getCharactersInPlay(game);
+              const charactersInPlay = getCharactersInPlay(game);
 
-          // Duplicate characters are disallowed in setup, but allowed in play
-          // Due to characters like imp or fang-gu who can have multiple copies
-          const disabled = isSetup(game)
-            ? !isSelected && charactersInPlay.includes(character.id)
-            : false;
-          return (
-            <button
-              key={character.id}
-              disabled={disabled}
-              className={classnames({
-                [styles.character]: true,
-                [styles.selected]: isSelected,
-                [styles.disabled]: disabled,
-              })}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const didSelectCharacter = currentCharacter !== character.id;
-                onModifyPlayer({
-                  ...player,
-                  character: didSelectCharacter ? character.id : undefined,
-                });
+              // Duplicate characters are disallowed in setup, but allowed in play
+              // Due to characters like imp or fang-gu who can have multiple copies
+              const disabled = isSetup(game)
+                ? !isSelected && charactersInPlay.includes(character.id)
+                : false;
+              return (
+                <button
+                  key={character.id}
+                  disabled={disabled}
+                  className={classnames({
+                    [styles.character]: true,
+                    [styles.selected]: isSelected,
+                    [styles.disabled]: disabled,
+                  })}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const didSelectCharacter =
+                      currentCharacter !== character.id;
+                    onModifyPlayer({
+                      ...player,
+                      character: didSelectCharacter ? character.id : undefined,
+                    });
 
-                if (didSelectCharacter) {
-                  onClose();
-                }
-              }}
-            >
-              <img src={CHARACTER_IMAGES[character.id]} alt={character.id} />
-            </button>
-          );
-        })}
+                    if (didSelectCharacter) {
+                      onClose();
+                    }
+                  }}
+                >
+                  <img
+                    src={CHARACTER_IMAGES[character.id]}
+                    alt={character.id}
+                  />
+                </button>
+              );
+            }
+          )}
       </PlayerIconContainer>
     </Modal>
   );

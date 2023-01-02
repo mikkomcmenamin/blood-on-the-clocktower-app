@@ -1,4 +1,3 @@
-import { EditionId } from "@common/editions/editions";
 import React from "react";
 
 const makeRandomString = (length: number) =>
@@ -20,7 +19,6 @@ export type Context = {
   deathReminders: number[];
   sound: boolean;
   video: boolean;
-  edition: EditionId;
   gameId: string;
 };
 
@@ -29,7 +27,6 @@ const isInitiallyMobile = window.innerWidth <= 768;
 export const initialCtxValue = isInitiallyMobile
   ? {
       storytellerMode: true as const,
-      edition: "TROUBLE_BREWING" as const,
       deathReminders: [],
       sound: false,
       video: false,
@@ -37,7 +34,6 @@ export const initialCtxValue = isInitiallyMobile
     }
   : {
       storytellerMode: false as const,
-      edition: "TROUBLE_BREWING" as const,
       deathReminders: [],
       sound: true,
       video: true,

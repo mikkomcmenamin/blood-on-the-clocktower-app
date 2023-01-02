@@ -326,7 +326,18 @@ function App() {
   return (
     <div className="App">
       {isEditionModalOpen && (
-        <EditionModal onClose={() => setIsEditionModalOpen(false)} />
+        <EditionModal
+          onClose={() => setIsEditionModalOpen(false)}
+          onEditionChosen={(edition) => {
+            dispatch({
+              type: "changeSettings",
+              stage: "setup",
+              payload: {
+                editionId: edition,
+              },
+            });
+          }}
+        />
       )}
       <InfoPanel position={"top-left"}>
         <p>{getGameStateText()}</p>

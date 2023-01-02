@@ -11,6 +11,7 @@ import {
   gameSchema,
   Player,
   ActiveStagePlayer,
+  globalSettingsSchema,
 } from "./model";
 
 // Stages mean the game is in a particular state (setup, active, finished)
@@ -37,6 +38,14 @@ const removePlayerActionSchema = setupActionSchema.merge(
     payload: z.number(),
   })
 );
+
+const changeSettingsSchema = setupActionSchema.merge(
+  z.object({
+    type: z.literal("changeSettings"),
+    payload: globalSettingsSchema,
+  })
+);
+
 const setNominatorActionSchema = activeActionSchema.merge(
   z.object({
     type: z.literal("setNominator"),
@@ -123,6 +132,7 @@ const modifyPlayersSchema = z.object({
 export const gameActionSchema = z.union([
   addPlayerActionSchema,
   removePlayerActionSchema,
+  changeSettingsSchema,
   setNominatorActionSchema,
   setNomineeActionSchema,
   cancelNominationActionSchema,
@@ -179,6 +189,11 @@ function gameStateSetupReducer(
         },
       };
     }
+    case "changeSettings":
+      return {
+        ...state,
+        globalSettings: action.payload,
+      };
   }
 }
 
@@ -474,6 +489,9 @@ export function gameStateReducer(state: Game, action: GameAction): Game {
         id,
         name,
       })),
+      globalSettings: {
+        editionId: "TROUBLE_BREWING",
+      },
     };
   } else if (action.type === "modifyPlayers") {
     if (state.stage !== "setup") {

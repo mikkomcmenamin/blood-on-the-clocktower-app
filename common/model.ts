@@ -35,6 +35,16 @@ export const activeStagePlayerSchema = z.union([
 
 export type ActiveStagePlayer = z.infer<typeof activeStagePlayerSchema>;
 
+export const editionIdSchema = z.union([
+  z.literal("TROUBLE_BREWING"),
+  z.literal("SECTS_AND_VIOLETS"),
+  z.literal("BAD_MOON_RISING"),
+]);
+
+export const globalSettingsSchema = z.object({
+  editionId: editionIdSchema,
+});
+
 export const nominationSchema = z.union([
   z.object({
     state: z.literal("active"),
@@ -81,6 +91,7 @@ export const gameSchema = z.union([
   z.object({
     stage: z.literal("setup"),
     players: z.array(setupStagePlayerSchema),
+    globalSettings: globalSettingsSchema,
   }),
   z.object({
     stage: z.literal("active"),
@@ -108,4 +119,7 @@ export const createSetupStagePlayer = (
 export const initialGameState: Game = {
   stage: "setup",
   players: [],
+  globalSettings: {
+    editionId: "TROUBLE_BREWING",
+  },
 };
