@@ -43,7 +43,8 @@ import EditionModal from "./components/Menu/EditionModal";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
-  url: `ws://${window.location.hostname}:2022`,
+  url:
+    import.meta.env.VITE_BACKEND_URL ?? `ws://${window.location.hostname}:2022`,
 });
 // configure TRPCClient to use WebSockets transport
 const client = createTRPCProxyClient<AppRouter>({
