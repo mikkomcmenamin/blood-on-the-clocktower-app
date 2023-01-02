@@ -228,22 +228,10 @@ function App() {
       }
     };
 
-    // open the modal when double-clicking
-    const handleDoubleClick = () => {
-      if (!isSetup(game)) return;
-      if (playerContextMenuOpen.open) return;
-
-      if (!isAddPlayerModalOpen) {
-        setIsAddPlayerModalOpen(true);
-      }
-    };
-
-    document.addEventListener("dblclick", handleDoubleClick);
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("dblclick", handleDoubleClick);
     };
   }, [isAddPlayerModalOpen, game, dispatch, playerContextMenuOpen.open]);
 
@@ -385,6 +373,9 @@ function App() {
               open: false,
             });
           }
+        }}
+        onAddPlayerButtonClick={() => {
+          setIsAddPlayerModalOpen(true);
         }}
       />
 

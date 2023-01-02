@@ -8,7 +8,11 @@ import clockHandHour from "../../assets/clockhand-hour.png";
 import { useDropzone, useWhilePressed } from "../../hooks";
 import styles from "./GameBoard.module.scss";
 import { getTwoClosestPlayers } from "../../domHelpers";
-import { isActiveNomination, isPendingNomination } from "@common/gameLogic";
+import {
+  isActiveNomination,
+  isPendingNomination,
+  isSetup,
+} from "@common/gameLogic";
 
 type GameBoardProps = {
   game: Game;
@@ -16,6 +20,7 @@ type GameBoardProps = {
   onModifyPlayers: (players: Player[]) => void;
   onCancelNomination: () => void;
   onToggleContextMenu: (playerId: number, open: boolean) => void;
+  onAddPlayerButtonClick: () => void;
 };
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -24,6 +29,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
   onModifyPlayers,
   onCancelNomination,
   onToggleContextMenu,
+  onAddPlayerButtonClick,
 }) => {
   const gameBoardRef = useRef<HTMLDivElement>(null);
 
@@ -150,6 +156,16 @@ const GameBoard: React.FC<GameBoardProps> = ({
         >
           <img src={clockHandHour} alt="clock hand hour" />
         </section>
+        {isSetup(game) && (
+          <div
+            onClick={onAddPlayerButtonClick}
+            className={styles.addPlayerInstruction}
+          >
+            <p>Tap here to add a player.</p>
+            <p>Drag players to reorder them.</p>
+            <p>Tap a player to edit them.</p>
+          </div>
+        )}
       </div>
     </section>
   );
