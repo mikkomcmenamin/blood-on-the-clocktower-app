@@ -32,6 +32,14 @@ class TypesafeEventEmitter extends EventEmitter {
 
 const e = new TypesafeEventEmitter();
 
+export type DBInterface = {
+  initDB: () => Promise<void>;
+  getGameState: (gameId: string) => Promise<Game | null>;
+  upsertGameState: (gameId: string, game: Game) => Promise<void>;
+};
+
+const gamesToFlush: string[] = [];
+
 export function createContext(
   _: CreateHTTPContextOptions | CreateWSSContextFnOptions
 ) {
@@ -44,9 +52,24 @@ const t = initTRPC.context<Context>().create();
 const publicProcedure = t.procedure;
 const router = t.router;
 
-export const createAppRouter = () => {
+export const createAppRouter = async (db: DBInterface) => {
   // todo namespace the games, right now just one server state
   // todo this shouldn't be in common
+
+  await db.initDB();
+
+  setInterval(async () => {
+    const queue = gamesToFlush.splice(0, gamesToFlush.length);
+    for (const gameId of queue) {
+      const game = serverState[gameId];
+      if (!game) {
+        continue;
+      }
+      await db.upsertGameState(gameId, game).catch((err) => {
+        console.error(`Error saving game ${gameId} to DB`, err);
+      });
+    }
+  }, 1000);
 
   const serverState: Record<string, Game> = {};
   const gameStateUpdatedAt = new Map<string, number>();
@@ -63,9 +86,16 @@ export const createAppRouter = () => {
     }
   }, 1000 * 60 /* every minute */);
 
-  const getOrCreateGame = (gameId: string) => {
+  const getOrCreateGame = async (gameId: string) => {
     if (!serverState[gameId]) {
-      serverState[gameId] = initialGameState;
+      const game = await db.getGameState(gameId);
+      console.log(`Got game ${gameId} from DB`, game);
+      if (!game) {
+        serverState[gameId] = initialGameState;
+        gamesToFlush.push(gameId);
+      } else {
+        serverState[gameId] = game;
+      }
     }
     return serverState[gameId];
   };
@@ -83,7 +113,8 @@ export const createAppRouter = () => {
             }) => {
               emit.next({ ...gameAndAction, gameId });
             };
-            listener({ game: getOrCreateGame(gameId) });
+
+            void getOrCreateGame(gameId).then((game) => listener({ game }));
             e.on(`game-${gameId}`, listener);
             return () => {
               e.off(`game-${gameId}`, listener);
@@ -95,11 +126,12 @@ export const createAppRouter = () => {
       .input(
         z.object({ action: gameActionSchema, gameId: z.string().length(6) })
       )
-      .mutation(({ input, ctx: _ }) => {
-        // console.log("Got game action", input);
-        const gameState = getOrCreateGame(input.gameId);
+      .mutation(async ({ input, ctx: _ }) => {
+        // console.log("Got game action", input.action.type);
+        const gameState = await getOrCreateGame(input.gameId);
         serverState[input.gameId] = gameStateReducer(gameState, input.action);
         gameStateUpdatedAt.set(input.gameId, Date.now());
+        gamesToFlush.push(input.gameId);
         e.emit(`game-${input.gameId}`, {
           game: serverState[input.gameId],
           input: input.action,
@@ -110,4 +142,4 @@ export const createAppRouter = () => {
   });
 };
 
-export type AppRouter = ReturnType<typeof createAppRouter>;
+export type AppRouter = Awaited<ReturnType<typeof createAppRouter>>;

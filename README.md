@@ -30,6 +30,13 @@ the correct IP address to connect to. For example:
 
 `192.168.1.100:5173/abcdef`
 
+To use a persistent database, run:
+
+```bash
+docker-compose up -d
+npm start
+```
+
 ## Authors
 
 Jussi Saurio - [Github](https://github.com/jussisaurio)
