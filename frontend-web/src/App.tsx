@@ -340,9 +340,11 @@ function App() {
           }}
         />
       )}
-      <SettingsButton
-        handleClick={() => setIsEditionModalOpen(!isEditionModalOpen)}
-      />
+      {isSetup(game) && (
+        <SettingsButton
+          handleClick={() => setIsEditionModalOpen(!isEditionModalOpen)}
+        />
+      )}
       <InfoPanel position={"top-left"}>
         <p>{getGameStateText()}</p>
       </InfoPanel>
