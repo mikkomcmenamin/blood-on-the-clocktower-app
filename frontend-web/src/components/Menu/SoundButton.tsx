@@ -12,17 +12,8 @@ const Button = styled.button<ButtonProps>`
   background: url(${(props) => (props.isOn ? SoundButtonOn : SoundButtonOff)})
     no-repeat;
   background-size: contain;
-  position: fixed;
-  margin: 15px;
-  bottom: 17%;
-  left: 0;
   width: 50px;
   height: 50px;
-
-  @media (min-width: 768px) {
-    bottom: 60px;
-    left: 0;
-  }
 `;
 
 const SoundButton: React.FC = () => {

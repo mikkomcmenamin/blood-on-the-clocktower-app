@@ -6,16 +6,20 @@ import {
   gameCanBeStarted,
   isActiveNomination,
   isNight,
+  isSetup,
 } from "@common/gameLogic";
-import "./Menu.scss";
 import { AppContext } from "../../context";
 import type { VotingRoundState } from "../Player/VotingRoundModal";
+import styles from "./Menu.module.scss";
+import SettingsButton from "./SettingsButton";
+import SoundButton from "./SoundButton";
 
 type Props = {
   game: Game;
   dispatch: (action: GameAction) => void;
   votingRoundState: VotingRoundState;
   onStartVotingRound: () => void;
+  onSettingsButtonClick: () => void;
 };
 
 const Menu: React.FC<Props> = ({
@@ -23,6 +27,7 @@ const Menu: React.FC<Props> = ({
   dispatch,
   votingRoundState,
   onStartVotingRound,
+  onSettingsButtonClick,
 }) => {
   const globals = useContext(AppContext);
 
@@ -36,11 +41,16 @@ const Menu: React.FC<Props> = ({
 
   return (
     <>
-      <nav id="controls">
-        <div aria-roledescription="navigation" id="menu">
-          {game.stage === "setup" && (
+      <nav className={styles.controls}>
+        <div className={styles.floatingButtons}>
+          {isSetup(game) && (
+            <SettingsButton handleClick={onSettingsButtonClick} />
+          )}
+          <SoundButton />
+        </div>
+        <div aria-roledescription="navigation" className={styles.menu}>
+          {game.stage === "setup" && gameCanBeStarted(game) && (
             <button
-              disabled={!gameCanBeStarted(game)}
               onClick={(e) => {
                 e.preventDefault();
                 dispatch({ type: "stageTransitionToActive", stage: "setup" });

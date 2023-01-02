@@ -1,20 +1,20 @@
-nav {
+.controls {
   position: fixed;
   bottom: 0;
   left: 0;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-evenly;
-  align-items: flex-end;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.6);
+  align-items: flex-start;
+  padding: 0;
   width: 100%;
-  box-shadow: 0 0 1rem black;
-  // should flex shrink as much as possible
-  flex-shrink: 0;
 }
 
-#menu {
+.menu {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 1rem black;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -36,11 +36,11 @@ nav {
 
 // On desktop devices, hovering on the right edge of the screen should show the menu
 @media (min-width: 768px) {
-  #menu {
+  .menu {
     display: none;
   }
 
-  nav {
+  .controls {
     position: relative;
     flex-direction: column;
     align-items: center;
@@ -53,13 +53,13 @@ nav {
     box-shadow: none;
   }
 
-  nav:focus-within,
-  nav:hover {
+  .controls:focus-within,
+  .controls:hover {
     width: 10rem;
     background: rgba(0, 0, 0, 0.6);
     box-shadow: 0 0 1rem black;
 
-    #menu {
+    .menu {
       display: flex;
       flex-wrap: wrap;
       flex-direction: column;
@@ -69,5 +69,19 @@ nav {
         flex: 1;
       }
     }
+  }
+}
+
+.floatingButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-inline: 0.5rem;
+  padding-block: 1rem;
+
+  @media (min-width: 768px) {
+    position: fixed;
+    bottom: 0;
+    left: 0;
   }
 }
