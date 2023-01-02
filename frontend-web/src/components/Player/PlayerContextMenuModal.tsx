@@ -166,7 +166,6 @@ const PlayerContextMenuModal: React.FC<Props> = ({
                   })}
                   onClick={(e) => {
                     e.preventDefault();
-                    e.stopPropagation();
                     const didSelectCharacter =
                       currentCharacter !== character.id;
                     onModifyPlayer({

@@ -144,7 +144,6 @@ export function usePressDurationDependentHandlers(
 
     const handlePointerDown = (e: PointerEvent) => {
       e.preventDefault();
-      e.stopPropagation();
       timer = setTimeout(() => {
         handlers.onLongPress?.(e);
         setLongPressFired(true);
@@ -153,7 +152,6 @@ export function usePressDurationDependentHandlers(
 
     const handlePointerUp = (e: PointerEvent) => {
       e.preventDefault();
-      e.stopPropagation();
       !longPressFired && handlers.onShortPress?.(e);
       cancel();
     };
@@ -174,6 +172,35 @@ export function usePressDurationDependentHandlers(
       ref.current?.removeEventListener("dragstart", cancel);
     };
   }, [ref.current, handlers, timeout]);
+}
+
+export function useWhilePressed(
+  ref: React.RefObject<HTMLElement>,
+  onPressStart: (e: PointerEvent) => void,
+  onPressEnd: (e: PointerEvent) => void,
+  enabled: boolean
+) {
+  useEffect(() => {
+    if (!ref.current || !enabled) return;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      e.preventDefault();
+      onPressStart(e);
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      e.preventDefault();
+      onPressEnd(e);
+    };
+
+    ref.current.addEventListener("pointerdown", handlePointerDown);
+    ref.current.addEventListener("pointerup", handlePointerUp);
+
+    return () => {
+      ref.current?.removeEventListener("pointerdown", handlePointerDown);
+      ref.current?.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [ref.current, onPressStart, onPressEnd, enabled]);
 }
 
 export function usePrevious<T>(value: T) {

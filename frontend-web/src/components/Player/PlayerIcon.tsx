@@ -24,6 +24,7 @@ type PlayerIconProps = {
   selectPlayer: (player: Player) => void;
   game: Game;
   onToggleContextMenu: (openState: boolean) => void;
+  conditionalShow: boolean;
 };
 
 const PlayerIcon: React.FC<PlayerIconProps> = ({
@@ -31,6 +32,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
   selectPlayer,
   game,
   onToggleContextMenu,
+  conditionalShow,
 }) => {
   const globals = useContext(AppContext);
 
@@ -90,6 +92,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
     const gameIsFinishedAndShouldRevealCharacter =
       isFinished(game) && game.revealedPlayers.includes(player.id);
     const shouldRevealCharacter =
+      conditionalShow &&
       playerIconRef.current &&
       player.character &&
       (globals.value.storytellerMode || gameIsFinishedAndShouldRevealCharacter);
@@ -105,6 +108,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
       );
     }
   }, [
+    conditionalShow,
     playerIconRef.current,
     player.character,
     globals.value.storytellerMode,

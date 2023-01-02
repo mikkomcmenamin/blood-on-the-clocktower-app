@@ -5,7 +5,7 @@ import PlayerIcon from "../Player/PlayerIcon";
 
 import clockHandMinute from "../../assets/clockhand.png";
 import clockHandHour from "../../assets/clockhand-hour.png";
-import { useDropzone } from "../../hooks";
+import { useDropzone, useWhilePressed } from "../../hooks";
 import styles from "./GameBoard.module.scss";
 import { getTwoClosestPlayers } from "../../domHelpers";
 import { isActiveNomination, isPendingNomination } from "@common/gameLogic";
@@ -101,6 +101,18 @@ const GameBoard: React.FC<GameBoardProps> = ({
     onCancelNomination();
   }
 
+  const [gameBoardPressed, setGameBoardPressed] = React.useState(false);
+  useWhilePressed(
+    gameBoardContainerRef,
+    () => {
+      setGameBoardPressed(true);
+    },
+    () => {
+      setGameBoardPressed(false);
+    },
+    game.stage === "active"
+  );
+
   return (
     <section
       onClick={onClickGameBoardContainer}
@@ -113,6 +125,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             key={player.id}
             player={player}
             game={game}
+            conditionalShow={game.stage === "active" ? gameBoardPressed : true}
             selectPlayer={() => onSelectPlayer(player.id)}
             onToggleContextMenu={(open) => {
               onToggleContextMenu(player.id, open);
