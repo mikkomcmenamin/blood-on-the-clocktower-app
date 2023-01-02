@@ -23,21 +23,11 @@ type Props = Omit<ModalProps, "children"> & {
 
 type PlayerIconContainerProps = {
   children: React.ReactNode;
-  onLeftArrowClick: (e: any) => void;
-  onRightArrowClick: (e: any) => void;
 };
-
-const EDITION_IDS = [
-  "TROUBLE_BREWING",
-  "SECTS_AND_VIOLETS",
-  "BAD_MOON_RISING",
-] as const;
 
 // TODO get rid of these inline styles
 const PlayerIconContainer: React.FC<PlayerIconContainerProps> = ({
   children,
-  onLeftArrowClick,
-  onRightArrowClick,
 }) => {
   return (
     <div
@@ -50,9 +40,6 @@ const PlayerIconContainer: React.FC<PlayerIconContainerProps> = ({
         gap: "1rem",
       }}
     >
-      <button onClick={onLeftArrowClick} className={styles.arrow}>
-        {"<"}
-      </button>
       <div
         style={{
           flex: 1,
@@ -70,9 +57,6 @@ const PlayerIconContainer: React.FC<PlayerIconContainerProps> = ({
       >
         {children}
       </div>
-      <button onClick={onRightArrowClick} className={styles.arrow}>
-        {">"}
-      </button>
     </div>
   );
 };
@@ -161,26 +145,7 @@ const PlayerContextMenuModal: React.FC<Props> = ({
         </button>
       )}
 
-      <PlayerIconContainer
-        onLeftArrowClick={(e) => {
-          e.preventDefault();
-          const curIdx = EDITION_IDS.indexOf(globals.value.edition);
-          const newIdx = curIdx === 0 ? EDITION_IDS.length - 1 : curIdx - 1;
-          globals.setValue({
-            ...globals.value,
-            edition: EDITION_IDS[newIdx],
-          });
-        }}
-        onRightArrowClick={(e) => {
-          e.preventDefault();
-          const curIdx = EDITION_IDS.indexOf(globals.value.edition);
-          const newIdx = curIdx === EDITION_IDS.length - 1 ? 0 : curIdx + 1;
-          globals.setValue({
-            ...globals.value,
-            edition: EDITION_IDS[newIdx],
-          });
-        }}
-      >
+      <PlayerIconContainer>
         {EDITIONS[globals.value.edition].characters.map((character) => {
           const isSelected = currentCharacter === character.id;
 
