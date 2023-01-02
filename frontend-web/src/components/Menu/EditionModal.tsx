@@ -1,16 +1,15 @@
 import React from "react";
-import {EDITIONS} from "@common/editions/editions";
+import { EDITIONS } from "@common/editions/editions";
 import Modal from "../Modal";
-import styles from "./EditionModal.module.scss"
+import styles from "./EditionModal.module.scss";
 import Button from "../Reusable/Button";
 
 type Props = {
   onClose: () => void;
   //modalRef: React.RefObject<HTMLDivElement>;
-}
+};
 
-const EditionModal: React.FC<Props> = ({onClose}) => {
-
+const EditionModal: React.FC<Props> = ({ onClose }) => {
   const editions = Object.values(EDITIONS);
 
   return (
@@ -20,10 +19,8 @@ const EditionModal: React.FC<Props> = ({onClose}) => {
       {editions.map((edition) => (
         <Button onClick={onClose}>{edition.name}</Button>
       ))}
-
     </Modal>
-  )
-
-}
+  );
+};
 
 export default EditionModal;

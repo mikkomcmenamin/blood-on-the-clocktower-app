@@ -325,7 +325,7 @@ function App() {
   return (
     <div className="App">
       {isEditionModalOpen && (
-        <EditionModal onClose={() => setIsEditionModalOpen(false)}/>
+        <EditionModal onClose={() => setIsEditionModalOpen(false)} />
       )}
       <InfoPanel position={"top-left"}>
         <p>{getGameStateText()}</p>
