@@ -485,7 +485,7 @@ function App() {
               {onTheBlock && (
                 <p>
                   {game.players.find((p) => p.id === onTheBlock.playerId)!.name}{" "}
-                  about to die
+                  💀 with {onTheBlock.votes} votes
                 </p>
               )}
             </InfoPanel>
