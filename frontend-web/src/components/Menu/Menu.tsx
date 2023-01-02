@@ -25,6 +25,15 @@ const Menu: React.FC<Props> = ({
   onStartVotingRound,
 }) => {
   const globals = useContext(AppContext);
+
+  const toggleFullscreen = (isEnabled: boolean) => {
+    if (document.fullscreenElement && !isEnabled) {
+      document.exitFullscreen();
+    } else if (isEnabled) {
+      document.documentElement.requestFullscreen();
+    }
+  };
+
   return (
     <>
       <nav id="controls">
@@ -35,6 +44,7 @@ const Menu: React.FC<Props> = ({
               onClick={(e) => {
                 e.preventDefault();
                 dispatch({ type: "stageTransitionToActive", stage: "setup" });
+                toggleFullscreen(true);
               }}
             >
               Start game
@@ -49,6 +59,7 @@ const Menu: React.FC<Props> = ({
                   stage: "active",
                   payload: "good",
                 });
+                toggleFullscreen(false);
               }}
             >
               Finish game
@@ -100,6 +111,7 @@ const Menu: React.FC<Props> = ({
               onClick={(e) => {
                 e.preventDefault();
                 dispatch({ type: "resetToSetup" });
+                toggleFullscreen(false);
               }}
             >
               Reset game
