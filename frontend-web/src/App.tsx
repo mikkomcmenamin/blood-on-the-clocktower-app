@@ -41,6 +41,7 @@ import VotingRoundModal, {
 } from "./components/Player/VotingRoundModal";
 import EditionModal from "./components/Menu/EditionModal";
 import SettingsButton from "./components/Menu/SettingsButton";
+import SoundButton from "./components/Menu/SoundButton";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -347,6 +348,7 @@ function App() {
           handleClick={() => setIsEditionModalOpen(!isEditionModalOpen)}
         />
       )}
+      <SoundButton />
       <InfoPanel position={"top-left"}>
         <p>{getGameStateText()}</p>
       </InfoPanel>
