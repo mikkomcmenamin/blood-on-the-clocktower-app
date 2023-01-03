@@ -312,9 +312,10 @@ function App() {
         } else if (isNight(game)) {
           return `Night ${game.phase.nightNumber}`;
         }
+        return "";
       }
       case "finished":
-        return "Game Finished";
+        return game.winningTeam === "good" ? "Good Wins!" : "Evil Wins...";
     }
   }
 
@@ -322,6 +323,11 @@ function App() {
   const MOBILE_THRESHOLD = 768;
 
   const onTheBlock = isDay(game) && game.phase.onTheBlock;
+
+  const backgroundPhase =
+    isNight(game) || (game.stage === "finished" && game.winningTeam === "evil")
+      ? "night"
+      : "day";
 
   return (
     <div className="App">
@@ -343,7 +349,7 @@ function App() {
       <InfoPanel position={"top-left"}>
         <p>{getGameStateText()}</p>
       </InfoPanel>
-      <Background phase={isNight(game) ? "night" : "day"} />
+      <Background phase={backgroundPhase} />
       <GameBoard
         game={game}
         onSelectPlayer={handleSelectPlayer}

@@ -13,6 +13,45 @@ import type { VotingRoundState } from "../Player/VotingRoundModal";
 import styles from "./Menu.module.scss";
 import SettingsButton from "./SettingsButton";
 import SoundButton from "./SoundButton";
+import Modal from "../Modal";
+
+const FinishGameModal: React.FC<{
+  dispatch: (action: GameAction) => void;
+  onClose: () => void;
+}> = ({ dispatch, onClose }) => {
+  return (
+    <Modal onClose={onClose}>
+      <h2>Finish game</h2>
+      <p>Which team won?</p>
+      <div className={styles.finishGameModalButtons}>
+        <button
+          onClick={() => {
+            dispatch({
+              type: "stageTransitionToFinished",
+              stage: "active",
+              payload: "evil",
+            });
+            onClose();
+          }}
+        >
+          Evil
+        </button>
+        <button
+          onClick={() => {
+            dispatch({
+              type: "stageTransitionToFinished",
+              stage: "active",
+              payload: "good",
+            });
+            onClose();
+          }}
+        >
+          Good
+        </button>
+      </div>
+    </Modal>
+  );
+};
 
 type Props = {
   game: Game;
@@ -31,6 +70,8 @@ const Menu: React.FC<Props> = ({
 }) => {
   const globals = useContext(AppContext);
 
+  const [finishGameModalOpen, setFinishGameModalOpen] = React.useState(false);
+
   const toggleFullscreen = (isEnabled: boolean) => {
     if (document.fullscreenElement && !isEnabled) {
       document.exitFullscreen();
@@ -41,6 +82,12 @@ const Menu: React.FC<Props> = ({
 
   return (
     <>
+      {finishGameModalOpen && (
+        <FinishGameModal
+          dispatch={dispatch}
+          onClose={() => setFinishGameModalOpen(false)}
+        />
+      )}
       <nav className={styles.controls}>
         <div className={styles.floatingButtons}>
           {isSetup(game) && (
@@ -64,12 +111,7 @@ const Menu: React.FC<Props> = ({
             <button
               onClick={(e) => {
                 e.preventDefault();
-                dispatch({
-                  type: "stageTransitionToFinished",
-                  stage: "active",
-                  payload: "good",
-                });
-                toggleFullscreen(false);
+                setFinishGameModalOpen(true);
               }}
             >
               Finish game

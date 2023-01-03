@@ -28,10 +28,10 @@
     height: 100%;
     z-index: -99;
     &.phase-night {
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.8);
     }
     &.phase-day {
-      background: rgba(111, 111, 111, 0.7);
+      background: rgba(77, 77, 77, 0.3);
     }
   }
 }

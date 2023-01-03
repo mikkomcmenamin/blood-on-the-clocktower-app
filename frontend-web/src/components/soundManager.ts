@@ -13,6 +13,7 @@ import Nomination from "../assets/sounds/S_Nomination1.mp3";
 import Nomination2 from "../assets/sounds/S_Nomination2.mp3";
 import Vote from "../assets/sounds/S_Vote.mp3";
 import Triumph from "../assets/sounds/S_Triumph.mp3";
+import TriumphEvil from "../assets/sounds/S_TriumphEvil.mp3";
 import VoteCountdown from "../assets/sounds/S_VoteCountdown.mp3";
 import { soundVolume } from "src/context";
 
@@ -32,6 +33,7 @@ const SOUNDS = {
   vote: new Audio(Vote),
   newDay: new Audio(NewDay),
   triumph: new Audio(Triumph),
+  triumphEvil: new Audio(TriumphEvil),
   voteCountdown: new Audio(VoteCountdown),
   anticipation: new Audio(Anticipation),
   demonsWin: new Audio(DemonsWin),

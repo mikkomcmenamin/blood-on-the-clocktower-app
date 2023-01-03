@@ -230,7 +230,7 @@ export function useDeclarativeSoundPlayer(game: Game) {
   useEffect(() => {
     if (game.stage === "finished") {
       stopAllSounds();
-      playSound("triumph");
+      playSound(game.winningTeam === "good" ? "triumph" : "triumphEvil");
     } else if (game.stage === "setup") {
       stopAllSounds();
     }
