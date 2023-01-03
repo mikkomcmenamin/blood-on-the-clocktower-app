@@ -34,7 +34,7 @@ To use a persistent database, run:
 
 ```bash
 docker-compose up -d
-npm start
+USE_DATABASE=true npm start
 ```
 
 ## Authors
