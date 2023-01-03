@@ -6,7 +6,12 @@ import {
   stopAllSounds,
   stopSound,
 } from "./components/soundManager";
-import { isActiveNomination, isDay, isNight } from "@common/gameLogic";
+import {
+  isActiveNomination,
+  isDay,
+  isInactiveNomination,
+  isNight,
+} from "@common/gameLogic";
 
 export function useClickOutside(
   ref: React.RefObject<HTMLElement>,
@@ -299,12 +304,14 @@ export function useDeclarativeSoundPlayer(game: Game) {
   }, [game, previousNomination]);
 
   // A player is on the block, and there is no active nomination, play anticipatory music
+  const onTheBlock =
+    isDay(game) && isInactiveNomination(game) && !!game.phase.onTheBlock;
   useEffect(() => {
-    if (isDay(game) && !isActiveNomination(game) && game.phase.onTheBlock) {
+    if (onTheBlock) {
       stopSound("anticipation");
       loopSound("anticipation", 0.5);
     } else {
       stopSound("anticipation");
     }
-  }, [game]);
+  }, [onTheBlock]);
 }

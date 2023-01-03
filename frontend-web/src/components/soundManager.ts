@@ -39,6 +39,8 @@ const SOUNDS = {
 
 type SoundType = keyof typeof SOUNDS;
 
+const isPlaying = (audio: HTMLAudioElement) => !audio.paused;
+
 let globalVolume = 1;
 export function setGlobalVolume(volume: soundVolume) {
   globalVolume = volume;
@@ -46,11 +48,13 @@ export function setGlobalVolume(volume: soundVolume) {
 }
 
 export function playSound(soundType: SoundType, loop = false, volume = 1) {
-  const audio = getSound(soundType);
+  const audio = pickSound(soundType);
   audio.currentTime = 0;
   audio.loop = loop;
   audio.volume = globalVolume * volume;
-  audio.play();
+  if (!isPlaying(audio)) {
+    audio.play();
+  }
 }
 
 export function loopSound(soundType: SoundType, volume = 1) {
@@ -59,22 +63,18 @@ export function loopSound(soundType: SoundType, volume = 1) {
 
 export function stopSound(soundType: SoundType) {
   const audio = getSound(soundType);
-  audio.pause();
-  audio.currentTime = 0;
+  const sounds = audio instanceof Array ? audio : [audio];
+  for (const s of sounds) {
+    if (isPlaying(s)) {
+      s.pause();
+      s.currentTime = 0;
+    }
+  }
 }
 
 export function stopAllSounds() {
-  Object.values(SOUNDS).forEach((sound) => {
-    if (sound instanceof Array) {
-      sound.forEach((s) => {
-        s.pause();
-        s.currentTime = 0;
-      });
-    } else {
-      sound.pause();
-      sound.currentTime = 0;
-    }
-  });
+  const soundTypes = Object.keys(SOUNDS) as SoundType[];
+  soundTypes.forEach(stopSound);
 }
 
 export function changeVolumeForAllSounds() {
@@ -89,11 +89,15 @@ export function changeVolumeForAllSounds() {
   });
 }
 
-function getSound(type: SoundType): HTMLAudioElement {
+function pickSound(type: SoundType): HTMLAudioElement {
   const sound = SOUNDS[type];
   if (sound instanceof Array) {
     return sound[Math.floor(Math.random() * sound.length)];
   } else {
     return sound;
   }
+}
+
+function getSound(type: SoundType): HTMLAudioElement | HTMLAudioElement[] {
+  return SOUNDS[type];
 }
