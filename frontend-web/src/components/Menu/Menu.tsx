@@ -14,6 +14,7 @@ import styles from "./Menu.module.scss";
 import SettingsButton from "./SettingsButton";
 import SoundButton from "./SoundButton";
 import Modal from "../Modal";
+import { classnames } from "@common/util";
 
 const FinishGameModal: React.FC<{
   dispatch: (action: GameAction) => void;
@@ -58,7 +59,7 @@ type Props = {
   dispatch: (action: GameAction) => void;
   votingRoundState: VotingRoundState;
   onStartVotingRound: () => void;
-  onSettingsButtonClick: () => void;
+  onChooseEditionClick: () => void;
 };
 
 const Menu: React.FC<Props> = ({
@@ -66,11 +67,13 @@ const Menu: React.FC<Props> = ({
   dispatch,
   votingRoundState,
   onStartVotingRound,
-  onSettingsButtonClick,
+  onChooseEditionClick,
 }) => {
   const globals = useContext(AppContext);
 
   const [finishGameModalOpen, setFinishGameModalOpen] = React.useState(false);
+  const [desktopMenuDrawerOpen, setDesktopMenuDrawerOpen] =
+    React.useState(false);
 
   const toggleFullscreen = (isEnabled: boolean) => {
     if (document.fullscreenElement && !isEnabled) {
@@ -78,6 +81,10 @@ const Menu: React.FC<Props> = ({
     } else if (isEnabled) {
       document.documentElement.requestFullscreen();
     }
+  };
+
+  const onSettingsButtonClick = () => {
+    setDesktopMenuDrawerOpen(!desktopMenuDrawerOpen);
   };
 
   return (
@@ -88,14 +95,27 @@ const Menu: React.FC<Props> = ({
           onClose={() => setFinishGameModalOpen(false)}
         />
       )}
-      <nav className={styles.controls}>
+      <nav
+        className={classnames({
+          [styles.controls]: true,
+          [styles.desktopMenuDrawerOpen]: desktopMenuDrawerOpen,
+        })}
+      >
         <div className={styles.floatingButtons}>
-          {isSetup(game) && (
-            <SettingsButton handleClick={onSettingsButtonClick} />
-          )}
+          <SettingsButton handleClick={onSettingsButtonClick} />
           <SoundButton />
         </div>
         <div aria-roledescription="navigation" className={styles.menu}>
+          {game.stage === "setup" && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                onChooseEditionClick();
+              }}
+            >
+              Choose edition
+            </button>
+          )}
           {game.stage === "setup" && gameCanBeStarted(game) && (
             <button
               onClick={(e) => {

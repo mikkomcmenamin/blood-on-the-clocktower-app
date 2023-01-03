@@ -391,7 +391,7 @@ function App() {
           if (votingRoundState.open) return;
           startVotingRound();
         }}
-        onSettingsButtonClick={() => {
+        onChooseEditionClick={() => {
           setIsEditionModalOpen(true);
         }}
         game={game}
