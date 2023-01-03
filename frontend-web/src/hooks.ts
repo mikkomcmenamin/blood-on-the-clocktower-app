@@ -235,6 +235,8 @@ export function useDeclarativeSoundPlayer(game: Game) {
     if (game.stage === "finished") {
       stopAllSounds();
       playSound("triumph");
+    } else if (game.stage === "setup") {
+      stopAllSounds();
     }
   }, [game.stage]);
 
