@@ -234,7 +234,7 @@ export function useDeclarativeSoundPlayer(game: Game) {
     } else if (game.stage === "setup") {
       stopAllSounds();
     }
-  }, [game.stage]);
+  }, [game.stage, "winningTeam" in game ? game.winningTeam : null]);
 
   // Night music
   const night = isNight(game);

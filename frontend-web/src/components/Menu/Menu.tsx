@@ -6,7 +6,6 @@ import {
   gameCanBeStarted,
   isActiveNomination,
   isNight,
-  isSetup,
 } from "@common/gameLogic";
 import { AppContext } from "../../context";
 import type { VotingRoundState } from "../Player/VotingRoundModal";
