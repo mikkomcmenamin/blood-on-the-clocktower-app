@@ -78,7 +78,16 @@ export function stopAllSounds() {
 }
 
 export function changeVolumeForAllSounds() {
-  Object.values(SOUNDS).forEach((sound) => {
+  const soundTypes = Object.keys(SOUNDS) as SoundType[];
+  soundTypes.forEach((soundType) => {
+    // Unfortunately Apple doesn't allow us to change the volume of a playing sound
+    // So this hack instead:
+    if (globalVolume === 0) {
+      stopSound(soundType);
+      return;
+    }
+
+    const sound = getSound(soundType);
     if (sound instanceof Array) {
       sound.forEach((s) => {
         s.volume = globalVolume;
