@@ -15,11 +15,11 @@
 
 #gameBoard {
   position: relative;
-  width: min(95vw, 95vh);
-  height: min(95vw, 95vh);
+  width: min(100vw, 100vh);
+  height: min(100vw, 100vh);
 
   background-image: url("../../assets/T_GameBoard.png");
-  background-size: cover;
+  background-size: 100% 100%;
 }
 
 .clockhand {
