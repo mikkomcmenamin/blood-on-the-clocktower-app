@@ -228,14 +228,15 @@ export function usePrevious<T>(value: T) {
 export function useDeclarativeSoundPlayer(game: Game) {
   // Victory music when the game is over
   // TODO: play a different sound if the evil team wins
+  const winningTeam = "winningTeam" in game ? game.winningTeam : null;
   useEffect(() => {
     if (game.stage === "finished") {
       stopAllSounds();
-      playSound(game.winningTeam === "good" ? "triumph" : "triumphEvil");
+      playSound(winningTeam === "good" ? "triumph" : "triumphEvil");
     } else if (game.stage === "setup") {
       stopAllSounds();
     }
-  }, [game.stage, "winningTeam" in game ? game.winningTeam : null]);
+  }, [game.stage, winningTeam]);
 
   // Night music
   const night = isNight(game);
