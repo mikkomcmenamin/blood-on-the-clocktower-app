@@ -15,14 +15,11 @@
 
 #gameBoard {
   position: relative;
-  width: min(75vw, 75vh);
-  height: min(75vw, 75vh);
+  width: min(95vw, 95vh);
+  height: min(95vw, 95vh);
 
-  border-radius: 50%;
-  background-image: url("../../assets/clockface.jpg");
+  background-image: url("../../assets/T_GameBoard.png");
   background-size: cover;
-  // Raise it from the foreground as it if it was floating in the air
-  box-shadow: 0 0 2rem #646cffaa;
 }
 
 .clockhand {
