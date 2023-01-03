@@ -146,16 +146,17 @@ export function usePressDurationDependentHandlers(
   timeout = 1000
 ) {
   const [longPressFired, setLongPressFired] = useState(false);
+  const [timer, setTimer] = useState<NodeJS.Timeout>();
   useEffect(() => {
     if (!ref.current) return;
 
-    let timer: NodeJS.Timeout;
-
     const handlePointerDown = (e: PointerEvent) => {
-      timer = setTimeout(() => {
-        handlers.onLongPress?.(e);
-        setLongPressFired(true);
-      }, timeout);
+      setTimer(
+        setTimeout(() => {
+          handlers.onLongPress?.(e);
+          setLongPressFired(true);
+        }, timeout)
+      );
     };
 
     const handlePointerUp = (e: PointerEvent) => {
@@ -180,7 +181,7 @@ export function usePressDurationDependentHandlers(
       current.removeEventListener("pointerup", handlePointerUp);
       current.removeEventListener("dragstart", cancel);
     };
-  }, [ref, handlers, timeout, longPressFired]);
+  }, [ref, handlers, timeout, longPressFired, timer]);
 }
 
 export function useWhilePressed(
