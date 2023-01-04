@@ -5,6 +5,7 @@ import {
   GameAction,
   gameCanBeStarted,
   isActiveNomination,
+  isDay,
   isNight,
 } from "@common/gameLogic";
 import { AppContext } from "../../context";
@@ -14,6 +15,7 @@ import SettingsButton from "./SettingsButton";
 import SoundButton from "./SoundButton";
 import { classnames } from "@common/util";
 import FinishGameModal from "./FinishGameModal";
+import ErrorRecoveryMenuModal from "./ErrorRecoveryMenuModal";
 
 type Props = {
   game: Game;
@@ -33,6 +35,8 @@ const Menu: React.FC<Props> = ({
   const globals = useContext(AppContext);
 
   const [finishGameModalOpen, setFinishGameModalOpen] = React.useState(false);
+  const [errorRecoveryMenuModalOpen, setErrorRecoveryMenuModalOpen] =
+    React.useState(false);
   const [desktopMenuDrawerOpen, setDesktopMenuDrawerOpen] =
     React.useState(false);
 
@@ -109,6 +113,25 @@ const Menu: React.FC<Props> = ({
                 Voting round
               </button>
             )}
+          {game.stage === "active" &&
+            isDay(game) &&
+            errorRecoveryMenuModalOpen && (
+              <ErrorRecoveryMenuModal
+                onClose={() => setErrorRecoveryMenuModalOpen(false)}
+                dispatch={dispatch}
+                game={game}
+              />
+            )}
+          {game.stage === "active" && isDay(game) && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setErrorRecoveryMenuModalOpen(true);
+              }}
+            >
+              Error recovery
+            </button>
+          )}
           {canTransitionToNight(game) && (
             <button
               onClick={(e) => {
