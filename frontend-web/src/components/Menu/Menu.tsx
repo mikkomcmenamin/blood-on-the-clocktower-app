@@ -12,46 +12,8 @@ import type { VotingRoundState } from "../Player/VotingRoundModal";
 import styles from "./Menu.module.scss";
 import SettingsButton from "./SettingsButton";
 import SoundButton from "./SoundButton";
-import Modal from "../Modal";
 import { classnames } from "@common/util";
-
-const FinishGameModal: React.FC<{
-  dispatch: (action: GameAction) => void;
-  onClose: () => void;
-}> = ({ dispatch, onClose }) => {
-  return (
-    <Modal onClose={onClose}>
-      <h2>Finish game</h2>
-      <p>Which team won?</p>
-      <div className={styles.finishGameModalButtons}>
-        <button
-          onClick={() => {
-            dispatch({
-              type: "stageTransitionToFinished",
-              stage: "active",
-              payload: "evil",
-            });
-            onClose();
-          }}
-        >
-          Evil
-        </button>
-        <button
-          onClick={() => {
-            dispatch({
-              type: "stageTransitionToFinished",
-              stage: "active",
-              payload: "good",
-            });
-            onClose();
-          }}
-        >
-          Good
-        </button>
-      </div>
-    </Modal>
-  );
-};
+import FinishGameModal from "./FinishGameModal";
 
 type Props = {
   game: Game;
