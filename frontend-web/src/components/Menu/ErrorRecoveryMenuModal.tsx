@@ -1,5 +1,7 @@
-import { GameAction } from "@common/gameLogic";
+import { GameAction, isDay } from "@common/gameLogic";
 import { Game } from "@common/model";
+import { useState } from "react";
+import { usePrevious } from "../../hooks";
 import Modal from "../Modal";
 import styles from "./ErrorRecoveryMenuModal.module.scss";
 
@@ -8,15 +10,30 @@ const ErrorRecoveryMenuModal: React.FC<{
   onClose: () => void;
   game: Extract<Game, { stage: "active" }>;
 }> = ({ dispatch, onClose, game }) => {
-  // Should show each player in a list with:
-  // - their name
-  // - have they nominated today (checkbox)
-  // - have they been nominated today (checkbox)
-  // - are they alive or dead (checkbox)
-  // - if dead, do they have a ghost vote
-  //
-  // Ticking those boxes should update the game state using dispatch
+  const [onTheBlockForm, setOnTheBlockForm] = useState<{
+    playerId: number;
+    votes: number;
+  } | null>(game.phase.phase === "day" ? game.phase.onTheBlock ?? null : null);
+
+  const previousFormState = usePrevious(onTheBlockForm);
+
   if (game.phase.phase !== "day") return null;
+
+  if (onTheBlockForm !== previousFormState) {
+    const { onTheBlock: _, ...rest } = game.phase;
+    dispatch({
+      type: "replaceState",
+      payload: {
+        ...game,
+        phase: onTheBlockForm
+          ? {
+              ...game.phase,
+              onTheBlock: onTheBlockForm,
+            }
+          : rest,
+      },
+    });
+  }
 
   return (
     <Modal onClose={onClose}>
@@ -161,6 +178,60 @@ const ErrorRecoveryMenuModal: React.FC<{
           );
         })}
       </ul>
+      <div className={styles.onTheBlock}>
+        <span>About to die?</span>
+        {(() => {
+          const playerOnTheBlock = game.players.find(
+            (p) => isDay(game) && p.id === game.phase.onTheBlock?.playerId
+          );
+
+          return (
+            <div className={styles.onTheBlockForm}>
+              <select
+                value={playerOnTheBlock?.id ?? ""}
+                onChange={(e) => {
+                  if (e.target.value === "") {
+                    setOnTheBlockForm(null);
+                    return;
+                  }
+
+                  setOnTheBlockForm({
+                    playerId: parseInt(e.target.value),
+                    votes:
+                      onTheBlockForm?.votes ??
+                      Math.ceil(game.players.length / 2),
+                  });
+                }}
+              >
+                <option value="">None</option>
+                {game.players.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={onTheBlockForm?.votes ?? 0}
+                disabled={!onTheBlockForm}
+                onChange={(e) => {
+                  setOnTheBlockForm({
+                    playerId: playerOnTheBlock?.id ?? 0,
+                    votes: parseInt(e.target.value),
+                  });
+                }}
+              >
+                {Array.from({ length: game.players.length }, (_, i) => i + 1)
+                  .slice(Math.ceil(game.players.length / 2))
+                  .map((i) => (
+                    <option key={i} value={i} label={`${i} votes`}>
+                      {i}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          );
+        })()}
+      </div>
     </Modal>
   );
 };

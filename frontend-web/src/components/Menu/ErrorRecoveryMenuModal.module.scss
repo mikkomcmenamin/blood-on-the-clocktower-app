@@ -29,3 +29,34 @@
     flex: 1.5;
   }
 }
+
+.onTheBlock {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.onTheBlockForm {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+
+  & > * {
+    flex: 1;
+    flex-shrink: 0;
+  }
+
+  & > select {
+    border-radius: 0.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-inline: 2rem;
+    padding-block: 0.5rem;
+  }
+}
