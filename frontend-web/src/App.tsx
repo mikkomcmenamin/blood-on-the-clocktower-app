@@ -40,7 +40,7 @@ import Menu from "./components/Menu/Menu";
 import InfoPanel from "./components/InfoPanel";
 import VideoAnimation from "./components/VideoAnimation";
 //import ReaperVideo from "./assets/V_Reaper.mp4";
-import NightToDay from "./assets/V_NightToDay.mp4";
+import NightToDay from "./assets/V_NightToDay.webm";
 import DayToNight from "./assets/V_DayToNight.webm";
 import AddPlayerModal from "./components/Player/AddPlayerModal";
 import { AppContext } from "./context";
@@ -500,7 +500,7 @@ function App() {
         </div>
       )}
       {isNight(game) && <VideoAnimation src={DayToNight} type="video/webm" />}
-      {isDay(game) && <VideoAnimation src={NightToDay} />}
+      {isDay(game) && <VideoAnimation src={NightToDay} type="video/webm" />}
     </div>
   );
 }
