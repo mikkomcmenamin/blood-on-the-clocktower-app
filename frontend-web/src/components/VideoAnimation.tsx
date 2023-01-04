@@ -82,7 +82,7 @@ const VideoAnimation: React.FC<VideoAnimationProps> = ({
     if (isEnding) {
       setTimeout(() => {
         setHide(true);
-      }, 3000);
+      }, 2500);
     }
   }, [isEnding, setHide]);
 
