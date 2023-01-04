@@ -1,9 +1,39 @@
-.button {
+.killOrResurrectButton {
   // make it look like a material button with shadow and padding etc
-  padding: 0.5rem 1rem;
+  padding: 1rem 1rem;
   border-radius: 0.5rem;
-  border: 1px solid #888;
   box-shadow: 0 0 0.5rem #888;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+}
+
+.characterName {
+  padding-left: 10px;
+}
+
+.characterSelectionContainer {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  position: relative;
+  padding-block: 1rem;
+  gap: 1rem;
+}
+
+.characterSelectionTable {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem;
+  justify-content: center;
+  overflow-y: scroll;
+  border-radius: 0.2rem;
+  height: 300px;
 }
 
 .character {
@@ -35,6 +65,13 @@
     border: 2px solid #0f0;
     box-shadow: 0 0 0.5rem #0f0;
   }
+
+  &.header {
+    border: 2px solid #0f0;
+    box-shadow: 0 0 0.5rem #0f0;
+    width: 70px;
+    height: 70px;
+  }
 }
 
 .noCharacter {
@@ -57,11 +94,10 @@
 }
 
 .removePlayerButton {
-  padding: 0.2rem;
+  padding: 0.5rem;
   border-radius: 0.5rem;
-  border: 1px solid #888;
   box-shadow: 0 0 0.5rem red;
-  background-color: red;
+  background-color: hsl(359, 100%, 30%);
   color: white;
   font-size: 1rem;
   flex: none;

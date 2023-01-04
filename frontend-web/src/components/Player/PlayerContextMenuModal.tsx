@@ -9,6 +9,7 @@ import {
 } from "@common/editions/editions";
 import { classnames } from "@common/util";
 import { CHARACTER_IMAGES } from "../../assets/characters/characterImages";
+import Button from "../Reusable/Button";
 
 type Props = Omit<ModalProps, "children"> & {
   playerId: number;
@@ -28,33 +29,8 @@ const PlayerIconContainer: React.FC<PlayerIconContainerProps> = ({
   children,
 }) => {
   return (
-    <div
-      style={{
-        display: "flex",
-        width: "100%",
-        alignItems: "flex-start",
-        position: "relative",
-        paddingBlock: "1rem",
-        gap: "1rem",
-      }}
-    >
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "0.5rem",
-          width: "100%",
-          padding: "1rem",
-          justifyContent: "center",
-          overflowY: "scroll",
-          background: "#ccc",
-          borderRadius: "0.2rem",
-          height: "300px",
-        }}
-      >
-        {children}
-      </div>
+    <div className={styles.characterSelectionContainer}>
+      <div className={styles.characterSelectionTable}>{children}</div>
     </div>
   );
 };
@@ -81,66 +57,44 @@ const PlayerContextMenuModal: React.FC<Props> = ({
 
   return (
     <Modal onClose={onClose} modalRef={modalRef}>
-      <h2>
-        {player.name} ({formatCharacterName(currentCharacter)})
-      </h2>
+      <div className={styles.header}>
+        <div
+          onClick={(e) => {
+            e.preventDefault();
+            if (!isSetup(game)) {
+              return;
+            }
+            onModifyPlayer({
+              ...player,
+              character: undefined,
+            });
+          }}
+          style={{
+            cursor: isSetup(game) && !!player.character ? "pointer" : "default",
+          }}
+          className={classnames({
+            [styles.character]: true,
+            [styles.selected]: currentCharacter !== "no character",
+            [styles.header]: true,
+          })}
+        >
+          {(() => {
+            if (currentCharacter === "no character") {
+              return <span className={styles.noCharacter}>?</span>;
+            }
 
-      <div
-        onClick={(e) => {
-          e.preventDefault();
-          if (!isSetup(game)) {
-            return;
-          }
-          onModifyPlayer({
-            ...player,
-            character: undefined,
-          });
-        }}
-        style={{
-          cursor: isSetup(game) && !!player.character ? "pointer" : "default",
-        }}
-        className={classnames({
-          [styles.character]: true,
-          [styles.selected]: currentCharacter !== "no character",
-        })}
-      >
-        {(() => {
-          if (currentCharacter === "no character") {
-            return <span className={styles.noCharacter}>?</span>;
-          }
-
-          return (
-            <img
-              src={CHARACTER_IMAGES[currentCharacter as Character]}
-              alt={currentCharacter}
-            />
-          );
-        })()}
+            return (
+              <img
+                src={CHARACTER_IMAGES[currentCharacter as Character]}
+                alt={currentCharacter}
+              />
+            );
+          })()}
+        </div>
+        <h2 className={styles.characterName}>
+          {player.name} ({formatCharacterName(currentCharacter)})
+        </h2>
       </div>
-
-      {isSetup(game) && (
-        <button
-          className={styles.removePlayerButton}
-          onClick={(e) => {
-            e.preventDefault();
-            onRemovePlayer(player.id);
-          }}
-        >
-          Remove player
-        </button>
-      )}
-      {!isSetup(game) && (
-        <button
-          className={styles.button}
-          onClick={(e) => {
-            e.preventDefault();
-            onKillOrResurrect(player.id);
-            onClose();
-          }}
-        >
-          {isAlive ? "Kill player" : "Resurrect player"}
-        </button>
-      )}
 
       <PlayerIconContainer>
         {(game.stage === "setup" || game.stage === "active") &&
@@ -188,6 +142,27 @@ const PlayerContextMenuModal: React.FC<Props> = ({
             }
           )}
       </PlayerIconContainer>
+      {isSetup(game) && (
+        <button
+          className={styles.removePlayerButton}
+          onClick={(e) => {
+            e.preventDefault();
+            onRemovePlayer(player.id);
+          }}
+        >
+          Remove player
+        </button>
+      )}
+      {!isSetup(game) && (
+        <Button
+          onClick={() => {
+            onKillOrResurrect(player.id);
+            onClose();
+          }}
+        >
+          {isAlive ? "Kill player" : "Resurrect player"}
+        </Button>
+      )}
     </Modal>
   );
 };
