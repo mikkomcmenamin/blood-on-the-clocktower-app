@@ -41,7 +41,15 @@ const SOUNDS = {
 
 type SoundType = keyof typeof SOUNDS;
 
-const isPlaying = (audio: HTMLAudioElement) => !audio.paused;
+const isAnyPlaying = (s: SoundType) => {
+  const audio = getSound(s);
+  const sounds = audio instanceof Array ? audio : [audio];
+  return sounds.some(isPlaying);
+};
+
+const isPlaying = (a: HTMLAudioElement) => !a.paused;
+
+const noop = () => {};
 
 let globalVolume = 1;
 export function setGlobalVolume(volume: soundVolume) {
@@ -54,13 +62,14 @@ export function playSound(soundType: SoundType, loop = false, volume = 1) {
   audio.currentTime = 0;
   audio.loop = loop;
   audio.volume = globalVolume * volume;
-  if (!isPlaying(audio) && globalVolume > 0) {
-    audio.play();
+  if (!isAnyPlaying(soundType) && globalVolume > 0) {
+    return audio.play().catch(noop);
   }
+  return Promise.resolve();
 }
 
 export function loopSound(soundType: SoundType, volume = 1) {
-  playSound(soundType, true, volume);
+  return playSound(soundType, true, volume);
 }
 
 export function stopSound(soundType: SoundType) {
@@ -77,6 +86,15 @@ export function stopSound(soundType: SoundType) {
 export function stopAllSounds() {
   const soundTypes = Object.keys(SOUNDS) as SoundType[];
   soundTypes.forEach(stopSound);
+}
+
+export function stopAllSoundsExcept(soundType: SoundType) {
+  const soundTypes = Object.keys(SOUNDS) as SoundType[];
+  soundTypes.forEach((type) => {
+    if (type !== soundType) {
+      stopSound(type);
+    }
+  });
 }
 
 export function changeVolumeForAllSounds() {

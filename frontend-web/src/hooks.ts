@@ -4,6 +4,7 @@ import {
   loopSound,
   playSound,
   stopAllSounds,
+  stopAllSoundsExcept,
   stopSound,
 } from "./components/soundManager";
 import {
@@ -224,92 +225,70 @@ export function usePrevious<T>(value: T) {
 }
 
 export function useDeclarativeSoundPlayer(game: Game) {
+  const previousGame = usePrevious(game);
+  if (!previousGame) return;
   // Victory music when the game is over
-  // TODO: play a different sound if the evil team wins
-  const winningTeam = "winningTeam" in game ? game.winningTeam : null;
-  useEffect(() => {
+  if (game.stage !== previousGame?.stage) {
     if (game.stage === "finished") {
       stopAllSounds();
-      playSound(winningTeam === "good" ? "triumph" : "triumphEvil");
+      playSound(game.winningTeam === "good" ? "triumph" : "triumphEvil");
     } else if (game.stage === "setup") {
       stopAllSounds();
     }
-  }, [game.stage, winningTeam]);
+  }
 
   // Night music
-  const night = isNight(game);
-  useEffect(() => {
-    if (night) {
-      stopAllSounds();
-      loopSound("demonsWin");
-    }
-  }, [night]);
+  if (isNight(game) && !isNight(previousGame)) {
+    stopAllSoundsExcept("demonsWin");
+    loopSound("demonsWin");
+  }
 
   // Stop sounds when day starts
   // TODO: day ambience or a sound to indicate the start of the day?
-  const day = isDay(game);
-  useEffect(() => {
-    if (day) {
-      stopAllSounds();
-    }
-  }, [day]);
+  if (isDay(game) && !isDay(previousGame)) {
+    stopAllSounds();
+  }
 
   // Nomination starts
-  const activeNomination = isActiveNomination(game);
-  useEffect(() => {
-    if (activeNomination) {
-      stopAllSounds();
-      playSound("nomination");
-    }
-  }, [activeNomination]);
+  if (isActiveNomination(game) && !isActiveNomination(previousGame)) {
+    stopAllSoundsExcept("nomination");
+    playSound("nomination");
+  }
 
   // Player has died, play a random death sound
-  const previousPlayers = usePrevious(game.players);
-  useEffect(() => {
-    if (!isDay(game)) return;
-
+  if (isDay(game)) {
     const playerHasDied = game.players.some(
       (player) =>
         !player.alive &&
-        previousPlayers?.some(
+        previousGame.players.some(
           (p) => "alive" in p && p.id === player.id && p.alive
         )
     );
 
     if (playerHasDied) {
-      stopAllSounds();
+      stopAllSoundsExcept("death");
       playSound("death");
     }
-  }, [game, previousPlayers]);
+  }
 
   // There is an active nomination and a player votes, play a bojoing sound
-  const previousNomination: Nomination | undefined = usePrevious(
-    isActiveNomination(game) ? game.phase.nomination : { state: "inactive" }
-  );
-  useEffect(() => {
-    if (!isActiveNomination(game)) return;
 
-    const previousVoteCount =
-      previousNomination?.state === "active"
-        ? previousNomination.voters.length
-        : 0;
+  if (isActiveNomination(game) && isActiveNomination(previousGame)) {
+    const previousVoteCount = previousGame.phase.nomination.voters.length;
     const playerHasVoted =
       game.phase.nomination.voters.length > previousVoteCount;
 
     if (playerHasVoted) {
       playSound("vote");
     }
-  }, [game, previousNomination]);
+  }
 
   // A player is on the block, and there is no active nomination, play anticipatory music
-  const onTheBlock =
-    isDay(game) && isInactiveNomination(game) && !!game.phase.onTheBlock;
-  useEffect(() => {
-    if (onTheBlock) {
-      stopSound("anticipation");
-      loopSound("anticipation", 0.5);
-    } else {
-      stopSound("anticipation");
-    }
-  }, [onTheBlock]);
+  const onTheBlock = (g: Game) =>
+    isDay(g) && isInactiveNomination(g) && !!g.phase.onTheBlock;
+  if (onTheBlock(game) && !onTheBlock(previousGame)) {
+    loopSound("anticipation", 0.5);
+  } else if (!onTheBlock(game) && onTheBlock(previousGame)) {
+    stopSound("anticipation");
+  }
 }
