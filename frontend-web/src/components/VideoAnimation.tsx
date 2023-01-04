@@ -41,8 +41,9 @@ const VideoAnimation: React.FC<VideoAnimationProps> = ({
   type = "video/mp4",
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isEnded, setIsEnded] = useState(false);
+  const [isEnding, setIsEnding] = useState(false);
   const [hide, setHide] = useState(false);
+  const [metadataLoaded, setMetadataLoaded] = useState(false);
 
   const globals = useContext(AppContext);
 
@@ -52,29 +53,43 @@ const VideoAnimation: React.FC<VideoAnimationProps> = ({
       return;
     }
 
-    if (videoRef.current) {
-      setTimeout(() => {
-        videoRef.current?.play();
-      }, 2000);
+    if (!videoRef.current) {
+      return;
     }
-  }, [videoRef, globals.value.video]);
 
-  const handleEnded = () => {
-    setIsEnded(true);
-  };
+    const current = videoRef.current;
+    const ready = () => {
+      setMetadataLoaded(true);
+    };
+    current.addEventListener("loadedmetadata", ready);
+
+    return () => {
+      current.removeEventListener("loadedmetadata", ready);
+    };
+  }, [videoRef, globals.value.video, setMetadataLoaded]);
 
   useEffect(() => {
-    if (isEnded) {
+    if (videoRef.current && metadataLoaded) {
+      videoRef.current.play();
+      setMetadataLoaded(false);
+      setTimeout(() => {
+        setIsEnding(true);
+      }, (videoRef.current.duration - 3) * 1000);
+    }
+  }, [metadataLoaded, videoRef]);
+
+  useEffect(() => {
+    if (isEnding) {
       setTimeout(() => {
         setHide(true);
       }, 3000);
     }
-  }, [isEnded]);
+  }, [isEnding, setHide]);
 
   // playsInline is required for the video to play on iOS
 
   return hide ? null : (
-    <Video fadeIn={!isEnded} ref={videoRef} playsInline onEnded={handleEnded}>
+    <Video fadeIn={!isEnding} ref={videoRef} playsInline>
       <source src={src} type={type}></source>
     </Video>
   );
