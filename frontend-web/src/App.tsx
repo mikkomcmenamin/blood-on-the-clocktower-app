@@ -40,6 +40,7 @@ import Menu from "./components/Menu/Menu";
 import InfoPanel from "./components/InfoPanel";
 import VideoAnimation from "./components/VideoAnimation";
 import ReaperVideo from "./assets/V_Reaper.mp4";
+import NightToDay from "./assets/V_NightToDay.mp4";
 import AddPlayerModal from "./components/Player/AddPlayerModal";
 import { AppContext } from "./context";
 import PlayerContextMenuModal from "./components/Player/PlayerContextMenuModal";
@@ -498,6 +499,7 @@ function App() {
         </div>
       )}
       {isNight(game) && <VideoAnimation src={ReaperVideo} />}
+      {isDay(game) && <VideoAnimation src={NightToDay} type="video/mp4" />}
     </div>
   );
 }

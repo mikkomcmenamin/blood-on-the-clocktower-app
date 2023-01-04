@@ -33,9 +33,13 @@ const Video = styled.video<{ fadeIn: boolean }>`
 
 type VideoAnimationProps = {
   src: string;
+  type?: string;
 };
 
-const VideoAnimation: React.FC<VideoAnimationProps> = ({ src }) => {
+const VideoAnimation: React.FC<VideoAnimationProps> = ({
+  src,
+  type = "video/mp4",
+}) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isEnded, setIsEnded] = useState(false);
   const [hide, setHide] = useState(false);
@@ -71,7 +75,7 @@ const VideoAnimation: React.FC<VideoAnimationProps> = ({ src }) => {
 
   return hide ? null : (
     <Video fadeIn={!isEnded} ref={videoRef} playsInline onEnded={handleEnded}>
-      <source src={src} type="video/mp4"></source>
+      <source src={src} type={type}></source>
     </Video>
   );
 };
