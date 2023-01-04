@@ -54,7 +54,7 @@ export function playSound(soundType: SoundType, loop = false, volume = 1) {
   audio.currentTime = 0;
   audio.loop = loop;
   audio.volume = globalVolume * volume;
-  if (!isPlaying(audio)) {
+  if (!isPlaying(audio) && globalVolume > 0) {
     audio.play();
   }
 }

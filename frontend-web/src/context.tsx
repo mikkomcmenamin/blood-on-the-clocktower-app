@@ -30,14 +30,14 @@ export const initialCtxValue = isInitiallyMobile
   ? {
       storytellerMode: true as const,
       deathReminders: [],
-      soundVolume: 0 as soundVolume,
+      soundVolume: 0 as const,
       video: false,
       gameId: urlPathPart,
     }
   : {
       storytellerMode: false as const,
       deathReminders: [],
-      soundVolume: 1 as soundVolume,
+      soundVolume: 1 as const,
       video: true,
       gameId: urlPathPart,
     };
