@@ -39,8 +39,9 @@ import {
 import Menu from "./components/Menu/Menu";
 import InfoPanel from "./components/InfoPanel";
 import VideoAnimation from "./components/VideoAnimation";
-import ReaperVideo from "./assets/V_Reaper.mp4";
+//import ReaperVideo from "./assets/V_Reaper.mp4";
 import NightToDay from "./assets/V_NightToDay.mp4";
+import DayToNight from "./assets/V_DayToNight.webm";
 import AddPlayerModal from "./components/Player/AddPlayerModal";
 import { AppContext } from "./context";
 import PlayerContextMenuModal from "./components/Player/PlayerContextMenuModal";
@@ -498,8 +499,8 @@ function App() {
           }
         </div>
       )}
-      {isNight(game) && <VideoAnimation src={ReaperVideo} />}
-      {isDay(game) && <VideoAnimation src={NightToDay} type="video/mp4" />}
+      {isNight(game) && <VideoAnimation src={DayToNight} type="video/webm" />}
+      {isDay(game) && <VideoAnimation src={NightToDay} />}
     </div>
   );
 }
