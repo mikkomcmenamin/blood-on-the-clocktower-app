@@ -1,9 +1,4 @@
-.killOrResurrectButton {
-  // make it look like a material button with shadow and padding etc
-  padding: 1rem 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 0.5rem #888;
-}
+@import "../../style-modules/colors.module.scss";
 
 .header {
   display: flex;
@@ -62,13 +57,13 @@
   }
 
   &.selected {
-    border: 2px solid #0f0;
-    box-shadow: 0 0 0.5rem #0f0;
+    border: 2px solid $proudOrange;
+    box-shadow: 0 0 1rem $proudOrange;
   }
 
   &.header {
-    border: 2px solid #0f0;
-    box-shadow: 0 0 0.5rem #0f0;
+    border: 2px solid $proudOrange;
+    box-shadow: 0 0 0.5rem $proudOrange;
     width: 70px;
     height: 70px;
   }
@@ -82,22 +77,11 @@
   color: #888;
 }
 
-.arrow {
-  padding: 1rem 0.5rem;
-  font-size: 2rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 0.5rem #888;
-  background-color: black;
-  color: white;
-  height: 50%;
-  align-self: center;
-}
-
 .removePlayerButton {
   padding: 0.5rem;
   border-radius: 0.5rem;
-  box-shadow: 0 0 0.5rem red;
-  background-color: hsl(359, 100%, 30%);
+  box-shadow: 0 0 0.5rem $crimson;
+  background-color: $crimson;
   color: white;
   font-size: 1rem;
   flex: none;
