@@ -14,106 +14,99 @@ import {
   globalSettingsSchema,
 } from "./model";
 
-// Stages mean the game is in a particular state (setup, active, finished)
-const setupActionSchema = z.object({
-  stage: z.literal("setup"),
-});
-const activeActionSchema = z.object({
-  stage: z.literal("active"),
-});
-const finishedActionSchema = z.object({
-  stage: z.literal("finished"),
-});
-
 // Actions are the things that can happen within a specific stage
-const addPlayerActionSchema = setupActionSchema.merge(
-  z.object({
-    type: z.literal("addPlayer"),
-    payload: setupStagePlayerSchema,
-  })
-);
-const removePlayerActionSchema = setupActionSchema.merge(
-  z.object({
-    type: z.literal("removePlayer"),
-    payload: z.number(),
-  })
-);
+const addPlayerActionSchema = z.object({
+  type: z.literal("addPlayer"),
+  payload: setupStagePlayerSchema,
+});
 
-const changeSettingsSchema = setupActionSchema.merge(
-  z.object({
-    type: z.literal("changeSettings"),
-    payload: globalSettingsSchema,
-  })
-);
+const removePlayerActionSchema = z.object({
+  type: z.literal("removePlayer"),
+  payload: z.number(),
+});
 
-const setNominatorActionSchema = activeActionSchema.merge(
-  z.object({
-    type: z.literal("setNominator"),
-    payload: activeStagePlayerSchema,
-  })
-);
-const setNomineeActionSchema = activeActionSchema.merge(
-  z.object({
-    type: z.literal("setNominee"),
-    payload: activeStagePlayerSchema,
-  })
-);
-const cancelNominationActionSchema = activeActionSchema.merge(
-  z.object({
-    type: z.literal("cancelNomination"),
-  })
-);
-const resolveVoteActionSchema = activeActionSchema.merge(
-  z.object({
-    type: z.literal("resolveVote"),
-  })
-);
-const toggleVoteActionSchema = activeActionSchema.merge(
-  z.object({
-    type: z.literal("toggleVote"),
-    payload: activeStagePlayerSchema,
-  })
-);
-const togglePlayerAliveStatusActionSchema = activeActionSchema.merge(
-  z.object({
-    type: z.literal("togglePlayerAliveStatus"),
-    payload: activeStagePlayerSchema,
-  })
-);
-const phaseTransitionToNightActionSchema = activeActionSchema.merge(
-  z.object({
-    type: z.literal("phaseTransitionToNight"),
-  })
-);
-const phaseTransitionToDayActionSchema = activeActionSchema.merge(
-  z.object({
-    type: z.literal("phaseTransitionToDay"),
-  })
-);
-const stageTransitionToActiveActionSchema = setupActionSchema.merge(
-  z.object({
-    type: z.literal("stageTransitionToActive"),
-  })
-);
-const stageTransitionToFinishedActionSchema = activeActionSchema.merge(
-  z.object({
-    type: z.literal("stageTransitionToFinished"),
-    payload: teamSchema,
-  })
-);
+const changeSettingsSchema = z.object({
+  type: z.literal("changeSettings"),
+  payload: globalSettingsSchema,
+});
 
-const revealPlayerSchema = finishedActionSchema.merge(
-  z.object({
-    type: z.literal("revealPlayer"),
-    payload: z.number(),
-  })
-);
+const stageTransitionToActiveActionSchema = z.object({
+  type: z.literal("stageTransitionToActive"),
+});
 
-const revealAllPlayersSchema = finishedActionSchema.merge(
-  z.object({
-    type: z.literal("revealAllPlayers"),
-  })
-);
+const setupActionSchema = z.discriminatedUnion("type", [
+  addPlayerActionSchema,
+  removePlayerActionSchema,
+  changeSettingsSchema,
+  stageTransitionToActiveActionSchema,
+]);
+
+const setNominatorActionSchema = z.object({
+  type: z.literal("setNominator"),
+  payload: activeStagePlayerSchema,
+});
+
+const setNomineeActionSchema = z.object({
+  type: z.literal("setNominee"),
+  payload: activeStagePlayerSchema,
+});
+
+const cancelNominationActionSchema = z.object({
+  type: z.literal("cancelNomination"),
+});
+
+const resolveVoteActionSchema = z.object({
+  type: z.literal("resolveVote"),
+});
+
+const toggleVoteActionSchema = z.object({
+  type: z.literal("toggleVote"),
+  payload: activeStagePlayerSchema,
+});
+
+const togglePlayerAliveStatusActionSchema = z.object({
+  type: z.literal("togglePlayerAliveStatus"),
+  payload: activeStagePlayerSchema,
+});
+
+const phaseTransitionToNightActionSchema = z.object({
+  type: z.literal("phaseTransitionToNight"),
+});
+
+const phaseTransitionToDayActionSchema = z.object({
+  type: z.literal("phaseTransitionToDay"),
+});
+
+const stageTransitionToFinishedActionSchema = z.object({
+  type: z.literal("stageTransitionToFinished"),
+  payload: teamSchema,
+});
+
+const activeActionSchema = z.discriminatedUnion("type", [
+  setNominatorActionSchema,
+  setNomineeActionSchema,
+  cancelNominationActionSchema,
+  resolveVoteActionSchema,
+  toggleVoteActionSchema,
+  togglePlayerAliveStatusActionSchema,
+  phaseTransitionToNightActionSchema,
+  phaseTransitionToDayActionSchema,
+  stageTransitionToFinishedActionSchema,
+]);
+
+const revealPlayerSchema = z.object({
+  type: z.literal("revealPlayer"),
+  payload: z.number(),
+});
+
+const revealAllPlayersSchema = z.object({
+  type: z.literal("revealAllPlayers"),
+});
+
+const finishedActionSchema = z.discriminatedUnion("type", [
+  revealPlayerSchema,
+  revealAllPlayersSchema,
+]);
 
 const replaceStateSchema = z.object({
   type: z.literal("replaceState"),
@@ -129,32 +122,27 @@ const modifyPlayersSchema = z.object({
   payload: z.array(activeStagePlayerSchema).or(z.array(setupStagePlayerSchema)),
 });
 
-export const gameActionSchema = z.union([
-  addPlayerActionSchema,
-  removePlayerActionSchema,
-  changeSettingsSchema,
-  setNominatorActionSchema,
-  setNomineeActionSchema,
-  cancelNominationActionSchema,
-  resolveVoteActionSchema,
-  toggleVoteActionSchema,
-  togglePlayerAliveStatusActionSchema,
-  phaseTransitionToNightActionSchema,
-  phaseTransitionToDayActionSchema,
-  stageTransitionToActiveActionSchema,
-  stageTransitionToFinishedActionSchema,
-  revealPlayerSchema,
-  revealAllPlayersSchema,
+const anyStageActionSchema = z.discriminatedUnion("type", [
   replaceStateSchema,
   resetToSetupSchema,
   modifyPlayersSchema,
 ]);
 
+export const gameActionSchema = setupActionSchema
+  .or(activeActionSchema)
+  .or(finishedActionSchema)
+  .or(anyStageActionSchema);
+
+export type SetupAction = z.infer<typeof setupActionSchema>;
+export type ActiveAction = z.infer<typeof activeActionSchema>;
+export type FinishedAction = z.infer<typeof finishedActionSchema>;
+export type AnyStageAction = z.infer<typeof anyStageActionSchema>;
+
 export type GameAction = z.infer<typeof gameActionSchema>;
 
 function gameStateSetupReducer(
   state: Extract<Game, { stage: "setup" }>,
-  action: Extract<GameAction, { stage: "setup" }>
+  action: SetupAction
 ) {
   switch (action.type) {
     case "addPlayer":
@@ -199,7 +187,7 @@ function gameStateSetupReducer(
 
 function gameStateActiveReducer(
   state: Extract<Game, { stage: "active" }>,
-  action: Extract<GameAction, { stage: "active" }>
+  action: ActiveAction
 ) {
   switch (action.type) {
     case "setNominator":
@@ -457,7 +445,7 @@ function gameStateActiveReducer(
 
 export function gameStateFinishedReducer(
   state: Extract<Game, { stage: "finished" }>,
-  action: Extract<GameAction, { stage: "finished" }>
+  action: FinishedAction
 ): Extract<Game, { stage: "finished" }> {
   switch (action.type) {
     case "revealPlayer": {
@@ -479,65 +467,78 @@ export function gameStateFinishedReducer(
   }
 }
 
-export function gameStateReducer(state: Game, action: GameAction): Game {
-  if (action.type === "replaceState") {
-    return action.payload;
-  } else if (action.type === "resetToSetup") {
-    return {
-      stage: "setup",
-      players: state.players.map(({ id, name }) => ({
-        id,
-        name,
-      })),
-      globalSettings: {
-        editionId: "TROUBLE_BREWING",
-      },
-    };
-  } else if (action.type === "modifyPlayers") {
-    if (state.stage !== "setup") {
-      const activeStagePlayers = z
-        .array(activeStagePlayerSchema)
-        .safeParse(action.payload);
-      if (!activeStagePlayers.success) {
-        throw new Error(
-          "Cannot modify players to be setup stage players when game is not in setup stage"
-        );
+export function gameStateReducer(state: Game, _action: GameAction): Game {
+  const anyStageAction = anyStageActionSchema.safeParse(_action);
+  if (anyStageAction.success) {
+    const action = anyStageAction.data;
+    if (action.type === "replaceState") {
+      return action.payload;
+    } else if (action.type === "resetToSetup") {
+      return {
+        stage: "setup",
+        players: state.players.map(({ id, name }) => ({
+          id,
+          name,
+        })),
+        globalSettings: {
+          editionId: "TROUBLE_BREWING",
+        },
+      };
+    } else if (action.type === "modifyPlayers") {
+      if (state.stage !== "setup") {
+        const activeStagePlayers = z
+          .array(activeStagePlayerSchema)
+          .safeParse(action.payload);
+        if (!activeStagePlayers.success) {
+          throw new Error(
+            "Cannot modify players to be setup stage players when game is not in setup stage"
+          );
+        }
+
+        return {
+          ...state,
+          players: activeStagePlayers.data,
+        };
       }
 
       return {
         ...state,
-        players: activeStagePlayers.data,
+        players: action.payload,
       };
     }
+  }
 
-    return {
-      ...state,
-      players: action.payload,
-    };
+  const setupStageAction = setupActionSchema.safeParse(_action);
+  if (setupStageAction.success) {
+    if (state.stage !== "setup") {
+      throw new Error(
+        `Cannot perform setup stage action ${setupStageAction.data.type} when game is not in setup stage`
+      );
+    }
+    return gameStateSetupReducer(state, setupStageAction.data);
   }
-  switch (action.stage) {
-    case "setup":
-      if (state.stage !== "setup") {
-        throw new Error(
-          `Cannot perform action ${action.type} when game is not in setup stage`
-        );
-      }
-      return gameStateSetupReducer(state, action);
-    case "active":
-      if (state.stage !== "active") {
-        throw new Error(
-          `Cannot perform action ${action.type} when game is not in active stage`
-        );
-      }
-      return gameStateActiveReducer(state, action);
-    case "finished":
-      if (state.stage !== "finished") {
-        throw new Error(
-          `Cannot perform action ${action.type} when game is not in finished stage`
-        );
-      }
-      return gameStateFinishedReducer(state, action);
+
+  const activeStageAction = activeActionSchema.safeParse(_action);
+  if (activeStageAction.success) {
+    if (state.stage !== "active") {
+      throw new Error(
+        `Cannot perform active stage action ${activeStageAction.data.type} when game is not in active stage`
+      );
+    }
+    return gameStateActiveReducer(state, activeStageAction.data);
   }
+
+  const finishedStageAction = finishedActionSchema.safeParse(_action);
+  if (finishedStageAction.success) {
+    if (state.stage !== "finished") {
+      throw new Error(
+        `Cannot perform finished stage action ${finishedStageAction.data.type} when game is not in finished stage`
+      );
+    }
+    return gameStateFinishedReducer(state, finishedStageAction.data);
+  }
+
+  throw new Error("Unreachable");
 }
 
 export function calculateVotesRequired(game: Game): number {
@@ -663,34 +664,29 @@ export const getActions = (
   addPlayer: (payload) => {
     dispatch({
       type: "addPlayer",
-      stage: "setup",
       payload,
     });
   },
   removePlayer: (payload) => {
     dispatch({
       type: "removePlayer",
-      stage: "setup",
       payload,
     });
   },
   changeSettings: (payload) => {
     dispatch({
       type: "changeSettings",
-      stage: "setup",
       payload,
     });
   },
   stageTransitionToActive: () => {
     dispatch({
       type: "stageTransitionToActive",
-      stage: "setup",
     });
   },
   cancelNomination: () => {
     dispatch({
       type: "cancelNomination",
-      stage: "active",
     });
   },
   modifyPlayers: (payload) => {
@@ -702,13 +698,11 @@ export const getActions = (
   phaseTransitionToDay: () => {
     dispatch({
       type: "phaseTransitionToDay",
-      stage: "active",
     });
   },
   phaseTransitionToNight: () => {
     dispatch({
       type: "phaseTransitionToNight",
-      stage: "active",
     });
   },
   replaceState: (payload) => {
@@ -725,54 +719,46 @@ export const getActions = (
   resolveVote: () => {
     dispatch({
       type: "resolveVote",
-      stage: "active",
     });
   },
   revealAllPlayers: () => {
     dispatch({
       type: "revealAllPlayers",
-      stage: "finished",
     });
   },
   revealPlayer: (payload) => {
     dispatch({
       type: "revealPlayer",
-      stage: "finished",
       payload,
     });
   },
   setNominator: (payload) => {
     dispatch({
       type: "setNominator",
-      stage: "active",
       payload,
     });
   },
   setNominee: (payload) => {
     dispatch({
       type: "setNominee",
-      stage: "active",
       payload,
     });
   },
   stageTransitionToFinished: (payload) => {
     dispatch({
       type: "stageTransitionToFinished",
-      stage: "active",
       payload,
     });
   },
   togglePlayerAliveStatus: (payload) => {
     dispatch({
       type: "togglePlayerAliveStatus",
-      stage: "active",
       payload,
     });
   },
   toggleVote: (payload) => {
     dispatch({
       type: "toggleVote",
-      stage: "active",
       payload,
     });
   },
