@@ -45,8 +45,10 @@ import { useAtom } from "jotai";
 import {
   deathRemindersAtom,
   gameIdAtom,
+  interactiveAtom,
   storyTellerModeAtom,
 } from "./settingsAtoms";
+import LoadingModal from "./components/LoadingModal";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -80,6 +82,7 @@ function App() {
   const [gameId] = useAtom(gameIdAtom);
   const [storyTellerMode] = useAtom(storyTellerModeAtom);
   const [deathReminders, setDeathReminders] = useAtom(deathRemindersAtom);
+  const [interactive, setInteractive] = useAtom(interactiveAtom);
 
   useEffect(() => {
     const unsub = client.onGameAction.subscribe(
@@ -88,6 +91,11 @@ function App() {
         onData: (data) => {
           console.log("Got server state and action", data);
           _dispatch({ type: "replaceState", payload: data.game });
+
+          if (!interactive) {
+            setInteractive(true);
+          }
+
           semaphore.unlock();
         },
         onError: (err) => {
@@ -98,7 +106,7 @@ function App() {
     return () => {
       unsub.unsubscribe();
     };
-  }, [gameId]);
+  }, [gameId, interactive, setInteractive]);
 
   const [game, _dispatch] = useReducer(gameStateReducer, initialGameState);
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
@@ -117,15 +125,24 @@ function App() {
 
   const dispatch = useCallback(
     async (action: GameAction) => {
+      if (!interactive) {
+        return;
+      }
       await semaphore.lock;
       console.log("Dispatching action", action);
-      _dispatch(action);
-      client.gameAction.mutate({ gameId, action });
-      semaphore.lock = new Promise((resolve) => {
-        semaphore.unlock = resolve;
-      });
+
+      try {
+        await client.gameAction.mutate({ gameId, action });
+        _dispatch(action);
+
+        semaphore.lock = new Promise((resolve) => {
+          semaphore.unlock = resolve;
+        });
+      } catch (e) {
+        console.error(e);
+      }
     },
-    [gameId]
+    [gameId, interactive]
   );
 
   const nomination = isDay(game)
@@ -327,6 +344,7 @@ function App() {
 
   return (
     <div className="App">
+      {!interactive && <LoadingModal />}
       {isEditionModalOpen && (
         <EditionModal
           onClose={() => setIsEditionModalOpen(false)}
