@@ -23,8 +23,6 @@ const SoundButton: React.FC = () => {
 
   setGlobalVolume(volume);
 
-  console.log(volume > 0 ? "SOUND IS ON" : "OFFFFF");
-
   const handleClick = () => {
     setVolume(volume > 0 ? 0 : 1);
   };
