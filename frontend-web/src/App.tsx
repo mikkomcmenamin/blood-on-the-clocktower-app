@@ -132,11 +132,10 @@ function App() {
       console.log("Dispatching action", action);
 
       try {
-        await client.gameAction.mutate({ gameId, action });
-
         semaphore.lock = new Promise((resolve) => {
           semaphore.unlock = resolve;
         });
+        await client.gameAction.mutate({ gameId, action });
       } catch (e) {
         console.error(e);
       }
