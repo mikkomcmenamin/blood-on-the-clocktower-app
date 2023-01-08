@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { keyframes } from "styled-components";
 import { useAtom } from "jotai";
-import { videoAtom } from "../settingsAtoms";
+import { videoAtom } from "../atoms/settingsAtoms";
 
 const Video = styled.video<{ fadeIn: boolean }>`
   position: fixed;

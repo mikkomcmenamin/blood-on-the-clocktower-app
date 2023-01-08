@@ -4,7 +4,7 @@ import SoundButtonOn from "../../assets/T_SoundButtonOn.png";
 import SoundButtonOff from "../../assets/T_SoundButtonOff.png";
 import { useAtom } from "jotai";
 import { setGlobalVolume } from "../soundManager";
-import { soundVolumeAtom } from "../../settingsAtoms";
+import { soundVolumeAtom } from "../../atoms/settingsAtoms";
 
 type ButtonProps = {
   isOn: boolean;

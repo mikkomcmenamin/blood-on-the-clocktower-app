@@ -1,12 +1,6 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { createTRPCProxyClient, createWSClient, wsLink } from "@trpc/client";
-import type { AppRouter } from "@common/router";
+import { useEffect, useRef, useState } from "react";
 import "./App.scss";
-import {
-  createSetupStagePlayer,
-  initialGameState,
-  Player,
-} from "@common/model";
+import { createSetupStagePlayer, Player } from "@common/model";
 import {
   useClickOutside,
   useDeclarativeSoundPlayer,
@@ -18,8 +12,6 @@ import Background from "./components/Background";
 import GameBoard from "./components/GameBoard/GameBoard";
 import {
   calculateVotesRequired,
-  GameAction,
-  gameStateReducer,
   isActiveNomination,
   isDay,
   isFinished,
@@ -32,7 +24,6 @@ import {
 import Menu from "./components/Menu/Menu";
 import InfoPanel from "./components/InfoPanel";
 import VideoAnimation from "./components/VideoAnimation";
-//import ReaperVideo from "./assets/V_Reaper.mp4";
 import NightToDay from "./assets/V_NightToDay.webm";
 import DayToNight from "./assets/V_DayToNight.webm";
 import AddPlayerModal from "./components/Player/AddPlayerModal";
@@ -41,28 +32,17 @@ import VotingRoundModal, {
   VotingRoundState,
 } from "./components/Player/VotingRoundModal";
 import EditionModal from "./components/Menu/EditionModal";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
+import { deathRemindersAtom, storyTellerModeAtom } from "./atoms/settingsAtoms";
+import LoadingModal from "./components/LoadingModal";
 import {
-  deathRemindersAtom,
+  dispatchAtom,
+  gameAtom,
   gameIdAtom,
   interactiveAtom,
-  storyTellerModeAtom,
-} from "./settingsAtoms";
-import LoadingModal from "./components/LoadingModal";
-
-// create persistent WebSocket connection
-const wsClient = createWSClient({
-  url:
-    import.meta.env.VITE_BACKEND_URL ?? `ws://${window.location.hostname}:2022`,
-});
-// configure TRPCClient to use WebSockets transport
-const client = createTRPCProxyClient<AppRouter>({
-  links: [
-    wsLink({
-      client: wsClient,
-    }),
-  ],
-});
+  nominationAtom,
+} from "./atoms/gameAtoms";
+import { client, semaphore } from "./networking";
 
 type PlayerContextMenuState =
   | {
@@ -73,16 +53,15 @@ type PlayerContextMenuState =
       playerId: number;
     };
 
-const semaphore = {
-  lock: Promise.resolve(),
-  unlock: () => {},
-};
-
 function App() {
   const [gameId] = useAtom(gameIdAtom);
   const [storyTellerMode] = useAtom(storyTellerModeAtom);
   const [deathReminders, setDeathReminders] = useAtom(deathRemindersAtom);
   const [interactive, setInteractive] = useAtom(interactiveAtom);
+
+  const [game, setGame] = useAtom(gameAtom);
+  const [nomination] = useAtom(nominationAtom);
+  const dispatch = useAtomValue(dispatchAtom);
 
   useEffect(() => {
     const unsub = client.onGameAction.subscribe(
@@ -90,7 +69,7 @@ function App() {
       {
         onData: (data) => {
           console.log("Got server state and action", data);
-          _dispatch({ type: "replaceState", payload: data.game });
+          setGame(data.game);
 
           if (!interactive) {
             setInteractive(true);
@@ -108,7 +87,6 @@ function App() {
     };
   }, [gameId, interactive, setInteractive]);
 
-  const [game, _dispatch] = useReducer(gameStateReducer, initialGameState);
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
   const [playerContextMenuOpen, setPlayerContextMenuOpen] =
     useState<PlayerContextMenuState>({ open: false });
@@ -122,31 +100,6 @@ function App() {
   useClickOutside(contextMenuRef, () =>
     setPlayerContextMenuOpen({ open: false })
   );
-
-  const dispatch = useCallback(
-    async (action: GameAction) => {
-      if (!interactive) {
-        return;
-      }
-      await semaphore.lock;
-      console.log("Dispatching action", action);
-
-      try {
-        semaphore.lock = new Promise((resolve) => {
-          semaphore.unlock = resolve;
-        });
-        await client.gameAction.mutate({ gameId, action });
-      } catch (e) {
-        console.error(e);
-        semaphore.unlock();
-      }
-    },
-    [gameId, interactive]
-  );
-
-  const nomination = isDay(game)
-    ? game.phase.nomination
-    : { state: "inactive" as const };
 
   useHandlePlayerCountChangeUIEffects(game.players);
   useHandleNominationUIEffects(nomination, game.players);
@@ -364,7 +317,6 @@ function App() {
       </InfoPanel>
       <Background phase={backgroundPhase} />
       <GameBoard
-        game={game}
         onSelectPlayer={handleSelectPlayer}
         onModifyPlayers={(players) => {
           dispatch({
@@ -407,8 +359,6 @@ function App() {
         onChooseEditionClick={() => {
           setIsEditionModalOpen(true);
         }}
-        game={game}
-        dispatch={dispatch}
       />
       {isAddPlayerModalOpen && (
         <AddPlayerModal
@@ -440,14 +390,12 @@ function App() {
           }}
           onClose={() => setPlayerContextMenuOpen({ open: false })}
           playerId={playerContextMenuOpen.playerId}
-          game={game}
           modalRef={contextMenuRef}
         />
       )}
       {votingRoundState.open && game.stage === "active" && (
         <VotingRoundModal
           votingRoundState={votingRoundState}
-          game={game}
           onClose={() => {
             if (isActiveNomination(game)) {
               dispatch({ type: "cancelNomination", stage: "active" });

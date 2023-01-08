@@ -1,5 +1,5 @@
 import { getCharactersInPlay, isSetup } from "@common/gameLogic";
-import { Game, Player } from "@common/model";
+import { Player } from "@common/model";
 import Modal, { ModalProps } from "../Modal";
 import styles from "./PlayerContextMenuModal.module.scss";
 import {
@@ -10,10 +10,11 @@ import {
 import { classnames } from "@common/util";
 import { CHARACTER_IMAGES } from "../../assets/characters/characterImages";
 import Button from "../Reusable/Button";
+import { useAtomValue } from "jotai";
+import { gameAtom } from "../../atoms/gameAtoms";
 
 type Props = Omit<ModalProps, "children"> & {
   playerId: number;
-  game: Game;
   onKillOrResurrect: (playerId: number) => void;
   onModifyPlayer: (player: Player) => void;
   onRemovePlayer: (playerId: number) => void;
@@ -37,13 +38,13 @@ const PlayerIconContainer: React.FC<PlayerIconContainerProps> = ({
 
 const PlayerContextMenuModal: React.FC<Props> = ({
   playerId,
-  game,
   onKillOrResurrect,
   onClose,
   onModifyPlayer,
   onRemovePlayer,
   modalRef,
 }) => {
+  const game = useAtomValue(gameAtom);
   const player = game.players.find((p) => p.id === playerId);
 
   if (!player) {

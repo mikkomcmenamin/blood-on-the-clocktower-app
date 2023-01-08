@@ -17,7 +17,10 @@ import ghostVoteIcon from "../../assets/T_GhostVote.png";
 import { CHARACTER_IMAGES } from "../../assets/characters/characterImages";
 import { Character } from "@common/editions/editions";
 import { useAtom } from "jotai";
-import { deathRemindersAtom, storyTellerModeAtom } from "../../settingsAtoms";
+import {
+  deathRemindersAtom,
+  storyTellerModeAtom,
+} from "../../atoms/settingsAtoms";
 
 type PlayerIconProps = {
   key: number;

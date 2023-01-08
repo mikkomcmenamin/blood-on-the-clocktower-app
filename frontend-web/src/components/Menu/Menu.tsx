@@ -1,8 +1,6 @@
 import React from "react";
-import { Game } from "@common/model";
 import {
   canTransitionToNight,
-  GameAction,
   gameCanBeStarted,
   isActiveNomination,
   isDay,
@@ -15,30 +13,29 @@ import SoundButton from "./SoundButton";
 import { classnames } from "@common/util";
 import FinishGameModal from "./FinishGameModal";
 import ErrorRecoveryMenuModal from "./ErrorRecoveryMenuModal";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   soundVolumeAtom,
   storyTellerModeAtom,
   videoAtom,
-} from "../../settingsAtoms";
+} from "../../atoms/settingsAtoms";
+import { dispatchAtom, gameAtom } from "../../atoms/gameAtoms";
 
 type Props = {
-  game: Game;
-  dispatch: (action: GameAction) => void;
   votingRoundState: VotingRoundState;
   onStartVotingRound: () => void;
   onChooseEditionClick: () => void;
 };
 
 const Menu: React.FC<Props> = ({
-  game,
-  dispatch,
   votingRoundState,
   onStartVotingRound,
   onChooseEditionClick,
 }) => {
-  const [, setVideo] = useAtom(videoAtom);
-  const [, setSoundVolume] = useAtom(soundVolumeAtom);
+  const game = useAtomValue(gameAtom);
+  const dispatch = useAtomValue(dispatchAtom);
+  const setVideo = useSetAtom(videoAtom);
+  const setSoundVolume = useSetAtom(soundVolumeAtom);
   const [storyTellerMode, setStoryTellerMode] = useAtom(storyTellerModeAtom);
 
   const [finishGameModalOpen, setFinishGameModalOpen] = React.useState(false);

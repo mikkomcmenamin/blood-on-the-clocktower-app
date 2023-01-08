@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Game, Player } from "@common/model";
+import { Player } from "@common/model";
 import { classnames } from "@common/util";
 import PlayerIcon from "../Player/PlayerIcon";
 
@@ -13,9 +13,10 @@ import {
   isPendingNomination,
   isSetup,
 } from "@common/gameLogic";
+import { useAtomValue } from "jotai";
+import { gameAtom } from "../../atoms/gameAtoms";
 
 type GameBoardProps = {
-  game: Game;
   onSelectPlayer: (playerId: number) => void;
   onModifyPlayers: (players: Player[]) => void;
   onCancelNomination: () => void;
@@ -24,13 +25,13 @@ type GameBoardProps = {
 };
 
 const GameBoard: React.FC<GameBoardProps> = ({
-  game,
   onSelectPlayer,
   onModifyPlayers,
   onCancelNomination,
   onToggleContextMenu,
   onAddPlayerButtonClick,
 }) => {
+  const game = useAtomValue(gameAtom);
   const gameBoardRef = useRef<HTMLDivElement>(null);
 
   const showMinuteHand = isActiveNomination(game);

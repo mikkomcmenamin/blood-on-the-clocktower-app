@@ -1,7 +1,8 @@
 import { playerCanVote } from "@common/gameLogic";
-import { Game } from "@common/model";
 import { classnames } from "@common/util";
+import { useAtomValue } from "jotai";
 import React from "react";
+import { gameAtom } from "../../atoms/gameAtoms";
 import Modal from "../Modal";
 import styles from "./VotingRoundModal.module.scss";
 
@@ -19,7 +20,6 @@ type Props = {
   onClose: () => void;
   modalRef: React.RefObject<HTMLDivElement>;
   votingRoundState: VotingRoundState;
-  game: Extract<Game, { stage: "active" }>;
   onVoted: (voted: boolean) => void;
 };
 
@@ -27,9 +27,10 @@ const VotingRoundModal: React.FC<Props> = ({
   onClose,
   modalRef,
   votingRoundState,
-  game,
   onVoted,
 }) => {
+  const game = useAtomValue(gameAtom);
+
   // onclick, set the .clicked class to the button that was clicked
   // and timeout to remove it later. This is for animation purposes.
   const onClick = (
