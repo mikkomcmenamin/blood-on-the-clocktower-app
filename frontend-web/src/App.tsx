@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { createTRPCProxyClient, createWSClient, wsLink } from "@trpc/client";
 import type { AppRouter } from "@common/router";
 import "./App.scss";
@@ -43,12 +36,17 @@ import VideoAnimation from "./components/VideoAnimation";
 import NightToDay from "./assets/V_NightToDay.webm";
 import DayToNight from "./assets/V_DayToNight.webm";
 import AddPlayerModal from "./components/Player/AddPlayerModal";
-import { AppContext } from "./context";
 import PlayerContextMenuModal from "./components/Player/PlayerContextMenuModal";
 import VotingRoundModal, {
   VotingRoundState,
 } from "./components/Player/VotingRoundModal";
 import EditionModal from "./components/Menu/EditionModal";
+import { useAtom } from "jotai";
+import {
+  deathRemindersAtom,
+  gameIdAtom,
+  storyTellerModeAtom,
+} from "./settingsAtoms";
 
 // create persistent WebSocket connection
 const wsClient = createWSClient({
@@ -79,8 +77,9 @@ const semaphore = {
 };
 
 function App() {
-  const globals = useContext(AppContext);
-  const gameId = globals.value.gameId;
+  const [gameId] = useAtom(gameIdAtom);
+  const [storyTellerMode] = useAtom(storyTellerModeAtom);
+  const [deathReminders, setDeathReminders] = useAtom(deathRemindersAtom);
 
   useEffect(() => {
     const unsub = client.onGameAction.subscribe(
@@ -167,7 +166,7 @@ function App() {
   function startVotingRound() {
     if (
       !isActiveNomination(game) ||
-      !globals.value.storytellerMode ||
+      !storyTellerMode ||
       votingRoundState.open
     ) {
       return;
@@ -272,21 +271,16 @@ function App() {
   }
 
   function toggleDeathReminder(playerId: number, onState?: boolean) {
-    if (!globals.value.storytellerMode) {
+    if (!storyTellerMode) {
       return;
     }
-
-    const deathReminders = globals.value.deathReminders;
 
     const updatedDeathReminders =
       onState ?? !deathReminders.includes(playerId)
         ? [...deathReminders, playerId]
         : deathReminders.filter((id) => id !== playerId);
 
-    globals.setValue({
-      ...globals.value,
-      deathReminders: updatedDeathReminders,
-    });
+    setDeathReminders(updatedDeathReminders);
   }
 
   function handleSelectPlayer(playerId: number) {
@@ -499,8 +493,8 @@ function App() {
           }
         </div>
       )}
-      {isNight(game) && <VideoAnimation src={DayToNight} type="video/webm" />}
-      {isDay(game) && <VideoAnimation src={NightToDay} type="video/webm" />}
+      {isNight(game) && <VideoAnimation src={DayToNight} />}
+      {isDay(game) && <VideoAnimation src={NightToDay} />}
     </div>
   );
 }

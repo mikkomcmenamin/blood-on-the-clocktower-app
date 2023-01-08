@@ -1,19 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { AppContext, Context, initialCtxValue } from "./context";
 import "./index.css";
-import { setGlobalVolume } from "./components/soundManager";
+import { Provider } from "jotai";
 
 const ContextAwareApp: React.FC = () => {
-  const [value, setValue] = React.useState<Context>(initialCtxValue);
-
-  setGlobalVolume(value.soundVolume);
-
   return (
-    <AppContext.Provider value={{ value, setValue }}>
+    <Provider>
       <App />
-    </AppContext.Provider>
+    </Provider>
   );
 };
 

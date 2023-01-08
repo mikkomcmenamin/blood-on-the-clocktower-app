@@ -1,3 +1,4 @@
+import React, { useRef, useEffect } from "react";
 import {
   isActiveNomination,
   isInactiveNomination,
@@ -10,13 +11,13 @@ import {
 } from "@common/gameLogic";
 import { ActiveStagePlayer, Game, Player } from "@common/model";
 import { classnames } from "@common/util";
-import { useContext, useEffect, useRef } from "react";
-import { AppContext } from "../../context";
 import { usePressDurationDependentHandlers } from "../../hooks";
 import styles from "./PlayerIcon.module.scss";
 import ghostVoteIcon from "../../assets/T_GhostVote.png";
 import { CHARACTER_IMAGES } from "../../assets/characters/characterImages";
 import { Character } from "@common/editions/editions";
+import { useAtom } from "jotai";
+import { deathRemindersAtom, storyTellerModeAtom } from "../../settingsAtoms";
 
 type PlayerIconProps = {
   key: number;
@@ -34,7 +35,8 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
   onToggleContextMenu,
   conditionalShow,
 }) => {
-  const globals = useContext(AppContext);
+  const [storytellerMode] = useAtom(storyTellerModeAtom);
+  const [deathReminders] = useAtom(deathRemindersAtom);
 
   const votingDisabled =
     isActiveNomination(game) &&
@@ -54,9 +56,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
   const isDead = "alive" in player && !player.alive;
 
   const showDeathReminder =
-    !isDead &&
-    globals.value.storytellerMode &&
-    globals.value.deathReminders.includes(player.id);
+    !isDead && storytellerMode && deathReminders.includes(player.id);
 
   const hasGhostVote =
     isActiveNomination(game) &&
@@ -95,7 +95,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
       conditionalShow &&
       playerIconRef.current &&
       player.character &&
-      (globals.value.storytellerMode || gameIsFinishedAndShouldRevealCharacter);
+      (storytellerMode || gameIsFinishedAndShouldRevealCharacter);
     if (shouldRevealCharacter) {
       playerIconRef.current.style.setProperty(
         "--character-image-url",
@@ -111,7 +111,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({
     conditionalShow,
     playerIconRef,
     player.character,
-    globals.value.storytellerMode,
+    storytellerMode,
     game,
     player.id,
   ]);

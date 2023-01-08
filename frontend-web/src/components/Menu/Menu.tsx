@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Game } from "@common/model";
 import {
   canTransitionToNight,
@@ -8,7 +8,6 @@ import {
   isDay,
   isNight,
 } from "@common/gameLogic";
-import { AppContext } from "../../context";
 import type { VotingRoundState } from "../Player/VotingRoundModal";
 import styles from "./Menu.module.scss";
 import SettingsButton from "./SettingsButton";
@@ -16,6 +15,12 @@ import SoundButton from "./SoundButton";
 import { classnames } from "@common/util";
 import FinishGameModal from "./FinishGameModal";
 import ErrorRecoveryMenuModal from "./ErrorRecoveryMenuModal";
+import { useAtom } from "jotai";
+import {
+  soundVolumeAtom,
+  storyTellerModeAtom,
+  videoAtom,
+} from "../../settingsAtoms";
 
 type Props = {
   game: Game;
@@ -32,7 +37,9 @@ const Menu: React.FC<Props> = ({
   onStartVotingRound,
   onChooseEditionClick,
 }) => {
-  const globals = useContext(AppContext);
+  const [, setVideo] = useAtom(videoAtom);
+  const [, setSoundVolume] = useAtom(soundVolumeAtom);
+  const [storyTellerMode, setStoryTellerMode] = useAtom(storyTellerModeAtom);
 
   const [finishGameModalOpen, setFinishGameModalOpen] = React.useState(false);
   const [errorRecoveryMenuModalOpen, setErrorRecoveryMenuModalOpen] =
@@ -177,17 +184,12 @@ const Menu: React.FC<Props> = ({
             onClick={(e) => {
               // toggle storyteller mode
               e.preventDefault();
-              globals.setValue({
-                ...globals.value,
-                storytellerMode: !globals.value.storytellerMode,
-                soundVolume: globals.value.storytellerMode ? 1 : 0,
-                video: globals.value.storytellerMode,
-              });
+              setStoryTellerMode(!storyTellerMode);
+              setSoundVolume(storyTellerMode ? 1 : 0);
+              setVideo(storyTellerMode);
             }}
           >
-            {globals.value.storytellerMode
-              ? "Disable ST mode"
-              : "Enable ST mode"}
+            {storyTellerMode ? "Disable ST mode" : "Enable ST mode"}
           </button>
         </div>
       </nav>

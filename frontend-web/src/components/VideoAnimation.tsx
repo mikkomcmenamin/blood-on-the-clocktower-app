@@ -1,7 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { AppContext } from "../context";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { keyframes } from "styled-components";
+import { useAtom } from "jotai";
+import { videoAtom } from "../settingsAtoms";
 
 const Video = styled.video<{ fadeIn: boolean }>`
   position: fixed;
@@ -33,22 +34,17 @@ const Video = styled.video<{ fadeIn: boolean }>`
 
 type VideoAnimationProps = {
   src: string;
-  type?: string;
 };
 
-const VideoAnimation: React.FC<VideoAnimationProps> = ({
-  src,
-  type = "video/mp4",
-}) => {
+const VideoAnimation: React.FC<VideoAnimationProps> = ({ src }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isEnding, setIsEnding] = useState(false);
   const [hide, setHide] = useState(false);
   const [metadataLoaded, setMetadataLoaded] = useState(false);
-
-  const globals = useContext(AppContext);
+  const [video] = useAtom(videoAtom);
 
   useEffect(() => {
-    if (!globals.value.video) {
+    if (!video) {
       setHide(true);
       return;
     }
@@ -66,7 +62,7 @@ const VideoAnimation: React.FC<VideoAnimationProps> = ({
     return () => {
       current.removeEventListener("loadedmetadata", ready);
     };
-  }, [videoRef, globals.value.video, setMetadataLoaded]);
+  }, [videoRef, video, setMetadataLoaded]);
 
   useEffect(() => {
     if (videoRef.current && metadataLoaded) {
@@ -90,7 +86,7 @@ const VideoAnimation: React.FC<VideoAnimationProps> = ({
 
   return hide ? null : (
     <Video fadeIn={!isEnding} ref={videoRef} playsInline>
-      <source src={src} type={type}></source>
+      <source src={src} type="video/webm"></source>
     </Video>
   );
 };

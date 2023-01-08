@@ -1,8 +1,10 @@
-import React, { useContext } from "react";
-import { AppContext } from "../../context";
+import React from "react";
 import styled from "styled-components";
 import SoundButtonOn from "../../assets/T_SoundButtonOn.png";
 import SoundButtonOff from "../../assets/T_SoundButtonOff.png";
+import { useAtom } from "jotai";
+import { setGlobalVolume } from "../soundManager";
+import { soundVolumeAtom } from "../../settingsAtoms";
 
 type ButtonProps = {
   isOn: boolean;
@@ -17,18 +19,19 @@ const Button = styled.button<ButtonProps>`
 `;
 
 const SoundButton: React.FC = () => {
-  const globals = useContext(AppContext);
+  const [volume, setVolume] = useAtom(soundVolumeAtom);
+
+  setGlobalVolume(volume);
+
+  console.log(volume > 0 ? "SOUND IS ON" : "OFFFFF");
 
   const handleClick = () => {
-    globals.setValue({
-      ...globals.value,
-      soundVolume: globals.value.soundVolume > 0 ? 0 : 1,
-    });
+    setVolume(volume > 0 ? 0 : 1);
   };
 
   return (
     <Button
-      isOn={globals.value.soundVolume > 0}
+      isOn={volume > 0}
       onClick={(e) => {
         e.preventDefault();
         handleClick();

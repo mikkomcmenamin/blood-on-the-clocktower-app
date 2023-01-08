@@ -15,7 +15,6 @@ import Vote from "../assets/sounds/S_Vote.mp3";
 import Triumph from "../assets/sounds/S_Triumph.mp3";
 import TriumphEvil from "../assets/sounds/S_TriumphEvil.mp3";
 import VoteCountdown from "../assets/sounds/S_VoteCountdown.mp3";
-import { soundVolume } from "src/context";
 
 const SOUNDS = {
   nightloop: new Audio(NightLoop),
@@ -52,7 +51,7 @@ const isPlaying = (a: HTMLAudioElement) => !a.paused;
 const noop = () => {};
 
 let globalVolume = 1;
-export function setGlobalVolume(volume: soundVolume) {
+export function setGlobalVolume(volume: number) {
   globalVolume = volume;
   changeVolumeForAllSounds();
 }
