@@ -138,6 +138,7 @@ function App() {
         await client.gameAction.mutate({ gameId, action });
       } catch (e) {
         console.error(e);
+        semaphore.unlock();
       }
     },
     [gameId, interactive]
