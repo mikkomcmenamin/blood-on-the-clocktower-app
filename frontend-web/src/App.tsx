@@ -133,7 +133,6 @@ function App() {
 
       try {
         await client.gameAction.mutate({ gameId, action });
-        _dispatch(action);
 
         semaphore.lock = new Promise((resolve) => {
           semaphore.unlock = resolve;
