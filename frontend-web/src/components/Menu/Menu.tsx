@@ -19,7 +19,7 @@ import {
   storyTellerModeAtom,
   videoAtom,
 } from "../../atoms/settingsAtoms";
-import { dispatchAtom, gameAtom } from "../../atoms/gameAtoms";
+import { actionsAtom, gameAtom } from "../../atoms/gameAtoms";
 
 type Props = {
   votingRoundState: VotingRoundState;
@@ -33,7 +33,7 @@ const Menu: React.FC<Props> = ({
   onChooseEditionClick,
 }) => {
   const game = useAtomValue(gameAtom);
-  const dispatch = useAtomValue(dispatchAtom);
+  const actions = useAtomValue(actionsAtom);
   const setVideo = useSetAtom(videoAtom);
   const setSoundVolume = useSetAtom(soundVolumeAtom);
   const [storyTellerMode, setStoryTellerMode] = useAtom(storyTellerModeAtom);
@@ -59,10 +59,7 @@ const Menu: React.FC<Props> = ({
   return (
     <>
       {finishGameModalOpen && (
-        <FinishGameModal
-          dispatch={dispatch}
-          onClose={() => setFinishGameModalOpen(false)}
-        />
+        <FinishGameModal onClose={() => setFinishGameModalOpen(false)} />
       )}
       <nav
         className={classnames({
@@ -89,7 +86,7 @@ const Menu: React.FC<Props> = ({
             <button
               onClick={(e) => {
                 e.preventDefault();
-                dispatch({ type: "stageTransitionToActive", stage: "setup" });
+                actions.stageTransitionToActive();
                 toggleFullscreen(true);
               }}
             >
@@ -122,7 +119,6 @@ const Menu: React.FC<Props> = ({
             errorRecoveryMenuModalOpen && (
               <ErrorRecoveryMenuModal
                 onClose={() => setErrorRecoveryMenuModalOpen(false)}
-                dispatch={dispatch}
                 game={game}
               />
             )}
@@ -140,7 +136,7 @@ const Menu: React.FC<Props> = ({
             <button
               onClick={(e) => {
                 e.preventDefault();
-                dispatch({ type: "phaseTransitionToNight", stage: "active" });
+                actions.phaseTransitionToNight();
               }}
             >
               Transition to night
@@ -150,7 +146,7 @@ const Menu: React.FC<Props> = ({
             <button
               onClick={(e) => {
                 e.preventDefault();
-                dispatch({ type: "phaseTransitionToDay", stage: "active" });
+                actions.phaseTransitionToDay();
               }}
             >
               Transition to day
@@ -160,7 +156,7 @@ const Menu: React.FC<Props> = ({
             <button
               onClick={(e) => {
                 e.preventDefault();
-                dispatch({ type: "resolveVote", stage: "active" });
+                actions.resolveVote();
               }}
             >
               Resolve vote
@@ -170,7 +166,7 @@ const Menu: React.FC<Props> = ({
             <button
               onClick={(e) => {
                 e.preventDefault();
-                dispatch({ type: "resetToSetup" });
+                actions.resetToSetup();
                 toggleFullscreen(false);
               }}
             >

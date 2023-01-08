@@ -1,15 +1,17 @@
-import { GameAction, isDay } from "@common/gameLogic";
+import { isDay } from "@common/gameLogic";
 import { Game } from "@common/model";
+import { useAtomValue } from "jotai";
 import { useState } from "react";
+import { actionsAtom } from "src/atoms/gameAtoms";
 import { usePrevious } from "../../hooks";
 import Modal from "../Modal";
 import styles from "./ErrorRecoveryMenuModal.module.scss";
 
 const ErrorRecoveryMenuModal: React.FC<{
-  dispatch: (action: GameAction) => void;
   onClose: () => void;
   game: Extract<Game, { stage: "active" }>;
-}> = ({ dispatch, onClose, game }) => {
+}> = ({ onClose, game }) => {
+  const actions = useAtomValue(actionsAtom);
   const [onTheBlockForm, setOnTheBlockForm] = useState<{
     playerId: number;
     votes: number;
@@ -21,17 +23,14 @@ const ErrorRecoveryMenuModal: React.FC<{
 
   if (onTheBlockForm !== previousFormState) {
     const { onTheBlock: _, ...rest } = game.phase;
-    dispatch({
-      type: "replaceState",
-      payload: {
-        ...game,
-        phase: onTheBlockForm
-          ? {
-              ...game.phase,
-              onTheBlock: onTheBlockForm,
-            }
-          : rest,
-      },
+    actions.replaceState({
+      ...game,
+      phase: onTheBlockForm
+        ? {
+            ...game.phase,
+            onTheBlock: onTheBlockForm,
+          }
+        : rest,
     });
   }
 
@@ -55,24 +54,21 @@ const ErrorRecoveryMenuModal: React.FC<{
                     // typescript doesnt get it
                     if (game.phase.phase !== "day") return null;
                     const toggleState = e.target.checked;
-                    dispatch({
-                      type: "replaceState",
-                      payload: {
-                        ...game,
-                        phase: {
-                          ...game.phase,
-                          nominationBookkeeping: {
-                            ...game.phase.nominationBookkeeping,
-                            hasNominated: toggleState
-                              ? [
-                                  ...game.phase.nominationBookkeeping
-                                    .hasNominated,
-                                  player.id,
-                                ]
-                              : game.phase.nominationBookkeeping.hasNominated.filter(
-                                  (id) => id !== player.id
-                                ),
-                          },
+                    actions.replaceState({
+                      ...game,
+                      phase: {
+                        ...game.phase,
+                        nominationBookkeeping: {
+                          ...game.phase.nominationBookkeeping,
+                          hasNominated: toggleState
+                            ? [
+                                ...game.phase.nominationBookkeeping
+                                  .hasNominated,
+                                player.id,
+                              ]
+                            : game.phase.nominationBookkeeping.hasNominated.filter(
+                                (id) => id !== player.id
+                              ),
                         },
                       },
                     });
@@ -90,24 +86,21 @@ const ErrorRecoveryMenuModal: React.FC<{
                     // typescript doesnt get it
                     if (game.phase.phase !== "day") return null;
                     const toggleState = e.target.checked;
-                    dispatch({
-                      type: "replaceState",
-                      payload: {
-                        ...game,
-                        phase: {
-                          ...game.phase,
-                          nominationBookkeeping: {
-                            ...game.phase.nominationBookkeeping,
-                            hasBeenNominated: toggleState
-                              ? [
-                                  ...game.phase.nominationBookkeeping
-                                    .hasBeenNominated,
-                                  player.id,
-                                ]
-                              : game.phase.nominationBookkeeping.hasBeenNominated.filter(
-                                  (id) => id !== player.id
-                                ),
-                          },
+                    actions.replaceState({
+                      ...game,
+                      phase: {
+                        ...game.phase,
+                        nominationBookkeeping: {
+                          ...game.phase.nominationBookkeeping,
+                          hasBeenNominated: toggleState
+                            ? [
+                                ...game.phase.nominationBookkeeping
+                                  .hasBeenNominated,
+                                player.id,
+                              ]
+                            : game.phase.nominationBookkeeping.hasBeenNominated.filter(
+                                (id) => id !== player.id
+                              ),
                         },
                       },
                     });
@@ -123,25 +116,22 @@ const ErrorRecoveryMenuModal: React.FC<{
                     // typescript doesnt get it
                     if (game.phase.phase !== "day") return null;
                     const setAlive = e.target.checked;
-                    dispatch({
-                      type: "replaceState",
-                      payload: {
-                        ...game,
-                        players: game.players.map((p) =>
-                          p.id === player.id
-                            ? setAlive
-                              ? {
-                                  ...p,
-                                  alive: true as const,
-                                }
-                              : {
-                                  ...p,
-                                  alive: false,
-                                  ghostVote: true,
-                                }
-                            : p
-                        ),
-                      },
+                    actions.replaceState({
+                      ...game,
+                      players: game.players.map((p) =>
+                        p.id === player.id
+                          ? setAlive
+                            ? {
+                                ...p,
+                                alive: true as const,
+                              }
+                            : {
+                                ...p,
+                                alive: false,
+                                ghostVote: true,
+                              }
+                          : p
+                      ),
                     });
                   }}
                 />
@@ -156,19 +146,16 @@ const ErrorRecoveryMenuModal: React.FC<{
                     // typescript doesnt get it
                     if (game.phase.phase !== "day") return null;
                     const setGhostVote = e.target.checked;
-                    dispatch({
-                      type: "replaceState",
-                      payload: {
-                        ...game,
-                        players: game.players.map((p) =>
-                          p.id === player.id
-                            ? {
-                                ...p,
-                                ghostVote: setGhostVote,
-                              }
-                            : p
-                        ),
-                      },
+                    actions.replaceState({
+                      ...game,
+                      players: game.players.map((p) =>
+                        p.id === player.id
+                          ? {
+                              ...p,
+                              ghostVote: setGhostVote,
+                            }
+                          : p
+                      ),
                     });
                   }}
                 />

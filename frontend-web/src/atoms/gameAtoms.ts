@@ -1,6 +1,6 @@
 import { Game, initialGameState, Nomination } from "@common/model";
 import { atom } from "jotai";
-import { GameAction, isDay, isNight } from "@common/gameLogic";
+import { GameAction, getActions, isDay, isNight } from "@common/gameLogic";
 import urlPathPart from "../utils";
 import { client, semaphore } from "../networking";
 
@@ -47,4 +47,9 @@ export const dispatchAtom = atom((get) => {
   };
 
   return dispatch;
+});
+
+export const actionsAtom = atom((get) => {
+  const dispatch = get(dispatchAtom);
+  return getActions(dispatch);
 });

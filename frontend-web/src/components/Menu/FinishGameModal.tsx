@@ -1,11 +1,12 @@
-import { GameAction } from "@common/gameLogic";
+import { useAtomValue } from "jotai";
+import { actionsAtom } from "src/atoms/gameAtoms";
 import Modal from "../Modal";
 import styles from "./FinishGameModal.module.scss";
 
 const FinishGameModal: React.FC<{
-  dispatch: (action: GameAction) => void;
   onClose: () => void;
-}> = ({ dispatch, onClose }) => {
+}> = ({ onClose }) => {
+  const actions = useAtomValue(actionsAtom);
   return (
     <Modal onClose={onClose}>
       <h2>Finish game</h2>
@@ -13,11 +14,7 @@ const FinishGameModal: React.FC<{
       <div className={styles.finishGameModalButtons}>
         <button
           onClick={() => {
-            dispatch({
-              type: "stageTransitionToFinished",
-              stage: "active",
-              payload: "evil",
-            });
+            actions.stageTransitionToFinished("evil");
             onClose();
           }}
         >
@@ -25,11 +22,7 @@ const FinishGameModal: React.FC<{
         </button>
         <button
           onClick={() => {
-            dispatch({
-              type: "stageTransitionToFinished",
-              stage: "active",
-              payload: "good",
-            });
+            actions.stageTransitionToFinished("good");
             onClose();
           }}
         >

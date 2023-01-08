@@ -36,7 +36,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { deathRemindersAtom, storyTellerModeAtom } from "./atoms/settingsAtoms";
 import LoadingModal from "./components/LoadingModal";
 import {
-  dispatchAtom,
+  actionsAtom,
   gameAtom,
   gameIdAtom,
   interactiveAtom,
@@ -61,7 +61,7 @@ function App() {
 
   const [game, setGame] = useAtom(gameAtom);
   const [nomination] = useAtom(nominationAtom);
-  const dispatch = useAtomValue(dispatchAtom);
+  const actions = useAtomValue(actionsAtom);
 
   useEffect(() => {
     const unsub = client.onGameAction.subscribe(
@@ -106,11 +106,7 @@ function App() {
   useDeclarativeSoundPlayer(game);
 
   const addPlayer = (name: string, existingPlayers: Player[]) => {
-    dispatch({
-      type: "addPlayer",
-      stage: "setup",
-      payload: createSetupStagePlayer(name, existingPlayers),
-    });
+    actions.addPlayer(createSetupStagePlayer(name, existingPlayers));
     setIsAddPlayerModalOpen(false);
   };
 
@@ -118,7 +114,7 @@ function App() {
     if (game.stage !== "setup") {
       return;
     }
-    dispatch({ type: "removePlayer", stage: "setup", payload: id });
+    actions.removePlayer(id);
   };
 
   // close the modal when clicking outside of it
@@ -127,7 +123,7 @@ function App() {
   const votingRoundModalRef = useRef<HTMLDivElement>(null);
   useClickOutside(votingRoundModalRef, () => {
     if (isActiveNomination(game)) {
-      dispatch({ type: "cancelNomination", stage: "active" });
+      actions.cancelNomination();
     }
   });
 
@@ -193,7 +189,7 @@ function App() {
         }
 
         if (isDay(game)) {
-          dispatch({ type: "cancelNomination", stage: "active" });
+          actions.cancelNomination();
         }
       }
     };
@@ -203,7 +199,7 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isAddPlayerModalOpen, game, dispatch, playerContextMenuOpen.open]);
+  }, [isAddPlayerModalOpen, game, actions, playerContextMenuOpen.open]);
 
   function handleNomination(playerId: number) {
     if (!isDay(game)) return;
@@ -212,30 +208,18 @@ function App() {
       if (!playerCanNominate(player, game)) {
         return;
       }
-      dispatch({
-        type: "setNominator",
-        stage: "active",
-        payload: player,
-      });
+      actions.setNominator(player);
     } else if (nomination.state === "pending") {
       if (!playerCanBeNominated(player, game)) {
         return;
       }
-      dispatch({
-        type: "setNominee",
-        stage: "active",
-        payload: player,
-      });
+      actions.setNominee(player);
     } else {
       // Count the player's vote if they can vote
       if (!playerCanVote(player, game)) {
         return;
       }
-      dispatch({
-        type: "toggleVote",
-        stage: "active",
-        payload: player,
-      });
+      actions.toggleVote(player);
     }
   }
 
@@ -259,11 +243,7 @@ function App() {
     } else if (isNight(game)) {
       toggleDeathReminder(playerId);
     } else if (isFinished(game)) {
-      dispatch({
-        type: "revealPlayer",
-        stage: "finished",
-        payload: playerId,
-      });
+      actions.revealPlayer(playerId);
     }
   }
 
@@ -301,12 +281,8 @@ function App() {
         <EditionModal
           onClose={() => setIsEditionModalOpen(false)}
           onEditionChosen={(edition) => {
-            dispatch({
-              type: "changeSettings",
-              stage: "setup",
-              payload: {
-                editionId: edition,
-              },
+            actions.changeSettings({
+              editionId: edition,
             });
           }}
         />
@@ -318,19 +294,14 @@ function App() {
       <Background phase={backgroundPhase} />
       <GameBoard
         onSelectPlayer={handleSelectPlayer}
-        onModifyPlayers={(players) => {
-          dispatch({
-            type: "modifyPlayers",
-            payload: players,
-          });
-        }}
+        onModifyPlayers={actions.modifyPlayers}
         onCancelNomination={() => {
           if (playerContextMenuOpen.open) {
             return;
           }
 
           if (nomination.state !== "inactive") {
-            dispatch({ type: "cancelNomination", stage: "active" });
+            actions.cancelNomination();
           }
         }}
         onToggleContextMenu={(playerId: number, open: boolean) => {
@@ -372,21 +343,14 @@ function App() {
           onKillOrResurrect={(playerId: number) => {
             if (!isNight(game) && !isDay(game)) return;
             const player = game.players.find((p) => p.id === playerId)!;
-            dispatch({
-              type: "togglePlayerAliveStatus",
-              stage: "active",
-              payload: player,
-            });
+            actions.togglePlayerAliveStatus(player);
             toggleDeathReminder(playerId, false);
           }}
           onRemovePlayer={removePlayer}
           onModifyPlayer={(player) => {
-            dispatch({
-              type: "modifyPlayers",
-              payload: game.players.map((p) =>
-                p.id === player.id ? player : p
-              ),
-            });
+            actions.modifyPlayers(
+              game.players.map((p) => (p.id === player.id ? player : p))
+            );
           }}
           onClose={() => setPlayerContextMenuOpen({ open: false })}
           playerId={playerContextMenuOpen.playerId}
@@ -398,7 +362,7 @@ function App() {
           votingRoundState={votingRoundState}
           onClose={() => {
             if (isActiveNomination(game)) {
-              dispatch({ type: "cancelNomination", stage: "active" });
+              actions.cancelNomination();
             }
           }}
           onVoted={(voted: boolean) => {
@@ -406,20 +370,13 @@ function App() {
             const playerId = playerVotingOrder[currentIndex];
             const player = game.players.find((p) => p.id === playerId)!;
             if (voted) {
-              dispatch({
-                type: "toggleVote",
-                stage: "active",
-                payload: player,
-              });
+              actions.toggleVote(player);
             }
 
             const isLastIndex = currentIndex === playerVotingOrder.length - 1;
 
             if (isLastIndex) {
-              dispatch({
-                type: "resolveVote",
-                stage: "active",
-              });
+              actions.resolveVote();
             } else {
               setVotingRoundState({
                 ...votingRoundState,
