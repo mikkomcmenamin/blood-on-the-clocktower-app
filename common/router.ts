@@ -36,9 +36,9 @@ export type DBInterface = {
   initDB: () => Promise<void>;
   getGameState: (gameId: string) => Promise<Game | null>;
   upsertGameState: (gameId: string, game: Game) => Promise<void>;
+  deleteGame: (gameId: string) => Promise<void>;
+  deleteGamesNotUpdatedSince: (ts: number) => Promise<string[]>;
 };
-
-const gamesToFlush: string[] = [];
 
 export function createContext(
   _: CreateHTTPContextOptions | CreateWSSContextFnOptions
@@ -58,41 +58,41 @@ export const createAppRouter = async (db: DBInterface) => {
 
   await db.initDB();
 
-  setInterval(async () => {
-    const queue = gamesToFlush.splice(0, gamesToFlush.length);
-    for (const gameId of queue) {
-      const game = serverState[gameId];
-      if (!game) {
-        continue;
-      }
-      await db.upsertGameState(gameId, game).catch((err) => {
-        console.error(`Error saving game ${gameId} to DB`, err);
-      });
-    }
-  }, 1000);
+  // setInterval(async () => {
+  //   const queue = gamesToFlush.splice(0, gamesToFlush.length);
+  //   for (const gameId of queue) {
+  //     const game = serverState[gameId];
+  //     if (!game) {
+  //       continue;
+  //     }
+  //     await db.upsertGameState(gameId, game).catch((err) => {
+  //       console.error(`Error saving game ${gameId} to DB`, err);
+  //     });
+  //   }
+  // }, 1000);
 
   const serverState: Record<string, Game> = {};
-  const gameStateUpdatedAt = new Map<string, number>();
 
   // Run an interval that checks all games for inactivity (2 hours) and deletes them
-  setInterval(() => {
+  setInterval(async () => {
     const now = Date.now();
-    for (const [gameId, updatedAt] of gameStateUpdatedAt) {
-      if (now - updatedAt > 1000 * 60 * 60 * 2) {
-        console.log(`Deleting game ${gameId} due to inactivity`);
-        delete serverState[gameId];
-        gameStateUpdatedAt.delete(gameId);
-      }
+    // Delete all games that have not been updated in 24 hours
+    const deletedIds = await db.deleteGamesNotUpdatedSince(
+      now - 1000 * 60 * 60 * 24
+    );
+
+    for (const gameId of deletedIds) {
+      delete serverState[gameId];
     }
   }, 1000 * 60 /* every minute */);
 
   const getOrCreateGame = async (gameId: string) => {
     if (!serverState[gameId]) {
       const game = await db.getGameState(gameId);
-      console.log(`Got game ${gameId} from DB`, game);
+      console.log(`Got game ${gameId} from DB`);
       if (!game) {
+        await db.upsertGameState(gameId, initialGameState);
         serverState[gameId] = initialGameState;
-        gamesToFlush.push(gameId);
       } else {
         serverState[gameId] = game;
       }
@@ -129,9 +129,9 @@ export const createAppRouter = async (db: DBInterface) => {
       .mutation(async ({ input, ctx: _ }) => {
         // console.log("Got game action", input.action.type);
         const gameState = await getOrCreateGame(input.gameId);
-        serverState[input.gameId] = gameStateReducer(gameState, input.action);
-        gameStateUpdatedAt.set(input.gameId, Date.now());
-        gamesToFlush.push(input.gameId);
+        const updatedState = gameStateReducer(gameState, input.action);
+        serverState[input.gameId] = updatedState;
+        await db.upsertGameState(input.gameId, updatedState);
         e.emit(`game-${input.gameId}`, {
           game: serverState[input.gameId],
           input: input.action,
