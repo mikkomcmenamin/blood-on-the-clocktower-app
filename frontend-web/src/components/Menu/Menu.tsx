@@ -19,7 +19,7 @@ import {
   videoAtom,
 } from "../../atoms/settingsAtoms";
 import { actionsAtom, gameAtom } from "../../atoms/gameAtoms";
-import { useToggle } from "src/hooks";
+import { useToggle } from "../../hooks";
 
 type Props = {
   votingRoundOngoing: boolean;
