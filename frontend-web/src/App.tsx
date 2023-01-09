@@ -60,7 +60,7 @@ function App() {
   const [interactive, setInteractive] = useAtom(interactiveAtom);
 
   const [game, setGame] = useAtom(gameAtom);
-  const [nomination] = useAtom(nominationAtom);
+  const nomination = useAtomValue(nominationAtom);
   const actions = useAtomValue(actionsAtom);
 
   useEffect(() => {
