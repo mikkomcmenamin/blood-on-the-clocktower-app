@@ -2,7 +2,7 @@ import { isDay } from "@common/gameLogic";
 import { Game } from "@common/model";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
-import { actionsAtom } from "src/atoms/gameAtoms";
+import { actionsAtom } from "../../atoms/gameAtoms";
 import { usePrevious } from "../../hooks";
 import Modal from "../Modal";
 import styles from "./ErrorRecoveryMenuModal.module.scss";
