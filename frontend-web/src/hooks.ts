@@ -361,6 +361,6 @@ export function useToggleWithExtraData<T>(initialValue: ToggleData<T>) {
             close,
             toggle,
           },
-    [state, open, close, toggle]
+    [state, open, close, toggle, setData]
   );
 }
