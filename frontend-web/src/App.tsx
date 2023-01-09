@@ -46,6 +46,7 @@ import {
 } from "./atoms/gameAtoms";
 import { client, semaphore } from "./networking";
 import { getGameStateText } from "./format";
+import { pickRandomCharacter, pickRandomName } from "./devHelpers";
 
 function App() {
   const [gameId] = useAtom(gameIdAtom);
@@ -180,6 +181,24 @@ function App() {
 
         if (isDay(game)) {
           actions.cancelNomination();
+        }
+      }
+
+      if (e.key === "a" && e.metaKey) {
+        e.preventDefault();
+        if (isSetup(game)) {
+          addPlayer(pickRandomName());
+        }
+      }
+
+      if (e.key === "c" && e.metaKey) {
+        e.preventDefault();
+        if (isSetup(game)) {
+          actions.modifyPlayers(
+            game.players.map((player) => {
+            return { ...player, character: pickRandomCharacter(game) };
+          })
+        );
         }
       }
     };
