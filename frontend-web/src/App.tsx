@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.scss";
-import { createSetupStagePlayer, Player } from "@common/model";
+import { createSetupStagePlayer } from "@common/model";
 import {
   useClickOutside,
   useDeclarativeSoundPlayer,
@@ -113,8 +113,8 @@ function App() {
   useHandleNominationUIEffects(nomination, game.players);
   useDeclarativeSoundPlayer(game);
 
-  const addPlayer = (name: string, existingPlayers: Player[]) => {
-    actions.addPlayer(createSetupStagePlayer(name, existingPlayers));
+  const addPlayer = (name: string) => {
+    actions.addPlayer(createSetupStagePlayer(name, game.players));
     setIsAddPlayerModalOpen(false);
   };
 
@@ -304,10 +304,7 @@ function App() {
 
       <Menu
         votingRoundState={votingRoundState}
-        onStartVotingRound={() => {
-          if (votingRoundState.open) return;
-          startVotingRound();
-        }}
+        onStartVotingRound={startVotingRound}
         onChooseEditionClick={() => {
           setIsEditionModalOpen(true);
         }}
@@ -315,7 +312,7 @@ function App() {
       {isAddPlayerModalOpen && (
         <AddPlayerModal
           onClose={() => setIsAddPlayerModalOpen(false)}
-          addPlayer={(p) => addPlayer(p, game.players)}
+          addPlayer={addPlayer}
           modalRef={addPlayerModalRef}
         />
       )}

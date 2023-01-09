@@ -122,13 +122,7 @@ const Menu: React.FC<Props> = ({
           {game.stage === "active" &&
             isActiveNomination(game) &&
             !votingRoundState.open && (
-              <button
-                onClick={() => {
-                  onStartVotingRound();
-                }}
-              >
-                Voting round
-              </button>
+              <button onClick={onStartVotingRound}>Voting round</button>
             )}
           {game.stage === "active" &&
             isDay(game) &&
