@@ -2,6 +2,8 @@
 . "$(dirname -- "$0")/_/husky.sh"
 set -euo
 
-npm run format:check || ((npm run format:fix || true) && (echo "Formatting failed. Autoformatting has been run, try staging the changes and committing again." && exit 1))
-npm run lint:fix || (echo "Linting failed. Autofixable issues have been fixed, please fix the rest manually." && exit 1)
-npm run ts:check || (echo "Typechecking failed. Please fix the errors and try again." && exit 1)
+npm run format:check || ((npm run format:fix || true) && (echo "Formatting failed. Autoformatting has been run, try staging the changes and committing again." && exit 1)) &
+npm run lint:fix || (echo "Linting failed. Autofixable issues have been fixed, please fix the rest manually." && exit 1) &
+npm run ts:check || (echo "Typechecking failed. Please fix the errors and try again." && exit 1) &
+
+wait
