@@ -82,6 +82,22 @@ const Menu: React.FC<Props> = ({
               Choose edition
             </button>
           )}
+          {game.stage === "setup" && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                const randomizedPlayers = game.players.sort(() =>
+                  Math.random() > 0.5 ? 1 : -1
+                );
+                actions.replaceState({
+                  ...game,
+                  players: randomizedPlayers,
+                });
+              }}
+            >
+              Randomize seats
+            </button>
+          )}
           {game.stage === "setup" && gameCanBeStarted(game) && (
             <button
               onClick={(e) => {
