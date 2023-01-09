@@ -369,32 +369,27 @@ function App() {
         />
       )}
       {nomination.state === "active" && windowInnerWidth > MOBILE_THRESHOLD && (
-        <div>
+        <>
           <InfoPanel position={"top-right"}>
             <p>Votes required: {calculateVotesRequired(game)}</p>
           </InfoPanel>
-          {
-            <InfoPanel position={"top-right-2"}>
-              {nomination.voters.length > 0 && (
-                <p>{nomination.voters.length} votes given</p>
-              )}
-            </InfoPanel>
-          }
-        </div>
+
+          <InfoPanel position={"top-right-2"}>
+            {nomination.voters.length > 0 && (
+              <p>{nomination.voters.length} votes given</p>
+            )}
+          </InfoPanel>
+        </>
       )}
       {onTheBlock && windowInnerWidth > MOBILE_THRESHOLD && (
-        <div>
-          {
-            <InfoPanel position={"bottom-right"}>
-              {onTheBlock && (
-                <p>
-                  {game.players.find((p) => p.id === onTheBlock.playerId)!.name}{" "}
-                  💀 with {onTheBlock.votes} votes
-                </p>
-              )}
-            </InfoPanel>
-          }
-        </div>
+        <InfoPanel position={"bottom-right"}>
+          {onTheBlock && (
+            <p>
+              {game.players.find((p) => p.id === onTheBlock.playerId)!.name} 💀
+              with {onTheBlock.votes} votes
+            </p>
+          )}
+        </InfoPanel>
       )}
       {isNight(game) && <VideoAnimation src={DayToNight} />}
       {isDay(game) && <VideoAnimation src={NightToDay} />}
