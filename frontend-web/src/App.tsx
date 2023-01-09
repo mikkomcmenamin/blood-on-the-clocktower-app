@@ -43,6 +43,7 @@ import {
   nominationAtom,
 } from "./atoms/gameAtoms";
 import { client, semaphore } from "./networking";
+import { getGameStateText } from "./format";
 
 type PlayerContextMenuState =
   | {
@@ -96,10 +97,17 @@ function App() {
   const [isEditionModalOpen, setIsEditionModalOpen] = useState(false);
 
   const contextMenuRef = useRef<HTMLDivElement>(null);
-
   useClickOutside(contextMenuRef, () =>
     setPlayerContextMenuOpen({ open: false })
   );
+  const addPlayerModalRef = useRef<HTMLDivElement>(null);
+  useClickOutside(addPlayerModalRef, () => setIsAddPlayerModalOpen(false));
+  const votingRoundModalRef = useRef<HTMLDivElement>(null);
+  useClickOutside(votingRoundModalRef, () => {
+    if (isActiveNomination(game)) {
+      actions.cancelNomination();
+    }
+  });
 
   useHandlePlayerCountChangeUIEffects(game.players);
   useHandleNominationUIEffects(nomination, game.players);
@@ -116,16 +124,6 @@ function App() {
     }
     actions.removePlayer(id);
   };
-
-  // close the modal when clicking outside of it
-  const addPlayerModalRef = useRef<HTMLDivElement>(null);
-  useClickOutside(addPlayerModalRef, () => setIsAddPlayerModalOpen(false));
-  const votingRoundModalRef = useRef<HTMLDivElement>(null);
-  useClickOutside(votingRoundModalRef, () => {
-    if (isActiveNomination(game)) {
-      actions.cancelNomination();
-    }
-  });
 
   // set voting round state if storyteller mode is on and active nomination has just been set
   function startVotingRound() {
@@ -247,23 +245,6 @@ function App() {
     }
   }
 
-  function getGameStateText(): string {
-    switch (game.stage) {
-      case "setup":
-        return "Setup Players";
-      case "active": {
-        if (isDay(game)) {
-          return `Day ${game.phase.dayNumber}`;
-        } else if (isNight(game)) {
-          return `Night ${game.phase.nightNumber}`;
-        }
-        return "";
-      }
-      case "finished":
-        return game.winningTeam === "good" ? "Good Wins!" : "Evil Wins...";
-    }
-  }
-
   const windowInnerWidth = useWindowInnerWidth();
   const MOBILE_THRESHOLD = 768;
 
@@ -289,7 +270,7 @@ function App() {
       )}
 
       <InfoPanel position={"top-left"}>
-        <p>{getGameStateText()}</p>
+        <p>{getGameStateText(game)}</p>
       </InfoPanel>
       <Background phase={backgroundPhase} />
       <GameBoard
