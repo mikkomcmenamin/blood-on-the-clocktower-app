@@ -196,9 +196,9 @@ function App() {
         if (isSetup(game)) {
           actions.modifyPlayers(
             game.players.map((player) => {
-            return { ...player, character: pickRandomCharacter(game) };
-          })
-        );
+              return { ...player, character: pickRandomCharacter(game) };
+            })
+          );
         }
       }
     };
