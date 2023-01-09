@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { actionsAtom } from "src/atoms/gameAtoms";
+import { actionsAtom } from "../../atoms/gameAtoms";
 import Modal from "../Modal";
 import styles from "./FinishGameModal.module.scss";
 
