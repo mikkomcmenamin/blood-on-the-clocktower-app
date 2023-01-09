@@ -6,7 +6,6 @@ import {
   isDay,
   isNight,
 } from "@common/gameLogic";
-import type { VotingRoundState } from "../Player/VotingRoundModal";
 import styles from "./Menu.module.scss";
 import SettingsButton from "./SettingsButton";
 import SoundButton from "./SoundButton";
@@ -20,15 +19,16 @@ import {
   videoAtom,
 } from "../../atoms/settingsAtoms";
 import { actionsAtom, gameAtom } from "../../atoms/gameAtoms";
+import { useToggle } from "src/hooks";
 
 type Props = {
-  votingRoundState: VotingRoundState;
+  votingRoundOngoing: boolean;
   onStartVotingRound: () => void;
   onChooseEditionClick: () => void;
 };
 
 const Menu: React.FC<Props> = ({
-  votingRoundState,
+  votingRoundOngoing,
   onStartVotingRound,
   onChooseEditionClick,
 }) => {
@@ -38,11 +38,9 @@ const Menu: React.FC<Props> = ({
   const setSoundVolume = useSetAtom(soundVolumeAtom);
   const [storyTellerMode, setStoryTellerMode] = useAtom(storyTellerModeAtom);
 
-  const [finishGameModalOpen, setFinishGameModalOpen] = React.useState(false);
-  const [errorRecoveryMenuModalOpen, setErrorRecoveryMenuModalOpen] =
-    React.useState(false);
-  const [desktopMenuDrawerOpen, setDesktopMenuDrawerOpen] =
-    React.useState(false);
+  const finishGameModalToggle = useToggle(false);
+  const errorRecoveryMenuModalToggle = useToggle(false);
+  const desktopMenuDrawerToggle = useToggle(false);
 
   const toggleFullscreen = (isEnabled: boolean) => {
     if (document.fullscreenElement && !isEnabled) {
@@ -52,23 +50,19 @@ const Menu: React.FC<Props> = ({
     }
   };
 
-  const onSettingsButtonClick = () => {
-    setDesktopMenuDrawerOpen(!desktopMenuDrawerOpen);
-  };
-
   return (
     <>
-      {finishGameModalOpen && (
-        <FinishGameModal onClose={() => setFinishGameModalOpen(false)} />
+      {finishGameModalToggle.isOpen && (
+        <FinishGameModal onClose={finishGameModalToggle.close} />
       )}
       <nav
         className={classnames({
           [styles.controls]: true,
-          [styles.desktopMenuDrawerOpen]: desktopMenuDrawerOpen,
+          [styles.desktopMenuDrawerOpen]: desktopMenuDrawerToggle.isOpen,
         })}
       >
         <div className={styles.floatingButtons}>
-          <SettingsButton handleClick={onSettingsButtonClick} />
+          <SettingsButton handleClick={desktopMenuDrawerToggle.toggle} />
           <SoundButton />
         </div>
         <div aria-roledescription="navigation" className={styles.menu}>
@@ -110,35 +104,23 @@ const Menu: React.FC<Props> = ({
             </button>
           )}
           {game.stage === "active" && !isActiveNomination(game) && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                setFinishGameModalOpen(true);
-              }}
-            >
-              Finish game
-            </button>
+            <button onClick={finishGameModalToggle.open}>Finish game</button>
           )}
           {game.stage === "active" &&
             isActiveNomination(game) &&
-            !votingRoundState.open && (
+            !votingRoundOngoing && (
               <button onClick={onStartVotingRound}>Voting round</button>
             )}
           {game.stage === "active" &&
             isDay(game) &&
-            errorRecoveryMenuModalOpen && (
+            errorRecoveryMenuModalToggle.isOpen && (
               <ErrorRecoveryMenuModal
-                onClose={() => setErrorRecoveryMenuModalOpen(false)}
+                onClose={errorRecoveryMenuModalToggle.close}
                 game={game}
               />
             )}
           {game.stage === "active" && isDay(game) && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                setErrorRecoveryMenuModalOpen(true);
-              }}
-            >
+            <button onClick={errorRecoveryMenuModalToggle.open}>
               Error recovery
             </button>
           )}
@@ -162,7 +144,7 @@ const Menu: React.FC<Props> = ({
               Transition to day
             </button>
           )}
-          {isActiveNomination(game) && !votingRoundState.open && (
+          {isActiveNomination(game) && !votingRoundOngoing && (
             <button
               onClick={(e) => {
                 e.preventDefault();

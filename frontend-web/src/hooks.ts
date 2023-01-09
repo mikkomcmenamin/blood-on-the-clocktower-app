@@ -1,4 +1,10 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { Game, Nomination, Player } from "@common/model";
 import {
   loopSound,
@@ -291,4 +297,70 @@ export function useDeclarativeSoundPlayer(game: Game) {
   } else if (!onTheBlock(game) && onTheBlock(previousGame)) {
     stopSound("anticipation");
   }
+}
+
+export function useToggle(initialValue: boolean) {
+  const [isOpen, setValue] = useState(initialValue);
+  const open = useCallback(() => setValue(true), []);
+  const close = useCallback(() => setValue(false), []);
+  const toggle = useCallback(() => setValue((v) => !v), []);
+
+  return React.useMemo(
+    () => ({
+      isOpen,
+      open,
+      close,
+      toggle,
+    }),
+    [isOpen, open, close, toggle]
+  );
+}
+
+type ToggleData<T> =
+  | {
+      isOpen: false;
+    }
+  | {
+      isOpen: true;
+      data: T;
+    };
+
+export function useToggleWithExtraData<T>(initialValue: ToggleData<T>) {
+  const [state, setValue] = useState(initialValue);
+  const open = useCallback((data: T) => setValue({ isOpen: true, data }), []);
+  const close = useCallback(() => setValue({ isOpen: false }), []);
+  const toggle = useCallback(
+    (data: T) =>
+      setValue((v) =>
+        !v.isOpen
+          ? { isOpen: true, data }
+          : {
+              isOpen: false,
+            }
+      ),
+    []
+  );
+  const setData = useCallback(
+    (data: T) => setValue((v) => ({ ...v, data })),
+    []
+  );
+
+  return React.useMemo(
+    () =>
+      state.isOpen
+        ? {
+            ...state,
+            open,
+            close,
+            toggle,
+            setData,
+          }
+        : {
+            ...state,
+            open,
+            close,
+            toggle,
+          },
+    [state, open, close, toggle]
+  );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import "./App.scss";
 import { createSetupStagePlayer } from "@common/model";
 import {
@@ -6,6 +6,8 @@ import {
   useDeclarativeSoundPlayer,
   useHandleNominationUIEffects,
   useHandlePlayerCountChangeUIEffects,
+  useToggle,
+  useToggleWithExtraData,
   useWindowInnerWidth,
 } from "./hooks";
 import Background from "./components/Background";
@@ -45,15 +47,6 @@ import {
 import { client, semaphore } from "./networking";
 import { getGameStateText } from "./format";
 
-type PlayerContextMenuState =
-  | {
-      open: false;
-    }
-  | {
-      open: true;
-      playerId: number;
-    };
-
 function App() {
   const [gameId] = useAtom(gameIdAtom);
   const [storyTellerMode] = useAtom(storyTellerModeAtom);
@@ -88,20 +81,19 @@ function App() {
     };
   }, [gameId, interactive, setInteractive, setGame]);
 
-  const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
-  const [playerContextMenuOpen, setPlayerContextMenuOpen] =
-    useState<PlayerContextMenuState>({ open: false });
-  const [votingRoundState, setVotingRoundState] = useState<VotingRoundState>({
-    open: false,
+  const playerContextMenuToggle = useToggleWithExtraData<{ playerId: number }>({
+    isOpen: false,
   });
-  const [isEditionModalOpen, setIsEditionModalOpen] = useState(false);
+  const votingRoundToggle = useToggleWithExtraData<VotingRoundState>({
+    isOpen: false,
+  });
+  const addPlayerModalToggle = useToggle(false);
+  const editionModalToggle = useToggle(false);
 
   const contextMenuRef = useRef<HTMLDivElement>(null);
-  useClickOutside(contextMenuRef, () =>
-    setPlayerContextMenuOpen({ open: false })
-  );
+  useClickOutside(contextMenuRef, playerContextMenuToggle.close);
   const addPlayerModalRef = useRef<HTMLDivElement>(null);
-  useClickOutside(addPlayerModalRef, () => setIsAddPlayerModalOpen(false));
+  useClickOutside(addPlayerModalRef, addPlayerModalToggle.close);
   const votingRoundModalRef = useRef<HTMLDivElement>(null);
   useClickOutside(votingRoundModalRef, () => {
     if (isActiveNomination(game)) {
@@ -115,7 +107,7 @@ function App() {
 
   const addPlayer = (name: string) => {
     actions.addPlayer(createSetupStagePlayer(name, game.players));
-    setIsAddPlayerModalOpen(false);
+    addPlayerModalToggle.close();
   };
 
   const removePlayer = (id: number) => {
@@ -130,7 +122,7 @@ function App() {
     if (
       !isActiveNomination(game) ||
       !storyTellerMode ||
-      votingRoundState.open
+      votingRoundToggle.isOpen
     ) {
       return;
     }
@@ -151,8 +143,7 @@ function App() {
       .concat(game.players.slice(0, firstVoterIndex))
       .map((player) => player.id);
 
-    setVotingRoundState({
-      open: true,
+    votingRoundToggle.open({
       playerVotingOrder,
       currentIndex: 0,
     });
@@ -163,7 +154,7 @@ function App() {
       return;
     }
 
-    setVotingRoundState({ open: false });
+    votingRoundToggle.close();
   }, [game]);
 
   // handle keyboard and mouse shortcuts
@@ -173,9 +164,9 @@ function App() {
       // but only when command key is not pressed
       if (e.key === "+" || e.key === " ") {
         if (e.metaKey) return;
-        if (isSetup(game) && !isAddPlayerModalOpen) {
+        if (isSetup(game) && !addPlayerModalToggle.isOpen) {
           e.preventDefault();
-          setIsAddPlayerModalOpen(true);
+          addPlayerModalToggle.open();
         }
       }
       // close the modal when pressing the "Escape" key
@@ -183,7 +174,8 @@ function App() {
       if (e.key === "Escape") {
         e.preventDefault();
         if (isSetup(game)) {
-          setIsAddPlayerModalOpen(false);
+          addPlayerModalToggle.close();
+          editionModalToggle.close();
         }
 
         if (isDay(game)) {
@@ -197,7 +189,7 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isAddPlayerModalOpen, game, actions, playerContextMenuOpen.open]);
+  }, [addPlayerModalToggle, editionModalToggle, game, actions]);
 
   function handleNomination(playerId: number) {
     if (!isDay(game)) return;
@@ -258,9 +250,9 @@ function App() {
   return (
     <div className="App">
       {!interactive && <LoadingModal />}
-      {isEditionModalOpen && (
+      {editionModalToggle.isOpen && (
         <EditionModal
-          onClose={() => setIsEditionModalOpen(false)}
+          onClose={editionModalToggle.close}
           onEditionChosen={(edition) => {
             actions.changeSettings({
               editionId: edition,
@@ -277,7 +269,7 @@ function App() {
         onSelectPlayer={handleSelectPlayer}
         onModifyPlayers={actions.modifyPlayers}
         onCancelNomination={() => {
-          if (playerContextMenuOpen.open) {
+          if (playerContextMenuToggle.isOpen) {
             return;
           }
 
@@ -287,36 +279,29 @@ function App() {
         }}
         onToggleContextMenu={(playerId: number, open: boolean) => {
           if (open) {
-            setPlayerContextMenuOpen({
-              open: true,
+            playerContextMenuToggle.open({
               playerId,
             });
           } else {
-            setPlayerContextMenuOpen({
-              open: false,
-            });
+            playerContextMenuToggle.close();
           }
         }}
-        onAddPlayerButtonClick={() => {
-          setIsAddPlayerModalOpen(true);
-        }}
+        onAddPlayerButtonClick={addPlayerModalToggle.open}
       />
 
       <Menu
-        votingRoundState={votingRoundState}
+        votingRoundOngoing={votingRoundToggle.isOpen}
         onStartVotingRound={startVotingRound}
-        onChooseEditionClick={() => {
-          setIsEditionModalOpen(true);
-        }}
+        onChooseEditionClick={editionModalToggle.open}
       />
-      {isAddPlayerModalOpen && (
+      {addPlayerModalToggle.isOpen && (
         <AddPlayerModal
-          onClose={() => setIsAddPlayerModalOpen(false)}
+          onClose={addPlayerModalToggle.close}
           addPlayer={addPlayer}
           modalRef={addPlayerModalRef}
         />
       )}
-      {playerContextMenuOpen.open && (
+      {playerContextMenuToggle.isOpen && (
         <PlayerContextMenuModal
           onKillOrResurrect={(playerId: number) => {
             if (!isNight(game) && !isDay(game)) return;
@@ -330,21 +315,21 @@ function App() {
               game.players.map((p) => (p.id === player.id ? player : p))
             );
           }}
-          onClose={() => setPlayerContextMenuOpen({ open: false })}
-          playerId={playerContextMenuOpen.playerId}
+          onClose={playerContextMenuToggle.close}
+          playerId={playerContextMenuToggle.data.playerId}
           modalRef={contextMenuRef}
         />
       )}
-      {votingRoundState.open && game.stage === "active" && (
+      {votingRoundToggle.isOpen && game.stage === "active" && (
         <VotingRoundModal
-          votingRoundState={votingRoundState}
+          votingRoundState={votingRoundToggle.data}
           onClose={() => {
             if (isActiveNomination(game)) {
               actions.cancelNomination();
             }
           }}
           onVoted={(voted: boolean) => {
-            const { playerVotingOrder, currentIndex } = votingRoundState;
+            const { playerVotingOrder, currentIndex } = votingRoundToggle.data;
             const playerId = playerVotingOrder[currentIndex];
             const player = game.players.find((p) => p.id === playerId)!;
             if (voted) {
@@ -356,8 +341,8 @@ function App() {
             if (isLastIndex) {
               actions.resolveVote();
             } else {
-              setVotingRoundState({
-                ...votingRoundState,
+              votingRoundToggle.setData({
+                ...votingRoundToggle.data,
                 currentIndex: currentIndex + 1,
               });
             }

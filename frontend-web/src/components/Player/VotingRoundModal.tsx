@@ -6,15 +6,10 @@ import { gameAtom } from "../../atoms/gameAtoms";
 import Modal from "../Modal";
 import styles from "./VotingRoundModal.module.scss";
 
-export type VotingRoundState =
-  | {
-      open: false;
-    }
-  | {
-      open: true;
-      playerVotingOrder: number[];
-      currentIndex: number;
-    };
+export type VotingRoundState = {
+  playerVotingOrder: number[];
+  currentIndex: number;
+};
 
 type Props = {
   onClose: () => void;
@@ -47,7 +42,7 @@ const VotingRoundModal: React.FC<Props> = ({
     onVoted(voted);
   };
 
-  if (!votingRoundState.open) {
+  if (!("playerVotingOrder" in votingRoundState)) {
     return null;
   }
 
