@@ -85,7 +85,7 @@ function App() {
     return () => {
       unsub.unsubscribe();
     };
-  }, [gameId, interactive, setInteractive]);
+  }, [gameId, interactive, setInteractive, setGame]);
 
   const [isAddPlayerModalOpen, setIsAddPlayerModalOpen] = useState(false);
   const [playerContextMenuOpen, setPlayerContextMenuOpen] =
