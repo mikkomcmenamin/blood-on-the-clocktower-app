@@ -186,13 +186,11 @@ function App() {
 
       if (e.key === "c" && e.metaKey) {
         e.preventDefault();
-        if (isSetup(game)) {
-          actions.modifyPlayers(
-            game.players.map((player) => {
-              return { ...player, character: pickRandomCharacter(game) };
-            })
-          );
-        }
+        actions.if(isSetup(game)).modifyPlayers(
+          game.players.map((player) => {
+            return { ...player, character: pickRandomCharacter(game) };
+          })
+        );
       }
     };
 
