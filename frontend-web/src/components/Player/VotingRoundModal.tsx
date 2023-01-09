@@ -42,10 +42,6 @@ const VotingRoundModal: React.FC<Props> = ({
     onVoted(voted);
   };
 
-  if (!("playerVotingOrder" in votingRoundState)) {
-    return null;
-  }
-
   const { playerVotingOrder, currentIndex } = votingRoundState;
 
   const currentPlayerId = playerVotingOrder[currentIndex];
