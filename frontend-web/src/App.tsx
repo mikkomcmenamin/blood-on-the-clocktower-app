@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import "./App.scss";
 import { createSetupStagePlayer } from "@common/model";
 import {
@@ -105,10 +105,13 @@ function App() {
   useHandleNominationUIEffects(nomination, game.players);
   useDeclarativeSoundPlayer(game);
 
-  const addPlayer = (name: string) => {
-    actions.addPlayer(createSetupStagePlayer(name, game.players));
-    addPlayerModalToggle.close();
-  };
+  const addPlayer = useCallback(
+    (name: string) => {
+      actions.addPlayer(createSetupStagePlayer(name, game.players));
+      addPlayerModalToggle.close();
+    },
+    [actions, addPlayerModalToggle, game.players]
+  );
 
   // set voting round state if storyteller mode is on and active nomination has just been set
   function startVotingRound() {
@@ -148,7 +151,7 @@ function App() {
     }
 
     votingRoundToggle.close();
-  }, [game]);
+  }, [game, votingRoundToggle]);
 
   // handle keyboard and mouse shortcuts
   useEffect(() => {
@@ -198,7 +201,7 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [addPlayerModalToggle, editionModalToggle, game, actions]);
+  }, [addPlayerModalToggle, editionModalToggle, game, actions, addPlayer]);
 
   function handleNomination(playerId: number) {
     if (!isDay(game)) return;
