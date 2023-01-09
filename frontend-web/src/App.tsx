@@ -96,11 +96,10 @@ function App() {
   const addPlayerModalRef = useRef<HTMLDivElement>(null);
   useClickOutside(addPlayerModalRef, addPlayerModalToggle.close);
   const votingRoundModalRef = useRef<HTMLDivElement>(null);
-  useClickOutside(votingRoundModalRef, () => {
-    if (isActiveNomination(game)) {
-      actions.cancelNomination();
-    }
-  });
+  useClickOutside(
+    votingRoundModalRef,
+    actions.if(isActiveNomination(game)).cancelNomination
+  );
 
   useHandlePlayerCountChangeUIEffects(game.players);
   useHandleNominationUIEffects(nomination, game.players);
@@ -109,13 +108,6 @@ function App() {
   const addPlayer = (name: string) => {
     actions.addPlayer(createSetupStagePlayer(name, game.players));
     addPlayerModalToggle.close();
-  };
-
-  const removePlayer = (id: number) => {
-    if (game.stage !== "setup") {
-      return;
-    }
-    actions.removePlayer(id);
   };
 
   // set voting round state if storyteller mode is on and active nomination has just been set
@@ -179,9 +171,7 @@ function App() {
           editionModalToggle.close();
         }
 
-        if (isDay(game)) {
-          actions.cancelNomination();
-        }
+        actions.if(isDay(game)).cancelNomination();
       }
 
       if (e.key === "a" && e.metaKey) {
@@ -214,21 +204,11 @@ function App() {
     if (!isDay(game)) return;
     const player = game.players.find((p) => p.id === playerId)!;
     if (nomination.state === "inactive") {
-      if (!playerCanNominate(player, game)) {
-        return;
-      }
-      actions.setNominator(player);
+      actions.if(playerCanNominate(player, game)).setNominator(player);
     } else if (nomination.state === "pending") {
-      if (!playerCanBeNominated(player, game)) {
-        return;
-      }
-      actions.setNominee(player);
+      actions.if(playerCanBeNominated(player, game)).setNominee(player);
     } else {
-      // Count the player's vote if they can vote
-      if (!playerCanVote(player, game)) {
-        return;
-      }
-      actions.toggleVote(player);
+      actions.if(playerCanVote(player, game)).toggleVote(player);
     }
   }
 
@@ -287,15 +267,11 @@ function App() {
       <GameBoard
         onSelectPlayer={handleSelectPlayer}
         onModifyPlayers={actions.modifyPlayers}
-        onCancelNomination={() => {
-          if (playerContextMenuToggle.isOpen) {
-            return;
-          }
-
-          if (nomination.state !== "inactive") {
-            actions.cancelNomination();
-          }
-        }}
+        onCancelNomination={
+          actions.if(
+            playerContextMenuToggle.isOpen && nomination.state !== "inactive"
+          ).cancelNomination
+        }
         onToggleContextMenu={(playerId: number, open: boolean) => {
           if (open) {
             playerContextMenuToggle.open({
@@ -328,7 +304,7 @@ function App() {
             actions.togglePlayerAliveStatus(player);
             toggleDeathReminder(playerId, false);
           }}
-          onRemovePlayer={removePlayer}
+          onRemovePlayer={actions.if(isSetup(game)).removePlayer}
           onModifyPlayer={(player) => {
             actions.modifyPlayers(
               game.players.map((p) => (p.id === player.id ? player : p))
@@ -342,18 +318,13 @@ function App() {
       {votingRoundToggle.isOpen && game.stage === "active" && (
         <VotingRoundModal
           votingRoundState={votingRoundToggle.data}
-          onClose={() => {
-            if (isActiveNomination(game)) {
-              actions.cancelNomination();
-            }
-          }}
+          onClose={actions.if(isActiveNomination(game)).cancelNomination}
           onVoted={(voted: boolean) => {
             const { playerVotingOrder, currentIndex } = votingRoundToggle.data;
             const playerId = playerVotingOrder[currentIndex];
             const player = game.players.find((p) => p.id === playerId)!;
-            if (voted) {
-              actions.toggleVote(player);
-            }
+
+            actions.if(voted).toggleVote(player);
 
             const isLastIndex = currentIndex === playerVotingOrder.length - 1;
 

@@ -654,112 +654,146 @@ export function gameCanBeStarted(game: Game): game is Game & {
   );
 }
 
-export const getActions = (
-  dispatch: (action: GameAction) => void
-): {
+type Actions = {
   [T in GameAction["type"]]: (
     p: Extract<GameAction, { type: T }> extends { payload: infer P } ? P : void
   ) => void;
-} => ({
-  addPlayer: (payload) => {
-    dispatch({
-      type: "addPlayer",
-      payload,
-    });
-  },
-  removePlayer: (payload) => {
-    dispatch({
-      type: "removePlayer",
-      payload,
-    });
-  },
-  changeSettings: (payload) => {
-    dispatch({
-      type: "changeSettings",
-      payload,
-    });
-  },
-  stageTransitionToActive: () => {
-    dispatch({
-      type: "stageTransitionToActive",
-    });
-  },
-  cancelNomination: () => {
-    dispatch({
-      type: "cancelNomination",
-    });
-  },
-  modifyPlayers: (payload) => {
-    dispatch({
-      type: "modifyPlayers",
-      payload,
-    });
-  },
-  phaseTransitionToDay: () => {
-    dispatch({
-      type: "phaseTransitionToDay",
-    });
-  },
-  phaseTransitionToNight: () => {
-    dispatch({
-      type: "phaseTransitionToNight",
-    });
-  },
-  replaceState: (payload) => {
-    dispatch({
-      type: "replaceState",
-      payload,
-    });
-  },
-  resetToSetup: () => {
-    dispatch({
-      type: "resetToSetup",
-    });
-  },
-  resolveVote: () => {
-    dispatch({
-      type: "resolveVote",
-    });
-  },
-  revealAllPlayers: () => {
-    dispatch({
-      type: "revealAllPlayers",
-    });
-  },
-  revealPlayer: (payload) => {
-    dispatch({
-      type: "revealPlayer",
-      payload,
-    });
-  },
-  setNominator: (payload) => {
-    dispatch({
-      type: "setNominator",
-      payload,
-    });
-  },
-  setNominee: (payload) => {
-    dispatch({
-      type: "setNominee",
-      payload,
-    });
-  },
-  stageTransitionToFinished: (payload) => {
-    dispatch({
-      type: "stageTransitionToFinished",
-      payload,
-    });
-  },
-  togglePlayerAliveStatus: (payload) => {
-    dispatch({
-      type: "togglePlayerAliveStatus",
-      payload,
-    });
-  },
-  toggleVote: (payload) => {
-    dispatch({
-      type: "toggleVote",
-      payload,
-    });
-  },
-});
+};
+
+export const getActions = (
+  dispatch: (action: GameAction) => void
+): Actions & { if: (condition: boolean) => Actions } => {
+  const actions: Actions = {
+    addPlayer: (payload) => {
+      dispatch({
+        type: "addPlayer",
+        payload,
+      });
+    },
+    removePlayer: (payload) => {
+      dispatch({
+        type: "removePlayer",
+        payload,
+      });
+    },
+    changeSettings: (payload) => {
+      dispatch({
+        type: "changeSettings",
+        payload,
+      });
+    },
+    stageTransitionToActive: () => {
+      dispatch({
+        type: "stageTransitionToActive",
+      });
+    },
+    cancelNomination: () => {
+      dispatch({
+        type: "cancelNomination",
+      });
+    },
+    modifyPlayers: (payload) => {
+      dispatch({
+        type: "modifyPlayers",
+        payload,
+      });
+    },
+    phaseTransitionToDay: () => {
+      dispatch({
+        type: "phaseTransitionToDay",
+      });
+    },
+    phaseTransitionToNight: () => {
+      dispatch({
+        type: "phaseTransitionToNight",
+      });
+    },
+    replaceState: (payload) => {
+      dispatch({
+        type: "replaceState",
+        payload,
+      });
+    },
+    resetToSetup: () => {
+      dispatch({
+        type: "resetToSetup",
+      });
+    },
+    resolveVote: () => {
+      dispatch({
+        type: "resolveVote",
+      });
+    },
+    revealAllPlayers: () => {
+      dispatch({
+        type: "revealAllPlayers",
+      });
+    },
+    revealPlayer: (payload) => {
+      dispatch({
+        type: "revealPlayer",
+        payload,
+      });
+    },
+    setNominator: (payload) => {
+      dispatch({
+        type: "setNominator",
+        payload,
+      });
+    },
+    setNominee: (payload) => {
+      dispatch({
+        type: "setNominee",
+        payload,
+      });
+    },
+    stageTransitionToFinished: (payload) => {
+      dispatch({
+        type: "stageTransitionToFinished",
+        payload,
+      });
+    },
+    togglePlayerAliveStatus: (payload) => {
+      dispatch({
+        type: "togglePlayerAliveStatus",
+        payload,
+      });
+    },
+    toggleVote: (payload) => {
+      dispatch({
+        type: "toggleVote",
+        payload,
+      });
+    },
+  };
+
+  return {
+    ...actions,
+    if: (condition) => {
+      if (condition) {
+        return actions;
+      }
+
+      return {
+        addPlayer: () => {},
+        removePlayer: () => {},
+        changeSettings: () => {},
+        stageTransitionToActive: () => {},
+        cancelNomination: () => {},
+        modifyPlayers: () => {},
+        phaseTransitionToDay: () => {},
+        phaseTransitionToNight: () => {},
+        replaceState: () => {},
+        resetToSetup: () => {},
+        resolveVote: () => {},
+        revealAllPlayers: () => {},
+        revealPlayer: () => {},
+        setNominator: () => {},
+        setNominee: () => {},
+        stageTransitionToFinished: () => {},
+        togglePlayerAliveStatus: () => {},
+        toggleVote: () => {},
+      };
+    },
+  };
+};
