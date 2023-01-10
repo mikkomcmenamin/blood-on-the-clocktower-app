@@ -270,7 +270,7 @@ function App() {
         onModifyPlayers={actions.modifyPlayers}
         onCancelNomination={
           actions.if(
-            playerContextMenuToggle.isOpen && nomination.state !== "inactive"
+            !playerContextMenuToggle.isOpen && nomination.state !== "inactive"
           ).cancelNomination
         }
         onToggleContextMenu={(playerId: number, open: boolean) => {
