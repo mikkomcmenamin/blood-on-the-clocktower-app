@@ -3,8 +3,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 3rem;
   width: 100%;
+  text-align: center;
 }
 
 .playerButton {
@@ -44,12 +45,19 @@ h2 {
   font-size: 1.5rem;
 }
 
-form {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+.noPlayers {
+  font-style: italic;
+  font-size: 1rem;
+}
+
+.addPlayerForm {
+  form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+  }
 }
 
 .buttons {

@@ -28,7 +28,7 @@ import InfoPanel from "./components/InfoPanel";
 import VideoAnimation from "./components/VideoAnimation";
 import NightToDay from "./assets/V_NightToDay.webm";
 import DayToNight from "./assets/V_DayToNight.webm";
-import AddPlayerModal from "./components/Player/AddPlayerModal";
+import PlayerSetupMenuModal from "./components/Menu/PlayerSetupMenuModal";
 import PlayerContextMenuModal from "./components/Player/PlayerContextMenuModal";
 import VotingRoundModal, {
   VotingRoundState,
@@ -88,13 +88,13 @@ function App() {
   const votingRoundToggle = useToggleWithExtraData<VotingRoundState>({
     isOpen: false,
   });
-  const addPlayerModalToggle = useToggle(false);
+  const playerSetupMenuModalToggle = useToggle(false);
   const editionModalToggle = useToggle(false);
 
   const contextMenuRef = useRef<HTMLDivElement>(null);
   useClickOutside(contextMenuRef, playerContextMenuToggle.close);
   const addPlayerModalRef = useRef<HTMLDivElement>(null);
-  useClickOutside(addPlayerModalRef, addPlayerModalToggle.close);
+  useClickOutside(addPlayerModalRef, playerSetupMenuModalToggle.close);
   const votingRoundModalRef = useRef<HTMLDivElement>(null);
   useClickOutside(
     votingRoundModalRef,
@@ -108,9 +108,9 @@ function App() {
   const addPlayer = useCallback(
     (name: string) => {
       actions.addPlayer(createSetupStagePlayer(name, game.players));
-      addPlayerModalToggle.close();
+      playerSetupMenuModalToggle.close();
     },
-    [actions, addPlayerModalToggle, game.players]
+    [actions, playerSetupMenuModalToggle, game.players]
   );
 
   // set voting round state if storyteller mode is on and active nomination has just been set
@@ -160,9 +160,9 @@ function App() {
       // but only when command key is not pressed
       if (e.key === "+" || e.key === " ") {
         if (e.metaKey) return;
-        if (isSetup(game) && !addPlayerModalToggle.isOpen) {
+        if (isSetup(game) && !playerSetupMenuModalToggle.isOpen) {
           e.preventDefault();
-          addPlayerModalToggle.open();
+          playerSetupMenuModalToggle.open();
         }
       }
       // close the modal when pressing the "Escape" key
@@ -170,7 +170,7 @@ function App() {
       if (e.key === "Escape") {
         e.preventDefault();
         if (isSetup(game)) {
-          addPlayerModalToggle.close();
+          playerSetupMenuModalToggle.close();
           editionModalToggle.close();
         }
 
@@ -199,7 +199,13 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [addPlayerModalToggle, editionModalToggle, game, actions, addPlayer]);
+  }, [
+    playerSetupMenuModalToggle,
+    editionModalToggle,
+    game,
+    actions,
+    addPlayer,
+  ]);
 
   function handleNomination(playerId: number) {
     if (!isDay(game)) return;
@@ -282,20 +288,17 @@ function App() {
             playerContextMenuToggle.close();
           }
         }}
-        onAddPlayerButtonClick={addPlayerModalToggle.open}
+        onAddPlayerButtonClick={playerSetupMenuModalToggle.open}
       />
 
       <Menu
         votingRoundOngoing={votingRoundToggle.isOpen}
         onStartVotingRound={startVotingRound}
         onChooseEditionClick={editionModalToggle.open}
+        onOpenPlayerSetupMenu={playerSetupMenuModalToggle.open}
       />
-      {addPlayerModalToggle.isOpen && (
-        <AddPlayerModal
-          onClose={addPlayerModalToggle.close}
-          addPlayer={addPlayer}
-          modalRef={addPlayerModalRef}
-        />
+      {playerSetupMenuModalToggle.isOpen && (
+        <PlayerSetupMenuModal onClose={playerSetupMenuModalToggle.close} />
       )}
       {playerContextMenuToggle.isOpen && (
         <PlayerContextMenuModal

@@ -132,8 +132,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             onClick={onAddPlayerButtonClick}
             className={styles.addPlayerInstruction}
           >
-            <p>Tap here to add a player.</p>
-            <p>Drag players to reorder them.</p>
+            <p>Tap here to manage players.</p>
             <p>Tap a player to edit them.</p>
           </div>
         )}

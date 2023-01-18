@@ -25,12 +25,14 @@ type Props = {
   votingRoundOngoing: boolean;
   onStartVotingRound: () => void;
   onChooseEditionClick: () => void;
+  onOpenPlayerSetupMenu: () => void;
 };
 
 const Menu: React.FC<Props> = ({
   votingRoundOngoing,
   onStartVotingRound,
   onChooseEditionClick,
+  onOpenPlayerSetupMenu,
 }) => {
   const game = useAtomValue(gameAtom);
   const actions = useAtomValue(actionsAtom);
@@ -90,6 +92,16 @@ const Menu: React.FC<Props> = ({
               }}
             >
               Randomize seats
+            </button>
+          )}
+          {game.stage === "setup" && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                onOpenPlayerSetupMenu();
+              }}
+            >
+              Player setup
             </button>
           )}
           {game.stage === "setup" && gameCanBeStarted(game) && (

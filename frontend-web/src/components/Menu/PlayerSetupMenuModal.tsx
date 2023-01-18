@@ -2,7 +2,7 @@ import { Reorder } from "framer-motion";
 import { useAtomValue } from "jotai";
 import { actionsAtom, gameAtom } from "../../atoms/gameAtoms";
 import Modal from "../Modal";
-import styles from "./ReorderPlayersModal.module.scss";
+import styles from "./PlayerSetupMenuModal.module.scss";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { createSetupStagePlayer } from "@common/model";
@@ -40,8 +40,8 @@ const ReorderPlayersModal = ({ onClose }: Props) => {
   return (
     <Modal onClose={onClose}>
       <div className={styles.container}>
-        <h4>Player setup menu</h4>
-        {game.players.length > 0 && (
+        <h2>Player setup menu</h2>
+        {game.players.length > 0 ? (
           <Reorder.Group
             style={{
               listStyleType: "none",
@@ -70,9 +70,13 @@ const ReorderPlayersModal = ({ onClose }: Props) => {
               </Reorder.Item>
             ))}
           </Reorder.Group>
+        ) : (
+          <div className={styles.noPlayers}>
+            <p>(no players)</p>
+          </div>
         )}
-        <div>
-          <h2>Add a new player</h2>
+        <div className={styles.addPlayerForm}>
+          <h4>Add a new player</h4>
           <form id="add-player-form" onSubmit={handleAddPlayer}>
             <input
               ref={playerInputRef}
