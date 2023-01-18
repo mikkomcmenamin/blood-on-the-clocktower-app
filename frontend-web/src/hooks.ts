@@ -325,10 +325,12 @@ type ToggleData<T> =
       data: T;
     };
 
+const IS_CLOSED = { isOpen: false } as const;
+
 export function useToggleWithExtraData<T>(initialValue: ToggleData<T>) {
   const [state, setValue] = useState(initialValue);
   const open = useCallback((data: T) => setValue({ isOpen: true, data }), []);
-  const close = useCallback(() => setValue({ isOpen: false }), []);
+  const close = useCallback(() => setValue(IS_CLOSED), []);
   const toggle = useCallback(
     (data: T) =>
       setValue((v) =>
